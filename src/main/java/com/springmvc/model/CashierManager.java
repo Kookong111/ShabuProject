@@ -1,5 +1,8 @@
 package com.springmvc.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -27,5 +30,25 @@ public class CashierManager {
             }
         }
         return user;  // คืนค่า user object ถ้าพบผู้ใช้
+    }
+    
+    public List<Reserve> getAllReserve() {
+        List<Reserve> list = new ArrayList<>();
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+
+            // ค้นหาเฉพาะพนักงานที่มี empUsername ขึ้นต้นด้วย "CUS"
+            list = session.createQuery("FROM Reserve", Reserve.class).list(); 
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close(); 
+            }
+        }
+        return list;
     }
 }

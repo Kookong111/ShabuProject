@@ -1,5 +1,7 @@
 package com.springmvc.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -7,6 +9,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.model.CashierManager;
 import com.springmvc.model.Employee;
+
+import com.springmvc.model.Reserve;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -37,5 +41,19 @@ public class ManageCashierController {
             mav.addObject("error", "Email หรือรหัสผ่านไม่ถูกต้อง");
             return mav;
         }
+    }
+    
+    @RequestMapping(value = "/listTableReserveForCashier", method = RequestMethod.GET) //*************ข้อมูลการจองโต๊ะ**********
+    public ModelAndView listTableForCashier(HttpSession session) {
+    	CashierManager manager = new CashierManager();
+        List<Reserve> cashier = manager.getAllReserve();
+        ModelAndView mav = new ModelAndView("listTableForCashier");
+
+        session.setAttribute("listable", cashier);
+        if (cashier.isEmpty()) {
+            mav.addObject("error_message", "ยังไม่มีการจอง");
+        }
+        mav.addObject("add_result2", "ทำรายการสำเร็จ");
+        return mav;
     }
 }
