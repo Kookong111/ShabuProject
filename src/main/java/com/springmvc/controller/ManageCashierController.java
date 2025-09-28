@@ -43,7 +43,7 @@ public class ManageCashierController {
         }
     }
     
-    @RequestMapping(value = "/listTableReserveForCashier", method = RequestMethod.GET) //*************ข้อมูลการจองโต๊ะ**********
+    @RequestMapping(value = "/listTableReserveForCashier", method = RequestMethod.POST) //*************ข้อมูลการจองโต๊ะ**********
     public ModelAndView listTableForCashier(HttpSession session) {
     	CashierManager manager = new CashierManager();
         List<Reserve> cashier = manager.getAllReserve();
@@ -55,5 +55,10 @@ public class ManageCashierController {
         }
         mav.addObject("add_result2", "ทำรายการสำเร็จ");
         return mav;
+    }
+    
+    @RequestMapping(value = "/homecashier", method = RequestMethod.GET)//***********กลับหน้าhome***************
+    public String homecer() {
+        return "welcomeCashier"; 
     }
 }

@@ -170,6 +170,21 @@
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
+        }
+
+        .status-badge.confirmed {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .status-badge.reserved {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            color: #c2410c;
+            border: 1px solid #fb923c;
+        }
+
+        .status-badge.default {
             background: linear-gradient(135deg, var(--light-purple) 0%, #ddd6fe 100%);
             color: var(--primary-purple);
             border: 1px solid var(--light-purple);
@@ -271,17 +286,19 @@
             transform: translateY(-2px);
         }
 
-        .confirm-btn {
-            background: linear-gradient(135deg, var(--very-light-purple) 0%, #e9d5ff 100%);
-            color: var(--primary-purple);
-            border-color: var(--light-purple);
+        .payment-btn.disabled {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #9ca3af;
+            border-color: #d1d5db;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
-        .confirm-btn:hover {
-            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
-            color: var(--white);
-            border-color: var(--primary-purple);
-            transform: translateY(-2px);
+        .payment-btn.disabled:hover {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #9ca3af;
+            border-color: #d1d5db;
+            transform: none;
         }
 
         /* Empty State */
@@ -386,10 +403,6 @@
                 gap: 0.5rem;
             }
 
-            .card-actions .confirm-btn {
-                grid-column: span 2;
-            }
-
             .card-header {
                 flex-direction: column;
                 gap: 1rem;
@@ -427,6 +440,7 @@
 </head>
 
 <body>
+
     <div class="main-container">
         <!-- Header Section -->
         <div class="header-section">
@@ -446,7 +460,13 @@
                         <div class="table-number">
                             โต๊ะ ${item.tables.tableid}
                         </div>
-                        <div class="status-badge">${item.status}</div>
+                        <div class="status-badge 
+                            <c:choose>
+                                <c:when test='${item.status == "Confirm"}'>confirmed</c:when>
+                                <c:when test='${item.status == "Reserved"}'>reserved</c:when>
+                                <c:otherwise>default</c:otherwise>
+                            </c:choose>
+                        ">${item.status}</div>
                     </div>
                     
                     <div class="customer-info">
@@ -478,14 +498,20 @@
                             <i class="bi bi-pencil"></i>
                             แก้ไข
                         </a>
-                        <a href="#" onclick="confirmReservation('${item.reserveid}')" class="action-btn confirm-btn">
-                            <i class="bi bi-check-circle"></i>
-                            ยืนยันการจอง
-                        </a>
-                        <a href="#" onclick="processPayment('${item.reserveid}')" class="action-btn payment-btn">
-                            <i class="bi bi-credit-card"></i>
-                            ชำระเงิน
-                        </a>
+                        <c:choose>
+                            <c:when test='${item.status == "Confirm"}'>
+                                <a href="#" onclick="processPayment('${item.reserveid}')" class="action-btn payment-btn">
+                                    <i class="bi bi-credit-card"></i>
+                                    ชำระเงิน
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="action-btn payment-btn disabled" title="ต้องยืนยันการจองก่อนถึงจะสามารถชำระเงินได้">
+                                    <i class="bi bi-credit-card"></i>
+                                    ชำระเงิน
+                                </span>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </c:forEach>
@@ -507,30 +533,17 @@
 
         <!-- Footer -->
         <div class="footer-section">
-            <a href="home" class="back-link">
+            <a href="homecashier" class="back-link">
                 <i class="bi bi-house"></i>
                 กลับหน้าหลัก
             </a>
+            
         </div>
+        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function confirmReservation(reserveId) {
-            if (confirm('คุณต้องการยืนยันการจองนี้หรือไม่?')) {
-                fetch('confirmReservation', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'reserveId=' + encodeURIComponent(reserveId)
-                }).then(response => response.text())
-                  .then(() => location.reload())
-                  .catch(error => {
-                      console.error('Error:', error);
-                      alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
-                  });
-            }
-        }
-
         function processPayment(reserveId) {
             if (confirm('คุณต้องการดำเนินการชำระเงินสำหรับการจองนี้หรือไม่?')) {
                 fetch('processPayment', {
@@ -546,8 +559,18 @@
             }
         }
 
-        // เพิ่มเอฟเฟกต์ loading
+        // ป้องกันการคลิกปุ่มที่ถูกปิดใช้งาน
         document.addEventListener('DOMContentLoaded', function() {
+            const disabledButtons = document.querySelectorAll('.payment-btn.disabled');
+            disabledButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    alert('ไม่สามารถชำระเงินได้ กรุณายืนยันการจองก่อน');
+                });
+            });
+
+            // เพิ่มเอฟเฟกต์ loading
             const cards = document.querySelectorAll('.reservation-card');
             cards.forEach((card, index) => {
                 setTimeout(() => {
