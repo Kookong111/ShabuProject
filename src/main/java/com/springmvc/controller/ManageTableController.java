@@ -39,6 +39,10 @@ public class ManageTableController {
     public String gotoAddTable() {
         return "AddTable"; 
     }
+    @RequestMapping(value = "/gotowelcomeCustomer", method = RequestMethod.GET) //************ไปสู่หน้าAddTable*********
+    public String gotowellcomeCustomer() {
+        return "welcomeCustomer"; 
+    }
     
     
     @RequestMapping(value = "/Add_Table", method = RequestMethod.POST)  //***********AddTableร์************

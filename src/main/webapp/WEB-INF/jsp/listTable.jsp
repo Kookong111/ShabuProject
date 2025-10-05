@@ -396,6 +396,25 @@
                 margin-top: 24px;
             }
         }
+        .home-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 10px 18px;
+    border-radius: 50px;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+}
+
+.home-button:hover {
+    background: linear-gradient(135deg, var(--dark-purple), var(--primary-purple));
+    box-shadow: var(--shadow-medium);
+}
+        
     </style>
 </head>
 <body>
@@ -405,6 +424,7 @@
 
     <div class="container">
         <div class="header">
+        <a href="gotowelcomeCustomer" class="home-button">🏠 Home</a>
             <h1>Restaurant Table Management</h1>
             
         </div>
@@ -491,7 +511,8 @@
     </div>
 
     <script>
-        // Initialize page
+
+     // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             updateStats();
             initializeSearch();
