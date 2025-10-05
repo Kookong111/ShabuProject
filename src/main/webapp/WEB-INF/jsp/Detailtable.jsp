@@ -9,12 +9,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <style>
+<style>
     body {
         font-family: 'Poppins', sans-serif;
         margin: 0;
         padding: 40px;
-        /* พื้นหลังม่วงอ่อน */
         background: linear-gradient(135deg, #f3e8ff, #ede7f6);
         min-height: 100vh;
         display: flex;
@@ -26,10 +25,11 @@
         max-width: 600px;
         width: 100%;
         background: #fff;
-        padding: 35px 30px;
+        padding: 35px 30px 45px;
         border-radius: 20px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         animation: fadeIn 0.6s ease;
+        position: relative; /* ให้ปุ่ม Home อยู่ภายใน */
     }
 
     @keyframes fadeIn {
@@ -102,11 +102,35 @@
         cursor: not-allowed;
         box-shadow: none;
     }
+
+    /* ปุ่ม Home */
+    .home-button {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 50px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .home-button:hover {
+        background: linear-gradient(135deg, #8e44ad, #732d91);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    }
 </style>
 
 </head>
 <body>
     <div class="container">
+        <!-- ปุ่ม Home -->
+        <a href="gotoWellcomeCustomerT" class="home-button"><i class="fas fa-home"></i> Home</a>
+        
         <h1><i class="fas fa-chair"></i> Table Details</h1>
 
         <div class="detail-item">
@@ -138,7 +162,7 @@
                 </c:choose>
             </div>
         </div>
-
+		
         <c:choose>
             <c:when test="${table.status == 'Free'}">
                 <form action="reserveTable">

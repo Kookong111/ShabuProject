@@ -7,6 +7,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>การจองสำเร็จ - Restaurant</title>
+    <!-- ใช้ font awesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         * {
             margin: 0;
@@ -37,14 +40,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from {opacity: 0; transform: translateY(30px);}
+            to {opacity: 1; transform: translateY(0);}
         }
 
         .header {
@@ -61,15 +58,9 @@
         }
 
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-20px);
-            }
-            60% {
-                transform: translateY(-10px);
-            }
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
         }
 
         .header h1 {
@@ -170,6 +161,7 @@
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 20px;
         }
 
         .btn {
@@ -181,28 +173,9 @@
             font-size: 1.1em;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d, #495057);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-success {
@@ -216,19 +189,9 @@
         }
 
         @media (max-width: 768px) {
-            .detail-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .content {
-                padding: 25px;
-            }
+            .detail-row {flex-direction: column; align-items: flex-start; gap: 5px;}
+            .btn-group {flex-direction: column;}
+            .content {padding: 25px;}
         }
     </style>
 </head>
@@ -263,12 +226,10 @@
 
             <div class="reservation-details">
                 <h3 style="color: #28a745; margin-bottom: 20px; text-align: center;">📋 รายละเอียดการจอง</h3>
-                
                 <div class="detail-row">
                     <span class="detail-label">🏷️ หมายเลขโต๊ะ:</span>
                     <span class="detail-value">${reservation.tables.tableid}</span>
                 </div>
-                
                 <div class="detail-row">
                     <span class="detail-label">📅 วันที่จอง:</span>
                     <span class="detail-value">
@@ -276,22 +237,18 @@
                         ${formattedDate}
                     </span>
                 </div>
-                
                 <div class="detail-row">
                     <span class="detail-label">🕐 เวลาจอง:</span>
                     <span class="detail-value">${reservation.reservetime} น.</span>
                 </div>
-                
                 <div class="detail-row">
                     <span class="detail-label">👥 จำนวนผู้ใช้บริการ:</span>
                     <span class="detail-value">${reservation.numberOfGuests} คน</span>
                 </div>
-                
                 <div class="detail-row">
                     <span class="detail-label">🪑 ความจุโต๊ะ:</span>
                     <span class="detail-value">${reservation.tables.capacity} ที่นั่ง</span>
                 </div>
-                
                 <div class="detail-row">
                     <span class="detail-label">📊 สถานะ:</span>
                     <span class="detail-value" style="color: #28a745; font-weight: bold;">${reservation.status}</span>
@@ -302,4 +259,17 @@
                 <h4>⚠️ ข้อมูลสำคัญ</h4>
                 <ul>
                     <li>กรุณามาถึงร้านก่อนเวลาจอง 15 นาที</li>
-                    <li>หากมาสายเกิน 15 นาที การจองอาจถูกยกเลิก</li>
+                    <li>หากมาสายเกิน 20 นาที การจองอาจถูกยกเลิก</li>
+                </ul>
+            </div>
+
+            <!-- ปุ่ม Action -->
+            <div class="btn-group">
+                <a href="gotoWellcomeCustomerT" class="btn btn-success">
+                    <i class="fas fa-home"></i> กลับหน้าหลัก
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

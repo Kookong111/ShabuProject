@@ -353,25 +353,97 @@
         </div>
     </div>
 
-    <script>
-        // ตั้งค่าวันที่ขั้นต่ำเป็นวันนี้
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            const dateInput = document.getElementById('reservationDate');
-            dateInput.min = tomorrow.toISOString().split('T')[0];
-            
-            // ตั้งค่าวันที่สูงสุด (30 วันข้างหน้า)
-            const maxDate = new Date(today);
-            maxDate.setDate(maxDate.getDate() + 30);
-            dateInput.max = maxDate.toISOString().split('T')[0];
-        });
+   <script>
+    // แทนที่สคริปต์เดิมด้วยอันนี้ทั้งหมด
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('reservationDate');
+        const timeSelect = document.getElementById('reservationTime');
 
+        // ค่า server-side ที่ต้องการใช้งานใน JS
+        const maxCapacity = ${selectedTable.capacity}; // เป็นตัวเลข
+        const tableId = '${selectedTable.tableid}'; // ใช้ใน confirm message
+
+        // ตั้งค่าวันที่ขั้นต่ำเป็นวันนี้ (อนุญาตจองวันนี้ แต่ต้องเป็นเวลาข้างหน้า)
+        const now = new Date();
+        const todayIso = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                          .toISOString().split('T')[0];
+        dateInput.min = todayIso;
+
+        // ตั้งค่าวันที่สูงสุด (2 วันข้างหน้า)
+        const maxDate = new Date(now);
+        maxDate.setDate(maxDate.getDate() + 2);
+        dateInput.max = maxDate.toISOString().split('T')[0];
+
+        // ฟังก์ชันช่วย: ปรับสถานะตัวเลือกเวลาเมื่อเลือกวันเป็น "วันนี้" หรือวันอื่น
+        function updateTimeOptionsDisablePast() {
+            const selectedDateStr = dateInput.value;
+            if (!selectedDateStr) {
+                // ถ้ายังไม่เลือกวัน ให้เปิดตัวเลือกทั้งหมด (ยกเลิก disabled)
+                for (let opt of timeSelect.options) opt.disabled = false;
+                return;
+            }
+
+            const selectedDate = new Date(selectedDateStr);
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            // ถ้าเลือกวันนี้ ให้ปิดตัวเลือกเวลาที่ผ่านไปแล้ว
+            if (selectedDate.getTime() === today.getTime()) {
+                const current = new Date(); // เวลาปัจจุบันจริง
+                for (let i = 0; i < timeSelect.options.length; i++) {
+                    const opt = timeSelect.options[i];
+                    if (!opt.value) { // ตัวเลือก placeholder
+                        opt.disabled = false;
+                        continue;
+                    }
+                    // สร้าง Date object สำหรับเวลาที่เลือก (บนวันที่ที่เลือก)
+                    const [h, m] = opt.value.split(':').map(Number);
+                    const optDate = new Date(selectedDate);
+                    optDate.setHours(h, m, 0, 0);
+
+                    // ถ้าเวลาในอดีตหรือเท่ากับตอนนี้ -> disabled
+                    if (optDate <= current) {
+                        opt.disabled = true;
+                    } else {
+                        opt.disabled = false;
+                    }
+                }
+            } else {
+                // ถ้าไม่ใช่วันนี้ (วันถัดไป/2 วันข้างหน้า) ให้เปิดทุกตัวเลือก
+                for (let opt of timeSelect.options) opt.disabled = false;
+            }
+        }
+
+        // เรียกครั้งแรก (กรณี dateInput มีค่า preload)
+        updateTimeOptionsDisablePast();
+
+        // อัพเดตตัวเลือกเวลาเมื่อผู้ใช้เปลี่ยนวันที่
+        dateInput.addEventListener('change', updateTimeOptionsDisablePast);
+
+        // เพิ่ม animation เมื่อโหลดหน้า
+        const container = document.querySelector('.container');
+        container.style.transform = 'translateY(20px)';
+        container.style.opacity = '0';
+
+        setTimeout(() => {
+            container.style.transition = 'all 0.5s ease';
+            container.style.transform = 'translateY(0)';
+            container.style.opacity = '1';
+        }, 100);
+
+        // ติดตั้งการ validate ก่อน submit
+        const form = document.querySelector('form[action="confirmReservation"]');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // ฟังก์ชัน validate เดียว ทำหน้าที่ครบถ้วน
         function validateForm() {
-            const date = document.getElementById('reservationDate').value;
-            const time = document.getElementById('reservationTime').value;
+            const date = dateInput.value;
+            const time = timeSelect.value;
             const guests = document.getElementById('numberOfGuests').value;
 
             if (!date || !time || !guests) {
@@ -379,57 +451,48 @@
                 return false;
             }
 
-            // ตรวจสอบว่าวันที่เลือกไม่ใช่วันที่ผ่านมาแล้ว
-            const selectedDate = new Date(date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            if (selectedDate <= today) {
-                alert('กรุณาเลือกวันที่ในอนาคต');
-                return false;
-            }
-
-            // ตรวจสอบจำนวนผู้ใช้บริการไม่เกินความจุของโต๊ะ
-            const maxCapacity = ${selectedTable.capacity};
-            if (parseInt(guests) > maxCapacity) {
+            // ตรวจสอบจำนวนไม่เกินความจุของโต๊ะ
+            if (parseInt(guests) > parseInt(maxCapacity, 10)) {
                 alert('จำนวนผู้ใช้บริการเกินความจุของโต๊ะ (สูงสุด ' + maxCapacity + ' คน)');
                 return false;
             }
 
-            // ยืนยันการจอง
+            // สร้าง DateTime ที่ถูกเลือก
+            const [hour, minute] = time.split(":").map(Number);
+            const selectedDate = new Date(date);
+            selectedDate.setHours(hour, minute, 0, 0);
+
+            const nowReal = new Date();
+
+            // ถ้าวันที่เป็นวันนี้หรือวันก่อน ตรวจสอบเวลาให้แน่นอน
+            if (selectedDate <= nowReal) {
+                alert('ไม่สามารถจองเวลาที่ผ่านมาแล้วได้ กรุณาเลือกเวลาในอนาคต');
+                return false;
+            }
+
+            // ยืนยันการจอง (show confirmation)
             const confirmation = confirm(
-                'ยืนยันการจองโต๊ะ ${selectedTable.tableid}\n' +
+                'ยืนยันการจองโต๊ะ ' + tableId + '\n' +
                 'วันที่: ' + formatDate(date) + '\n' +
                 'เวลา: ' + time + '\n' +
                 'จำนวนคน: ' + guests + ' คน'
             );
-            
+
             return confirmation;
         }
 
         function formatDate(dateStr) {
             const date = new Date(dateStr);
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
+            const options = {
+                year: 'numeric',
+                month: 'long',
                 day: 'numeric',
                 weekday: 'long'
             };
             return date.toLocaleDateString('th-TH', options);
         }
+    });
+</script>
 
-        // เพิ่ม animation เมื่อโหลดหน้า
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.querySelector('.container');
-            container.style.transform = 'translateY(20px)';
-            container.style.opacity = '0';
-            
-            setTimeout(() => {
-                container.style.transition = 'all 0.5s ease';
-                container.style.transform = 'translateY(0)';
-                container.style.opacity = '1';
-            }, 100);
-        });
-    </script>
 </body>
 </html>
