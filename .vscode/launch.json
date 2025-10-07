@@ -6,7 +6,8 @@
       "name": "Attach to Tomcat (no prelaunch)",
       "request": "attach",
       "hostName": "localhost",
-      "port": 8000
+      "port": 8000,
+      "projectName": "Zproject_shabu2"
     },
     {
       "type": "java",
@@ -14,7 +15,8 @@
       "request": "attach",
       "hostName": "localhost",
       "port": 8000,
-      "preLaunchTask": "dev: build and up"
+      "preLaunchTask": "dev: build and up",
+      "projectName": "Zproject_shabu2"
     },
     {
       "type": "chrome",
