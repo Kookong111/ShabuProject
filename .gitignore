@@ -1,0 +1,41 @@
+### Maven / Java
+/target/
+*.class
+*.jar
+*.war
+*.ear
+
+### Eclipse / IntelliJ / VS Code
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+.vscode/
+
+### Logs
+.log
+logs/
+
+### OS files
+Thumbs.db
+.DS_Store
+
+### Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+### Docker
+docker-compose.override.yml
+docker-compose.*.yml
+**/docker/*.log
+
+### Temporary files
+*.tmp
+*.bak
+*~
+
+### Sensitive files (do not commit)
+env.properties
+application-local.properties
+application-*.secret
+
