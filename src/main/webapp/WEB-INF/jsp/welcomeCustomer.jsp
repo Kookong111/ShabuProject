@@ -591,7 +591,7 @@
             <a href="#" class="logo">ShaBu</a>
             <ul class="nav-menu">
                 <li><a href="loginCustomer" class="active">Home</a></li>
-                <li><a href="reserve&listTable">Reserve</a></li>
+                
                 <li><a href="menurecomand">Menu</a></li>
                 <li><a href="listTable">Table</a></li>
                 <li><a href="<c:url value='/contact' />">Contact</a></li>
@@ -620,9 +620,7 @@
             <p class="hero-description">
                 เสพความอร่อยแบบญี่ปุ่นแท้ ด้วยชาบูพรีเมียม วัตถุดิบสด ๆ คุณภาพเยี่ยม 
                 ในบรรยากาศอบอุ่นที่จะทำให้ทุกมื้ออาหารเป็นประสบการณ์พิเศษ
-                <form action="myReservess" method="post">
-    	<button>กดดดดดดดดดดดดดดด</button>
-    </form>
+               
             </p>
             
             <div class="hero-buttons">
