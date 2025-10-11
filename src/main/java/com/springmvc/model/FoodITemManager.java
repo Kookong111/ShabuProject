@@ -143,6 +143,26 @@ public class FoodITemManager {
         }
     }
     
+    public boolean insertMenuFood(MenuFood menu) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            // บันทึกผู้ใช้ลงในฐานข้อมูล
+            session.saveOrUpdate(menu);
+            session.getTransaction().commit();
+            return true;  // ถ้าบันทึกสำเร็จ return true
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;  // ถ้าบันทึกไม่สำเร็จ return false
+}
+    
     
 
 }

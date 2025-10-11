@@ -38,7 +38,7 @@ public class ManagerController {
     }
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String rolelogin() {
-        return "rolelogin"; 
+        return "loginManager"; 
     }
     
     @RequestMapping(value = "/RoleManager", method = RequestMethod.POST)
@@ -70,7 +70,7 @@ public class ManagerController {
     
     @RequestMapping(value = "/logoutmanager", method = RequestMethod.GET) //**********ออกจากระบบ************
     public String logoutmanager() {
-        return "rolelogin"; 
+        return "loginManager"; 
     }
     
     @RequestMapping(value = "/backmain", method = RequestMethod.GET)//************กลับสู่หน้าจัดการพนักงาน************

@@ -174,7 +174,7 @@
         <hr>
 
         <div class="form-links">
-            <a href="backmain"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
+            <a href="listwaiter"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
         </div>
     </div>
 
