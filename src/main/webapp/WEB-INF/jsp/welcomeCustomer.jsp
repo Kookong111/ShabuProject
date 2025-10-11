@@ -590,7 +590,7 @@
         <div class="nav-container">
             <a href="#" class="logo">ShaBu</a>
             <ul class="nav-menu">
-                <li><a href="loginCustomer" class="active">Home</a></li>
+                <li><a href="gotowelcomeCustomer" class="active">Home</a></li>
                 
                 <li><a href="menurecomand">Menu</a></li>
                 <li><a href="listTable">Table</a></li>
