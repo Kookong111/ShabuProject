@@ -22,6 +22,7 @@ import com.springmvc.model.MenuFood;
 import com.springmvc.model.MenufoodManager;
 import com.springmvc.model.Reserve;
 import com.springmvc.model.ReserveManager;
+import com.springmvc.model.TableManager;
 import com.springmvc.model.Tables;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -117,7 +118,7 @@ public class CustomerController {
     @RequestMapping(value = "/viewmenu", method = RequestMethod.GET)
     public ModelAndView viewMenuFood() {
         FoodITemManager foodManager = new FoodITemManager();
-        LoginManager tables = new LoginManager();
+        TableManager tables = new TableManager();
         List<MenuFood> menuList = foodManager.getAllFoodItem();
         List<FoodType> foodTypeList = foodManager.getAllFoodTypes();
         List<Tables> tablee = tables.getAllTable();
@@ -209,7 +210,7 @@ public class CustomerController {
     
     @RequestMapping(value = "/getdetailTable", method = RequestMethod.GET)
     public ModelAndView geteditTable(HttpServletRequest request) {
-        LoginManager rm = new LoginManager();
+    	TableManager rm = new TableManager();
         Tables r = null; 
         
         try {
@@ -226,7 +227,7 @@ public class CustomerController {
 
     @RequestMapping(value = "/reserveTable", method = RequestMethod.GET)
     public ModelAndView reserveTable(HttpServletRequest request, HttpSession session) {
-        LoginManager rm = new LoginManager();
+    	TableManager rm = new TableManager();
         Tables selectedTable = null;
         
         try {
@@ -333,14 +334,14 @@ public class CustomerController {
                 mav.addObject("user", user);
                 
                 // ดึงข้อมูลโต๊ะเพื่อแสดงในหน้าผลลัพธ์
-                LoginManager lm = new LoginManager();
+                TableManager lm = new TableManager();
                 Tables table1 = lm.getTableById(tableid);
                 mav.addObject("table", table1);
                 
                 return mav;
             } else {
                 // หากบันทึกไม่สำเร็จ
-                LoginManager lm = new LoginManager();
+            	TableManager lm = new TableManager();
                 Tables selectedTable = lm.getTableById(tableid);
                 
                 ModelAndView mav = new ModelAndView("reservetable");
@@ -394,7 +395,15 @@ public class CustomerController {
     public String myReservationss() {
         return "myReverve"; 
     }
-
+    
+    @RequestMapping(value = "/gotoContact", method = RequestMethod.GET)
+    public String contact() {
+        return "conTact"; 
+    }
+    @RequestMapping(value = "/logoutCustomer", method = RequestMethod.GET)
+    public String logoutCustomer() {
+        return "Homecustomer"; 
+    }
    
 
     

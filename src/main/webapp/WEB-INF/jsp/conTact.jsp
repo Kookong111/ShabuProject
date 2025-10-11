@@ -410,7 +410,7 @@
 <body>
     <div class="header-bar">
         <div class="header-content">
-            <a href="Homecustomer" class="back-link">
+            <a href="gotowelcomeCustomer" class="back-link">
                 <i class="fas fa-arrow-left"></i>
                 <span>กลับหน้าหลัก</span>
             </a>
@@ -431,7 +431,7 @@
                     </div>
                     <div class="info-content">
                         <h3>ที่อยู่</h3>
-                        <p>123 ถนนตัวอย่าง แขวงตัวอย่าง<br>เขตตัวอย่าง กรุงเทพมหานคร 10110</p>
+                        <p>มหาวิทยาลัยแม่โจ้<br>63 หมู่ 4 ต.หนองหาร อ.สันทราย จ.เชียงใหม่ 50290</p>
                     </div>
                 </div>
 
@@ -441,17 +441,7 @@
                     </div>
                     <div class="info-content">
                         <h3>เบอร์โทรศัพท์</h3>
-                        <p>02-123-4567<br>081-234-5678</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3>อีเมล</h3>
-                        <p>info@restaurant.com<br>contact@restaurant.com</p>
+                        <p>053-873-000<br>053-873-111</p>
                     </div>
                 </div>
 
@@ -471,7 +461,7 @@
                 <h2 class="section-title">ติดตามเราได้ที่</h2>
                 
                 <div class="social-grid">
-                    <a href="https://www.facebook.com/" target="_blank" class="social-link facebook">
+                    <a href="https://www.facebook.com/kongpop.janjongkam?locale=th_TH" target="_blank" class="social-link facebook">
                         <div class="social-icon">
                             <i class="fab fa-facebook-f"></i>
                         </div>
@@ -493,7 +483,7 @@
                         <span class="arrow">→</span>
                     </a>
 
-                    <a href="https://discord.gg/" target="_blank" class="social-link discord">
+                    <a href="https://discord.com/users/967454876923756564" target="_blank" class="social-link discord">
                         <div class="social-icon">
                             <i class="fab fa-discord"></i>
                         </div>
@@ -512,7 +502,7 @@
             <h2 class="section-title">แผนที่และการเดินทาง</h2>
             <div class="map-container">
                 <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.5908419185897!2d100.5237!3d13.7465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ0JzQ3LjQiTiAxMDDCsDMxJzI1LjMiRQ!5e0!3m2!1sth!2sth!4v1234567890"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3776.3928445558436!2d99.0017!3d18.8919!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30da3a9a271a8e8d%3A0x43c3528e6fe0070!2z4Lih4Lir4Liy4Lin4Li04LiX4Lii4Liy4Lil4Lix4Lii4LmB4Lih4LmI4LmC4LiI4LmJ!5e0!3m2!1sth!2sth!4v1234567890"
                     width="100%" 
                     height="100%" 
                     style="border:0; border-radius: 16px;" 
