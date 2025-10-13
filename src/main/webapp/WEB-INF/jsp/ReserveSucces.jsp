@@ -265,7 +265,7 @@
 
             <!-- ปุ่ม Action -->
             <div class="btn-group">
-                <a href="gotoWellcomeCustomerT" class="btn btn-success">
+                <a href="listTable" class="btn btn-success">
                     <i class="fas fa-home"></i> กลับหน้าหลัก
                 </a>
             </div>

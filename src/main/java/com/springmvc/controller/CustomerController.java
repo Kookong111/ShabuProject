@@ -266,120 +266,123 @@ public class CustomerController {
     @RequestMapping(value = "/confirmReservation", method = RequestMethod.POST)
     public ModelAndView confirmReservation(HttpServletRequest request, HttpSession session) {
         ReserveManager reserveManager = new ReserveManager();
-        
+
         try {
-            // ตรวจสอบว่าผู้ใช้ล็อกอินแล้วหรือไม่
+            // ✅ ตรวจสอบว่าผู้ใช้ล็อกอินแล้วหรือยัง
             Customer user = (Customer) session.getAttribute("user");
             if (user == null) {
                 ModelAndView mav = new ModelAndView("loginCustomer");
                 mav.addObject("error", "กรุณาเข้าสู่ระบบก่อนทำการจองโต๊ะ");
                 return mav;
             }
-            
-            // ดึงข้อมูลจากฟอร์ม
+
+            // ✅ ดึงค่าจากฟอร์ม
             String tableid = request.getParameter("tableid");
             String reservationDateStr = request.getParameter("reservationDate");
             String reservationTime = request.getParameter("reservationTime");
             String numberOfGuestsStr = request.getParameter("numberOfGuests");
-            
-            // Validate input
+
+            // ✅ ตรวจสอบค่าว่าง
             if (tableid == null || reservationDateStr == null || reservationTime == null || numberOfGuestsStr == null ||
-                tableid.trim().isEmpty() || reservationDateStr.trim().isEmpty() || 
+                tableid.trim().isEmpty() || reservationDateStr.trim().isEmpty() ||
                 reservationTime.trim().isEmpty() || numberOfGuestsStr.trim().isEmpty()) {
-                
-                // กลับไปหน้าจองพร้อมข้อความแสดงข้อผิดพลาด
+
                 Tables selectedTable = reserveManager.getTableById(tableid);
-                
                 ModelAndView mav = new ModelAndView("reservetable");
                 mav.addObject("selectedTable", selectedTable != null ? selectedTable : new Tables());
                 mav.addObject("user", user);
                 mav.addObject("error", "กรุณากรอกข้อมูลให้ครบถ้วน");
                 return mav;
             }
-            
-            // แปลงข้อมูล
+
+            // ✅ แปลงข้อมูล
             Date reservationDate = java.sql.Date.valueOf(reservationDateStr);
             Integer numberOfGuests = Integer.parseInt(numberOfGuestsStr);
-            
-            
-            
-            // ดึงข้อมูลโต๊ะและลูกค้าจากฐานข้อมูล
+
+            // ✅ ดึงข้อมูลโต๊ะและลูกค้าจากฐานข้อมูล
             Tables table = reserveManager.getTableById(tableid);
             Customer customer = reserveManager.getCustomerById(user.getCusId());
-            
+
             if (table == null || customer == null) {
                 ModelAndView mav = new ModelAndView("reservetable");
                 mav.addObject("error", "ไม่พบข้อมูลโต๊ะหรือลูกค้า");
                 return mav;
             }
-            
-            // สร้าง Reserve object
+
+            // ✅ สร้างอ็อบเจ็กต์ Reserve
             Reserve reservation = new Reserve();
             reservation.setNumberOfGuests(numberOfGuests);
             reservation.setReservedate(reservationDate);
             reservation.setReservetime(reservationTime);
             reservation.setStatus("confirm");
             reservation.setCustomers(customer);
-            reservation.setTables(table);	
-            
-            
-            
-            // บันทึกข้อมูลการจอง และรับ ID ที่ถูกสร้างใหม่
+            reservation.setTables(table);
+
+            // ✅ บันทึกข้อมูลการจอง
             boolean reserveId = reserveManager.insertReservation(reservation);
-            
+
             if (reserveId) {
-                // หากบันทึกสำเร็จ ไปหน้าแสดงผลการจองสำเร็จ
+                // ✅ เพิ่มส่วนนี้: อัปเดตสถานะโต๊ะให้เป็น "Reserved"
+                TableManager tableManager = new TableManager();
+                boolean updated = tableManager.updateStatusToReserved(tableid);
+                if (!updated) {
+                    System.out.println("⚠️ ไม่สามารถอัปเดตสถานะโต๊ะได้ tableId = " + tableid);
+                }
+
+                // ✅ หากบันทึกสำเร็จ ไปหน้าแสดงผลการจองสำเร็จ
                 ModelAndView mav = new ModelAndView("ReserveSucces");
-                mav.addObject("reservation", reservation);	
+                mav.addObject("reservation", reservation);
                 mav.addObject("user", user);
-                
-                // ดึงข้อมูลโต๊ะเพื่อแสดงในหน้าผลลัพธ์
+
+                // ดึงข้อมูลโต๊ะเพื่อแสดงผล
                 TableManager lm = new TableManager();
                 Tables table1 = lm.getTableById(tableid);
                 mav.addObject("table", table1);
-                
+
                 return mav;
             } else {
-                // หากบันทึกไม่สำเร็จ
-            	TableManager lm = new TableManager();
+                // ❌ หากบันทึกไม่สำเร็จ
+                TableManager lm = new TableManager();
                 Tables selectedTable = lm.getTableById(tableid);
-                
+
                 ModelAndView mav = new ModelAndView("reservetable");
                 mav.addObject("selectedTable", selectedTable != null ? selectedTable : new Tables());
                 mav.addObject("user", user);
                 mav.addObject("error", "เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
                 return mav;
             }
-            
+
         } catch (NumberFormatException e) {
-            // Error parsing number
+            // ❌ แปลงตัวเลขไม่ได้
             String tableid = request.getParameter("tableid");
             Customer user = (Customer) session.getAttribute("user");
             Tables selectedTable = reserveManager.getTableById(tableid);
-            
+
             ModelAndView mav = new ModelAndView("reservetable");
             mav.addObject("selectedTable", selectedTable != null ? selectedTable : new Tables());
             mav.addObject("user", user);
             mav.addObject("error", "ข้อมูลจำนวนผู้ใช้บริการไม่ถูกต้อง");
             return mav;
+
         } catch (IllegalArgumentException e) {
-            // Error parsing date
+            // ❌ รูปแบบวันที่ผิด
             String tableid = request.getParameter("tableid");
             Customer user = (Customer) session.getAttribute("user");
             Tables selectedTable = reserveManager.getTableById(tableid);
-            
+
             ModelAndView mav = new ModelAndView("reservetable");
             mav.addObject("selectedTable", selectedTable != null ? selectedTable : new Tables());
             mav.addObject("user", user);
             mav.addObject("error", "รูปแบบวันที่ไม่ถูกต้อง");
             return mav;
+
         } catch (Exception e) {
-            // General error
+            // ❌ ข้อผิดพลาดทั่วไป
             e.printStackTrace();
             String tableid = request.getParameter("tableid");
             Customer user = (Customer) session.getAttribute("user");
             Tables selectedTable = reserveManager.getTableById(tableid);
-            
+
             ModelAndView mav = new ModelAndView("reservetable");
             mav.addObject("selectedTable", selectedTable != null ? selectedTable : new Tables());
             mav.addObject("user", user);

@@ -1,5 +1,6 @@
 package com.springmvc.model;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,4 +96,38 @@ public class TableManager {
             return false;
         }
     }
+    
+    public boolean updateStatusToReserved(String tableId) {
+        SessionFactory sessionFactory = null;
+        Session session = null;
+        try {
+            sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            // ดึงข้อมูลโต๊ะที่ต้องการอัปเดต
+            Tables table = (Tables) session.get(Tables.class, tableId);
+            if (table != null) {
+                table.setStatus("Already reserved"); // เปลี่ยนสถานะโต๊ะ
+                session.update(table);       // อัปเดตลงฐานข้อมูล
+                session.getTransaction().commit();
+                return true;
+            } else {
+                System.out.println("ไม่พบข้อมูลโต๊ะที่ต้องการอัปเดต: " + tableId);
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback(); // ย้อนกลับถ้ามี error
+            }
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+
 }
