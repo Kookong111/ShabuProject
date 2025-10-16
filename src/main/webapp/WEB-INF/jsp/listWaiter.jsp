@@ -8,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายชื่อพนักงานแคชเชียร์</title>
+    <title>รายชื่อพนักงานเสริฟ์</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -279,7 +279,7 @@
                 <h2><i class="bi bi-cash-stack me-3"></i>รายชื่อพนักงานเสริฟ์</h2>
                 <p class="employee-count">จำนวนพนักงานเสริฟ์: ${listl2.size()} คน</p>
             </div>
-            <a href="gotoAddcashier" class="add-btn">
+            <a href="gotoAddwaiter" class="add-btn">
                 <i class="bi bi-plus-lg"></i>
             </a>
         </div>
@@ -306,12 +306,12 @@
                             <td class="employee-position">${item.position}</td>
                             <td>${item.age}</td>
                             <td>
-                                <a href="geteditcashier?empUsername=${item.empUsername}" class="action-btn edit-btn">
+                                <a href="geteditWaiter?empUsername=${item.empUsername}" class="action-btn edit-btn">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                             </td>
                             <td>
-                                <a href="#" onclick="deleteEmployeeCashier('${item.empUsername}')" class="action-btn delete-btn">
+                                <a href="#" onclick="deleteEmployeeWaiter('${item.empUsername}')" class="action-btn delete-btn">
                                     <i class="bi bi-trash3-fill"></i>
                                 </a>
                             </td>

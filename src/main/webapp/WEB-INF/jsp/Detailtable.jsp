@@ -129,7 +129,7 @@
 <body>
     <div class="container">
         <!-- ปุ่ม Home -->
-        <a href="gotoWellcomeCustomerT" class="home-button"><i class="fas fa-home"></i> Home</a>
+        <a href="listTable" class="home-button"><i class="fas fa-home"></i> Home</a>
         
         <h1><i class="fas fa-chair"></i> Table Details</h1>
 
