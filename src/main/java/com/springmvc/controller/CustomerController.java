@@ -7,14 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.springmvc.model.Customer;
 import com.springmvc.model.CustomerRegisterManager;
-
 import com.springmvc.model.FoodITemManager;
 import com.springmvc.model.FoodType;
 import com.springmvc.model.LoginManager;
@@ -130,30 +133,67 @@ public class CustomerController {
         return mav;
     }
     
+    /**
+     * เมธอดที่ถูกแก้ไขเพื่อรองรับ AJAX:
+     * - ใช้ @ResponseBody เพื่อส่ง JSON กลับไป
+     * - ใช้ ResponseEntity เพื่อควบคุม HTTP Status Code
+     */
     @RequestMapping(value = "/updateQuantity", method = RequestMethod.POST)
-    public String updateQuantity(HttpServletRequest request, HttpSession session) {
-        String foodId = request.getParameter("foodId");
-        String action = request.getParameter("action");
+    @ResponseBody 
+    public ResponseEntity<Map<String, Object>> updateQuantity(
+            @RequestParam("foodId") String foodId,
+            @RequestParam("action") String action,
+            HttpSession session) {
 
         Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
         if (cart == null) {
             cart = new HashMap<>();
         }
 
-        int id = Integer.parseInt(foodId);
-        int currentQty = cart.getOrDefault(id, 0);
+        try {
+            int id = Integer.parseInt(foodId);
+            int currentQty = cart.getOrDefault(id, 0);
+            int newQty = currentQty;
 
-        if ("increase".equals(action)) {
-            cart.put(id, currentQty + 1);
-        } else if ("decrease".equals(action) && currentQty > 0) {
-            cart.put(id, currentQty - 1);
-            if (cart.get(id) == 0) {
-                cart.remove(id);
+            if ("increase".equals(action)) {
+                newQty = currentQty + 1;
+                cart.put(id, newQty);
+            } else if ("decrease".equals(action) && currentQty > 0) {
+                newQty = currentQty - 1;
+                if (newQty == 0) {
+                    cart.remove(id);
+                } else {
+                    cart.put(id, newQty);
+                }
+            } else {
+                 // กรณีที่ currentQty == 0 และ action เป็น decrease
+                 newQty = currentQty;
             }
-        }
 
-        session.setAttribute("cart", cart);
-        return "redirect:viewmenu";
+            session.setAttribute("cart", cart);
+
+            // สร้าง JSON object เพื่อส่งกลับไปให้ AJAX (HTTP 200 OK)
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("newQuantity", newQty);
+            response.put("foodId", id);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (NumberFormatException e) {
+            // กรณีแปลงตัวเลขไม่ได้ (HTTP 400 BAD REQUEST)
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "รหัสอาหารไม่ถูกต้อง (Invalid foodId format)");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // ข้อผิดพลาดอื่น ๆ (HTTP 500 INTERNAL SERVER ERROR)
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้ง");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/viewCart", method = RequestMethod.GET)
@@ -314,7 +354,7 @@ public class CustomerController {
             reservation.setNumberOfGuests(numberOfGuests);
             reservation.setReservedate(reservationDate);
             reservation.setReservetime(reservationTime);
-            reservation.setStatus("confirm");
+            reservation.setStatus("Reserved");
             reservation.setCustomers(customer);
             reservation.setTables(table);
 
