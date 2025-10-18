@@ -20,9 +20,9 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ManageMenuFoodController {
-    @RequestMapping(value = "/ListAllMenuFood", method = RequestMethod.GET) //*************ข้อมูลFood**********
+    @RequestMapping(value = "/ListAllMenuFood", method = RequestMethod.GET) // *************ข้อมูลFood**********
     public ModelAndView ListAllMenuFood(HttpSession session) {
-    	FoodITemManager manager = new FoodITemManager();
+        FoodITemManager manager = new FoodITemManager();
         List<MenuFood> menufood = manager.getAllFoodItem();
         ModelAndView mav = new ModelAndView("listMenuFood");
 
@@ -33,22 +33,21 @@ public class ManageMenuFoodController {
         mav.addObject("add_result2", "ทำรายการสำเร็จ");
         return mav;
     }
+
     @RequestMapping(value = "/gotoAddMenu", method = RequestMethod.GET)
     public ModelAndView gotoAddMenu() {
         FoodITemManager foodManager = new FoodITemManager();
         List<FoodType> foodTypes = foodManager.getAllFoodTypes(); // ดึงจาก DB
-        
+
         ModelAndView mav = new ModelAndView("AddMenuFood");
         mav.addObject("foodTypes", foodTypes); // ส่งให้ JSP
         return mav;
     }
 
-    
-    
     @RequestMapping(value = "/Add_MenuFood", method = RequestMethod.POST)
     public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FoodITemManager foodManager = new FoodITemManager();
-        LoginManager rm = new LoginManager();
+        FoodITemManager rm = new FoodITemManager();
 
         // รับค่าจาก form
         String url = request.getParameter("url");
@@ -80,13 +79,13 @@ public class ManageMenuFoodController {
         } else {
             mav.addObject("error", "ไม่สามารถบันทึกข้อมูลได้");
         }
+
+        List<FoodType> foodTypes = foodManager.getAllFoodTypes(); // ดึงจาก DB
+        mav.addObject("foodTypes", foodTypes); // ส่งให้ JSP
+
         return mav;
     }
-    
-    
-    
-    
-    
+
     @RequestMapping(value = "/geteditMenufood", method = RequestMethod.GET)
     public ModelAndView geteditTable(HttpServletRequest request) {
         FoodITemManager rm = new FoodITemManager();
@@ -101,7 +100,6 @@ public class ManageMenuFoodController {
             ex.printStackTrace();
         }
 
-
         List<FoodType> foodTypes = rm.getAllFoodTypes();
 
         ModelAndView mav = new ModelAndView("Edit_MenuFood");
@@ -109,10 +107,11 @@ public class ManageMenuFoodController {
         mav.addObject("foodTypes", foodTypes); // ✅ ส่ง foodTypes ไป JSP
         return mav;
     }
-    
-    @RequestMapping(value="/confirmEditMenuFood", method=RequestMethod.POST)
+
+    @RequestMapping(value = "/confirmEditMenuFood", method = RequestMethod.POST)
     public ModelAndView confirmEditMenuFood(HttpServletRequest request) {
         FoodITemManager rm = new FoodITemManager();
+        List<FoodType> foodTypes = rm.getAllFoodTypes(); // 👈 ดึงรายการประเภทอาหารทั้งหมดล่วงหน้า
 
         String foodIdStr = request.getParameter("foodId");
         String url = request.getParameter("foodImage");
@@ -121,6 +120,9 @@ public class ManageMenuFoodController {
         String type = request.getParameter("type");
 
         ModelAndView mav = new ModelAndView("Edit_MenuFood");
+        mav.addObject("foodTypes", foodTypes); // 👈 ส่งรายการประเภทอาหารไปที่ ModelAndView ทันที
+
+        MenuFood menuToDisplay = null; // Object ที่จะถูกส่งกลับไปให้ JSP
 
         try {
             int foodId = Integer.parseInt(foodIdStr);
@@ -129,21 +131,25 @@ public class ManageMenuFoodController {
             // หา foodType จากชื่อ
             FoodType foodType = rm.getFoodTypeByName(type);
             if (foodType == null) {
+                // หากหาประเภทอาหารไม่พบ ให้โหลดข้อมูลเดิมกลับมาแสดง
+                menuToDisplay = rm.getMenuFoodeById(foodIdStr);
+                mav.addObject("menu", menuToDisplay != null ? menuToDisplay : new MenuFood());
                 mav.addObject("error_result", "ประเภทอาหารไม่ถูกต้อง");
                 return mav;
             }
 
-            // สร้างวัตถุใหม่
+            // สร้างวัตถุใหม่เพื่อทำการ update
             MenuFood rest = new MenuFood();
             rest.setFoodId(foodId);
             rest.setFoodImage(url);
             rest.setFoodname(foodname);
             rest.setPrice(price);
             rest.setFoodtype(foodType);
+            
+            menuToDisplay = rest; // ใช้ Object ที่กำลังจะถูกบันทึก/อัปเดต
 
             boolean result = rm.updateMenuFood(rest);
-            mav.addObject("menu", rest); // ส่งกลับไปให้แสดงในฟอร์ม
-
+            
             if (result) {
                 mav.addObject("add_result", "บันทึกสำเร็จ");
             } else {
@@ -152,32 +158,41 @@ public class ManageMenuFoodController {
         } catch (Exception e) {
             mav.addObject("error_result", "เกิดข้อผิดพลาด: " + e.getMessage());
             e.printStackTrace();
+            // หากเกิด Exception ให้โหลดข้อมูลเดิมกลับมาแสดง
+            if (menuToDisplay == null) {
+                 menuToDisplay = rm.getMenuFoodeById(foodIdStr);
+            }
         }
-
+        
+        // ***************************************************************
+        // ส่วนสำคัญ: ต้องส่ง MenuFood object กลับไปเสมอ
+        // ***************************************************************
+        mav.addObject("menu", menuToDisplay != null ? menuToDisplay : new MenuFood());
+        
         return mav;
     }
 
     @RequestMapping(value = "/deleteMenuFood", method = RequestMethod.POST)
-    public ModelAndView deleteMenuFood(@RequestParam("deleteMenuFood") String menu){
-    	FoodITemManager rm = new FoodITemManager();
+    public ModelAndView deleteMenuFood(@RequestParam("deleteMenuFood") String menu) {
+        FoodITemManager rm = new FoodITemManager();
         MenuFood reg = rm.getMenuFoodById(menu);
 
         if (reg != null) {
             rm.deleteMenuFood(reg);
         }
-        
+
         List<MenuFood> list = rm.getAllFoodItem();
-        
+
         ModelAndView mav = new ModelAndView("listMenuFood");
-        
-        mav.addObject("deleted","ลบสำเร็จ" );
+
+        mav.addObject("deleted", "ลบสำเร็จ");
 
         if (list.isEmpty()) {
             mav.addObject("error_msg", "ยังไม่มีคนลงทะเบียน");
         }
 
         return mav;
-        
+
     }
 
 }

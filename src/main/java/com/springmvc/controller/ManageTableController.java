@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 
 import com.springmvc.model.LoginManager;
+import com.springmvc.model.TableManager;
 import com.springmvc.model.Tables;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public class ManageTableController {
 	
 	 @RequestMapping(value = "/ManageTable", method = RequestMethod.GET) //*************ข้อมูลTable**********
 	    public ModelAndView ManageTable(HttpSession session) {
-	        LoginManager manager = new LoginManager();
+	        TableManager manager = new TableManager();
 	        List<Tables> table = manager.getAllTable();
 	        // Change this line to point to your new manager-specific JSP
 	        ModelAndView mav = new ModelAndView("listTableForManager"); // <-- Changed here
@@ -47,7 +48,7 @@ public class ManageTableController {
     
     @RequestMapping(value = "/Add_Table", method = RequestMethod.POST)  //***********AddTableร์************
     public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	LoginManager rm = new LoginManager();
+    	TableManager rm = new TableManager();
 
         // ดึงข้อมูลจากฟอร์ม
         String tablenumber = request.getParameter("tablenumber");
@@ -83,7 +84,7 @@ public class ManageTableController {
     
     @RequestMapping(value = "/geteditTable", method = RequestMethod.GET)//************ดึงข้อมูลโต๊ะพื่อไปยังหน้าedit************
     public ModelAndView geteditTable(HttpServletRequest request) {
-        LoginManager rm = new LoginManager();
+    	TableManager rm = new TableManager();
         Tables r = null; 
         
         try {
@@ -100,7 +101,7 @@ public class ManageTableController {
     
     @RequestMapping(value="/confirmEditTable", method=RequestMethod.POST)//***************ยืนยันการแก้ไขโต๊ะ*************
     public ModelAndView confirmEditTable(HttpServletRequest request) {
-        LoginManager rm= new LoginManager();
+    	TableManager rm= new TableManager();
         String tableid = request.getParameter("tableid");
         String capacity = request.getParameter("capacity");
         String status = request.getParameter("status");
@@ -121,7 +122,7 @@ public class ManageTableController {
     
     @RequestMapping(value = "/deleteTable", method = RequestMethod.POST)  //*************ลบพนักงานเสริฟ*************
     public ModelAndView deleteTable(@RequestParam("empusername") String tables) {
-        LoginManager rm = new LoginManager();
+    	TableManager rm = new TableManager();
         Tables reg = rm.getTableById(tables);
 
         if (reg != null) {

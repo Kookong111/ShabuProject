@@ -116,6 +116,17 @@
             color: #aaa;
         }
 
+        /* เพิ่ม Style สำหรับช่องแสดงผลสถานะ Free */
+        .status-display {
+            background-color: #3c3c3c;
+            border-radius: 10px;
+            color: #28a745; /* สีเขียวสำหรับ Free */
+            padding: 12px 15px;
+            margin-bottom: 1.3rem;
+            font-weight: bold;
+        }
+
+
         @media (max-width: 576px) {
             .form-container {
                 padding: 30px 20px;
@@ -135,7 +146,8 @@
 
         <form action="Add_Table" method="post">
             <div class="mb-3">
-                <label for="tablenumber" class="form-label"><i class="fas fa-hashtag"></i>หมายเลขโต๊ะ</label>
+                <label for="tablenumber" class="form-label"><i 
+                class="fas fa-hashtag"></i>หมายเลขโต๊ะ</label>
                 <input type="text" class="form-control" id="tablenumber" name="tablenumber" required>
             </div>
 
@@ -144,15 +156,12 @@
                 <input type="number" class="form-control" id="capacity" name="capacity" required>
             </div>
 
-            <!-- เพิ่ม input options -->
             <div class="mb-3">
-                <label for="status" class="form-label"><i class="fas fa-check-circle"></i>สถานะโต๊ะ</label>
-                <select class="form-control-select form-control" id="status" name="status" required>
-                    <option value="">-- เลือกสถานะ --</option>
-                    <option value="Free">Free</option>
-                    <option value="In use">In use</option>
-                    <option value="Already reserved">Already reserved</option>
-                </select>
+                <label class="form-label"><i class="fas fa-check-circle"></i>สถานะโต๊ะ</label>
+                <div class="status-display">
+                    Free
+                </div>
+                <input type="hidden" id="status" name="status" value="Free">
             </div>
 
             <button type="submit" class="btn btn-primary">

@@ -34,6 +34,33 @@ public class ReserveManager {
         return false;
     }
     
+    public boolean deleteReservation(Integer reserveid) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            Reserve reservation = (Reserve) session.get(Reserve.class, reserveid);
+            if (reservation != null) {
+                session.delete(reservation);
+                session.getTransaction().commit();
+                return true;
+            }
+            
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;
+    }
+    
     // Method สำหรับตรวจสอบว่าโต๊ะว่างในวันและเวลาที่ต้องการหรือไม่
     public boolean isTableAvailable(String tableid, Date reservedate, String reservetime) {
         Session session = null;
@@ -43,7 +70,7 @@ public class ReserveManager {
             session.beginTransaction();
             
             // ค้นหาการจองที่ตรงกับโต๊ะ วันที่ และเวลาที่ต้องการ
-            String hql = "FROM Reservation WHERE tableid = :tableid AND reservedate = :reservedate " +
+            String hql = "FROM Reserve WHERE tableid = :tableid AND reservedate = :reservedate " +
                         "AND reservetime = :reservetime AND status != 'Cancelled'";
             Query query = session.createQuery(hql);
             query.setParameter("tableid", tableid);
@@ -70,6 +97,7 @@ public class ReserveManager {
     }
     
     // Method สำหรับดึงข้อมูลการจองของลูกค้าคนหนึ่ง
+
     public List<Reserve> getReservationsByCustomerId(Integer cusid) {
         Session session = null;
         List<Reserve> reservations = null;
@@ -78,8 +106,13 @@ public class ReserveManager {
             session = sessionFactory.openSession();
             session.beginTransaction();
             
-            String hql = "FROM Reservation WHERE cusid = :cusid ORDER BY reservedate DESC, reservetime DESC";
-            Query query = session.createQuery(hql);
+            // HQL ที่ถูกต้องตามหลักการ ORM: 
+            // - FROM Reserve r : อ้างถึง Model Class ชื่อ Reserve
+            // - r.customers.cusId : เข้าถึง ID ของลูกค้าผ่าน Object Customer ที่ Map ไว้ใน Reserve
+            String hql = "FROM Reserve r WHERE r.customers.cusId = :cusid ORDER BY r.reservedate DESC, r.reservetime DESC";
+            
+            // ใช้ generic type <Reserve> เพื่อให้ถูกต้อง
+            Query<Reserve> query = session.createQuery(hql, Reserve.class);
             query.setParameter("cusid", cusid);
             
             reservations = query.list();
@@ -97,7 +130,6 @@ public class ReserveManager {
         }
         return reservations;
     }
-    
     // Method สำหรับอัปเดตสถานะการจอง
     public boolean updateReservationStatus(Integer reserveid, String status) {
         Session session = null;
@@ -202,6 +234,8 @@ public class ReserveManager {
         return customer;
     }
 
+    
+    
 	public boolean cancelReservation(int int1) {
 		// TODO Auto-generated method stub
 		return false;

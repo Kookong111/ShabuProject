@@ -132,14 +132,16 @@
         <form name="frm1" action="confirmEditMenuFood" method="post">
          <input type="hidden" name="foodId" value="${menu.foodId}" />
             <div class="mb-3">
-                <label for="foodname" class="form-label">ชื่อ</label>
+       
+                 <label for="foodname" class="form-label">ชื่อ</label>
                 <input type="text" class="form-control" id="foodname" name="foodname" value="${menu.foodname}" >
             </div>
 
             <div class="mb-3">
                 <label for=price class="form-label">ราคา</label>
                 <input type="text" class="form-control" id="price" name="price" value="${menu.price}">
-            </div>
+   
+             </div>
 
             <div class="mb-3">
     <label for="foodImage" class="form-label">รูป</label>
@@ -147,7 +149,8 @@
 
     <c:if test="${not empty menu.foodImage}">
         <div class="text-center mt-3">
-            <img src="${menu.foodImage}" alt="Preview Image" style="max-width: 50%; height: 50%; border-radius: 8px;" />
+            <img src="${menu.foodImage}" alt="Preview Image" style="max-width: 50%;
+height: 50%; border-radius: 8px;" />
         </div>
     </c:if>
 </div>
@@ -157,20 +160,25 @@
                 <label for="type" class="form-label">ประเภท</label>
                <select class="form-control form-control-select" id="type" name="type">
     <c:forEach var="ft" items="${foodTypes}">
-        <option value="${ft.foodtypeName}">${ft.foodtypeName}</option>
+        <option value="${ft.foodtypeName}" 
+            <c:if test="${not empty menu.foodtype and ft.foodtypeName == menu.foodtype.foodtypeName}">selected</c:if>>
+            ${ft.foodtypeName}
+        </option>
     </c:forEach>
 </select>
 
             </div>
             
-            <div class="d-flex justify-content-center gap-2">  <button type="submit" class="btn btn-success">บันทึก</button>
+  
+           <div class="d-flex justify-content-center gap-2">  <button type="submit" class="btn btn-success">บันทึก</button>
                 <button type="reset" class="btn btn-danger">รีเซ็ต</button>
             </div>
 
              <div class="result-message">
                  <font color="red"></font>
             </div>
-        </form>
+       
+ </form>
 
         <hr>
 
