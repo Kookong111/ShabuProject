@@ -1,5 +1,7 @@
 package com.springmvc.model;
 
+import java.util.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "orders")
@@ -18,8 +22,12 @@ public class Order {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String oderId;
 	
+	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
+    private Date orderDate;
+	
 	@Column(nullable = false, length = 255)
-	private String orderName;
+	private double totalPeice;
 	
 	@Column(nullable = false, length = 255)
 	private String status;
@@ -36,6 +44,67 @@ public class Order {
 
 	}
 
+
+	public Order(String oderId, Date orderDate, double totalPeice, String status, Tables table) {
+		super();
+		this.oderId = oderId;
+		this.orderDate = orderDate;
+		this.totalPeice = totalPeice;
+		this.status = status;
+		this.table = table;
+	}
+
+
+	public String getOderId() {
+		return oderId;
+	}
+
+
+	public void setOderId(String oderId) {
+		this.oderId = oderId;
+	}
+
+
+	public Date getOrderDate() {
+		return orderDate;
+	}
+
+
+	public void setOrderDate(Date orderDate) {
+		this.orderDate = orderDate;
+	}
+
+
+	public double getTotalPeice() {
+		return totalPeice;
+	}
+
+
+	public void setTotalPeice(double totalPeice) {
+		this.totalPeice = totalPeice;
+	}
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
+	public Tables getTable() {
+		return table;
+	}
+
+
+	public void setTable(Tables table) {
+		this.table = table;
+	}
+
+	
 	
 
  

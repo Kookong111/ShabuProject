@@ -18,14 +18,13 @@ public class OrderDetail {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private String odermenuId;
 	
-	@Column(nullable = false, length = 255)
-	private String orderNumber;
+	
 	
 	@Column(nullable = false, length = 255)
 	private String status;
 	
 	@Column(nullable = false, length = 45)
-	private String quality;
+	private int quality;
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "orderId", nullable = false)
@@ -40,65 +39,80 @@ public class OrderDetail {
 		// TODO Auto-generated constructor stub
 	}
 
-	public OrderDetail(String odermenuId, String orderNumber, String status, String quality, Order orders,
-			MenuFood menufood) {
+	
+
+	public OrderDetail(String odermenuId, String status, int quality, Order orders, MenuFood menufood) {
 		super();
 		this.odermenuId = odermenuId;
-		this.orderNumber = orderNumber;
 		this.status = status;
 		this.quality = quality;
 		this.orders = orders;
 		this.menufood = menufood;
 	}
+
+
 
 	public String getOdermenuId() {
 		return odermenuId;
 	}
 
+
+
 	public void setOdermenuId(String odermenuId) {
 		this.odermenuId = odermenuId;
 	}
 
-	public String getOrderNumber() {
-		return orderNumber;
-	}
 
-	public void setOrderNumber(String orderNumber) {
-		this.orderNumber = orderNumber;
-	}
 
 	public String getStatus() {
 		return status;
 	}
 
+
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
-	public String getQuality() {
+
+
+	public int getQuality() {
 		return quality;
 	}
 
-	public void setQuality(String quality) {
+
+
+	public void setQuality(int quality) {
 		this.quality = quality;
 	}
+
+
 
 	public Order getOrders() {
 		return orders;
 	}
 
+
+
 	public void setOrders(Order orders) {
 		this.orders = orders;
 	}
+
+
 
 	public MenuFood getMenufood() {
 		return menufood;
 	}
 
+
+
 	public void setMenufood(MenuFood menufood) {
 		this.menufood = menufood;
 	}
 
+
+
+	
 	
 	
 	
