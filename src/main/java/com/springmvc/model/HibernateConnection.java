@@ -22,7 +22,7 @@ public class HibernateConnection {
 			pwd = "1234";
 		} else {
 			// Local development environment
-			url = "jdbc:mysql://localhost:3307/project_shabu2?characterEncoding=UTF-8";
+			url = "jdbc:mysql://localhost:3306/project_shabu2?characterEncoding=UTF-8";
 			uname = "root";
 			pwd = "1234";
 		}
