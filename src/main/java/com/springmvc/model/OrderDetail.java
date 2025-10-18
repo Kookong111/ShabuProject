@@ -26,6 +26,9 @@ public class OrderDetail {
 	@Column(nullable = false, length = 45)
 	private int quality;
 	
+	@Column(nullable = false, length = 45)
+	private double priceAtTimeOfOrder; 
+	
 	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "orderId", nullable = false)
 	private Order orders;
