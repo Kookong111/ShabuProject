@@ -93,10 +93,25 @@
             border-radius: 8px;
             font-size: 16px;
         }
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #6a1b9a;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background: #4a148c;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <a href="gotowelcomeCustomer" class="btn-back">← กลับหน้าหลัก</a>
     <h2>รายการจองโต๊ะของฉัน 📝</h2>
 
     <c:choose>
