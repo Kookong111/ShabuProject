@@ -16,17 +16,17 @@ public class OrderDetail {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-    private String odermenuId;
+    private int odermenuId;
 	
 	
 	
 	@Column(nullable = false, length = 255)
 	private String status;
 	
-	@Column(nullable = false, length = 45)
-	private int quality;
+	@Column(nullable = false)
+	private int quantity;
 	
-	@Column(nullable = false, length = 45)
+	@Column(nullable = false)
 	private double priceAtTimeOfOrder; 
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
@@ -42,77 +42,66 @@ public class OrderDetail {
 		// TODO Auto-generated constructor stub
 	}
 
-	
-
-	public OrderDetail(String odermenuId, String status, int quality, Order orders, MenuFood menufood) {
+	public OrderDetail(int odermenuId, String status, int quantity, double priceAtTimeOfOrder, Order orders,
+			MenuFood menufood) {
 		super();
 		this.odermenuId = odermenuId;
 		this.status = status;
-		this.quality = quality;
+		this.quantity = quantity;
+		this.priceAtTimeOfOrder = priceAtTimeOfOrder;
 		this.orders = orders;
 		this.menufood = menufood;
 	}
 
-
-
-	public String getOdermenuId() {
+	public int getOdermenuId() {
 		return odermenuId;
 	}
 
-
-
-	public void setOdermenuId(String odermenuId) {
+	public void setOdermenuId(int odermenuId) {
 		this.odermenuId = odermenuId;
 	}
-
-
 
 	public String getStatus() {
 		return status;
 	}
 
-
-
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
-
-
-	public int getQuality() {
-		return quality;
+	public int getQuantity() {
+		return quantity;
 	}
 
-
-
-	public void setQuality(int quality) {
-		this.quality = quality;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 
+	public double getPriceAtTimeOfOrder() {
+		return priceAtTimeOfOrder;
+	}
 
+	public void setPriceAtTimeOfOrder(double priceAtTimeOfOrder) {
+		this.priceAtTimeOfOrder = priceAtTimeOfOrder;
+	}
 
 	public Order getOrders() {
 		return orders;
 	}
 
-
-
 	public void setOrders(Order orders) {
 		this.orders = orders;
 	}
-
-
 
 	public MenuFood getMenufood() {
 		return menufood;
 	}
 
-
-
 	public void setMenufood(MenuFood menufood) {
 		this.menufood = menufood;
 	}
 
+	
 
 
 	
