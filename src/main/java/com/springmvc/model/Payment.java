@@ -21,7 +21,7 @@ public class Payment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-    private String PaymentId;
+    private int PaymentId;
 	
 	
 	@Column(nullable = false, length = 255)
@@ -32,7 +32,7 @@ public class Payment {
     private Date paymentDate;
     
     @Column(nullable = false, length = 255)
-	private String totalPrice;
+	private Double totalPrice;
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "empUsername", nullable = false)
@@ -47,7 +47,7 @@ public class Payment {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Payment(String paymentId, String paymentStatus, Date paymentDate, String totalPrice, Employee employees,
+	public Payment(int paymentId, String paymentStatus, Date paymentDate, Double totalPrice, Employee employees,
 			Order orders) {
 		super();
 		PaymentId = paymentId;
@@ -58,11 +58,11 @@ public class Payment {
 		this.orders = orders;
 	}
 
-	public String getPaymentId() {
+	public int getPaymentId() {
 		return PaymentId;
 	}
 
-	public void setPaymentId(String paymentId) {
+	public void setPaymentId(int paymentId) {
 		PaymentId = paymentId;
 	}
 
@@ -82,11 +82,11 @@ public class Payment {
 		this.paymentDate = paymentDate;
 	}
 
-	public String getTotalPrice() {
+	public Double getTotalPrice() {
 		return totalPrice;
 	}
 
-	public void setTotalPrice(String totalPrice) {
+	public void setTotalPrice(Double totalPrice) {
 		this.totalPrice = totalPrice;
 	}
 
@@ -105,6 +105,8 @@ public class Payment {
 	public void setOrders(Order orders) {
 		this.orders = orders;
 	}
+
+	
 
 	
 

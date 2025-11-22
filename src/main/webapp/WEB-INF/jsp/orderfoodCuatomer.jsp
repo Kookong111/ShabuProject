@@ -47,6 +47,37 @@
             color: #333;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+        }
+
         .cart-icon-btn {
             background: none;
             border: none;
@@ -205,6 +236,19 @@
             .header {
                 padding: 12px 15px;
             }
+
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .back-btn span {
+                display: none;
+            }
+
+            .table-info {
+                font-size: 16px;
+            }
         }
 
         /* Loading animation */
@@ -224,17 +268,24 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-         <!-- <div class="table-info">
-                <c:forEach var="table" items="${tablesList}">
-                    <i class="fas fa-utensils"></i> โต๊ะ ${table.tableid}
-                </c:forEach>
-            </div> -->
+            <div class="table-info">
+                <i class="fas fa-utensils"></i> เมนูอาหาร
+            </div>
             
-            <form action="viewCart" method="get">
-                <button type="submit" class="cart-icon-btn" title="ดูตะกร้า">
-                    <i class="fas fa-shopping-cart"></i>
-                </button>
-            </form>
+            <div class="header-actions">
+                <form action="viewCart" method="get" style="display: inline;">
+                    <button type="submit" class="cart-icon-btn" title="ดูตะกร้า">
+                        <i class="fas fa-shopping-cart"></i>
+                    </button>
+                </form>
+                
+                <form action="gotowelcomeCustomer" method="get" style="display: inline;">
+                    <button type="submit" class="back-btn" title="กลับหน้าหลัก">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>กลับ</span>
+                    </button>
+                </form>
+            </div>
         </div>
 
         <!-- Menu Container -->

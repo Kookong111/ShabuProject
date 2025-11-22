@@ -26,6 +26,8 @@
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
+            --quick-action-color: #FF6F61; 
+            --quick-action-shadow: rgba(255, 111, 97, 0.4); 
         }
 
         body {
@@ -403,7 +405,7 @@
             font-size: 15px;
         }
 
-        /* --- Quick Actions (START of Custom Hover Style) --- */
+        /* --- Quick Actions (แสดงข้อความเสมอ) --- */
         .quick-actions {
             position: fixed;
             bottom: 40px;
@@ -412,54 +414,43 @@
         }
 
         .quick-action-btn {
-            /* Base Style - Looks like a circle icon */
+            /* แสดงทั้งไอคอนและข้อความตลอดเวลา */
             height: 60px;
-            width: 60px; /* Initial fixed width for icon only */
-            background: var(--text-primary);
+            width: auto; /* ปรับตามเนื้อหา */
+            
+            /* สีดำ */
+            background: #1a1a1a;
             color: white;
-            border-radius: 30px; /* Makes it a circle */
+            
+            border-radius: 30px; /* รูปทรงแคปซูล */
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center; /* Centers the icon */
+            justify-content: flex-start;
             font-size: 24px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             text-decoration: none;
             
-            /* Crucial properties for animation */
-            transition: all 0.4s ease; /* Smooth transition for width and scale */
-            overflow: hidden; /* Hides the text initially */
-            padding: 0 18px; /* Padding for when it expands */
-            white-space: nowrap; /* Prevents text wrap */
-            gap: 10px; /* Space between icon and text */
+            transition: all 0.3s ease;
+            padding: 0 24px 0 18px; /* padding ทั้งซ้ายและขวา */
+            white-space: nowrap;
+            gap: 10px;
         }
 
         .quick-action-btn:hover {
-            /* Hover State - Expands and becomes a pill shape */
-            width: auto; /* Allows width to grow to fit content */
-            padding-right: 24px; /* A bit more padding on the right for balance */
-            transform: scale(1.05);
-            box-shadow: var(--shadow-lg);
-            justify-content: flex-start; /* Aligns icon/text to the left */
+            transform: scale(1.05); /* ขยายเล็กน้อยเมื่อ hover */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+            background: #2c2c2c;
         }
 
         .quick-action-btn .btn-text {
-            /* Text Style */
+            /* แสดงข้อความตลอดเวลา */
             font-size: 15px;
             font-weight: 500;
-            opacity: 0; /* Text is invisible by default */
+            opacity: 1; /* แสดงเสมอ */
             line-height: 1;
-            /* Fade-in transition for text with a slight delay */
-            transition: opacity 0.2s ease 0.1s; 
         }
-
-        .quick-action-btn:hover .btn-text {
-            /* Text becomes visible on hover */
-            opacity: 1;
-        }
-        /* --- Quick Actions (END of Custom Hover Style) --- */
-
 
         /* Footer */
         footer {
@@ -614,17 +605,14 @@
                 right: 20px;
             }
 
-            /* Adjusted mobile hover behavior */
             .quick-action-btn {
-                width: 50px;
                 height: 50px;
                 font-size: 20px;
-                padding: 0 14px;
+                padding: 0 18px 0 14px;
             }
             
-            .quick-action-btn:hover {
-                width: auto; 
-                padding-right: 18px;
+            .quick-action-btn .btn-text {
+                font-size: 14px;
             }
         }
     </style>
@@ -701,8 +689,6 @@
         </div>
     </section>
 
-    
-
     <c:if test="${not empty user}">
         <div class="quick-actions">
             <a href="myReservess" class="quick-action-btn" title="ดูการจองของฉัน">
@@ -713,13 +699,11 @@
     </c:if>
 
     <footer>
-        
-            
-
+        <div class="footer-content">
             <div class="footer-bottom">
                 <p>&copy; 2024 ShaBu Restaurant. All rights reserved.</p>
             </div>
-       
+        </div>
     </footer>
 
     <script>

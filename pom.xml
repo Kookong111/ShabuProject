@@ -90,8 +90,13 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <artifactId>hibernate-core</artifactId>
     <version>5.6.15.Final</version>
 </dependency>
-	
 
-  	
+
+
+  	<dependency>
+  		<groupId>JSPLab00</groupId>
+  		<artifactId>JSPLab00</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>
