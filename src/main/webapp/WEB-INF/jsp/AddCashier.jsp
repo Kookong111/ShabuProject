@@ -129,10 +129,10 @@
         <h2><i class="fas fa-user-plus"></i> เพิ่มพนักงานแคชเชียร์</h2>
 
         <div class="result-message">
-            <div class="success-message">${add_result}</div>
+            <div class="success-message">${add_result2}</div>
         </div>
 
-        <form action="Add_Waiter" method="post">
+        <form action="Add_Cashier" method="post">
             <div class="mb-3">
                 <label for="empusername" class="form-label"><i class="fas fa-user"></i>ชื่อผู้ใช้งาน</label>
                 <input type="text" class="form-control" id="empusername" name="empusername" required>

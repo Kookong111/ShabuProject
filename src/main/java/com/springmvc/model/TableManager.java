@@ -155,5 +155,32 @@ public class TableManager {
         }
         return false;
     }
+    
+    public boolean updateTableStatus(String tableid, String newStatus) {
+ 		Session session = null;
+ 		try {
+ 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();	
+ 			session = sessionFactory.openSession();
+ 			session.beginTransaction();
+
+ 			Tables table = (Tables) session.get(Tables.class, tableid);
+ 			if (table != null) {
+ 				table.setStatus(newStatus); // ตั้งสถานะตามที่ส่งมา
+ 				session.update(table);
+ 				session.getTransaction().commit();
+ 				return true;
+ 			}
+ 		} catch (Exception ex) {
+ 			if (session != null && session.getTransaction() != null) {
+ 				session.getTransaction().rollback();
+ 			}
+ 			ex.printStackTrace();
+ 		} finally {
+ 			if (session != null) {
+ 				session.close();
+ 			}
+ 		}
+ 		return false;
+ 	}
 
 }

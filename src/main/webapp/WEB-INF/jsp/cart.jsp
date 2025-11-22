@@ -229,7 +229,7 @@
 <div class="container">
     <div class="header">
         <h2><i class="fas fa-shopping-cart"></i> ตะกร้าอาหาร</h2>
-        <a href="viewmenu" class="back-button"><i class="fas fa-arrow-left"></i> กลับเมนู</a>
+        <a href="gotowelcomeCustomer" class="back-button"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>
     </div>
 
     <c:if test="${empty cartItems}">
@@ -282,7 +282,9 @@
             <div class="total-price">
                 ราคารวม: ฿<fmt:formatNumber value="${total}" type="number" />
             </div>
-            <a href="confirmOrder" class="confirm-btn">ยืนยันคำสั่งซื้อ</a>
+            <form action="confirmOrder" method="post">
+    <button type="submit" class="confirm-btn">ยืนยันคำสั่งซื้อ</button>
+</form>
         </div>
     </c:if>
 </div>

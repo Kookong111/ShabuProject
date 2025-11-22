@@ -470,7 +470,7 @@
                     <div class="table-card 
                         <c:choose>
                             <c:when test='${table.status == "Free"}'>table-free</c:when>
-                            <c:when test='${table.status == "In use"}'>table-in-use</c:when>
+                            <c:when test='${table.status == "Occupied"}'>table-in-use</c:when>
                             <c:when test='${table.status == "Already reserved"}'>table-reserved</c:when>
                             <c:otherwise>table-free</c:otherwise>
                         </c:choose>"
@@ -483,7 +483,7 @@
                         <div class="table-status">
                             <c:choose>
                                 <c:when test='${table.status == "Free"}'>Available</c:when>
-                                <c:when test='${table.status == "In use"}'>Occupied</c:when>
+                                <c:when test='${table.status == "Occupied"}'>Occupied</c:when>
                                 <c:when test='${table.status == "Already reserved"}'>Reserved</c:when>
                                 <c:otherwise>${table.status}</c:otherwise>
                             </c:choose>
