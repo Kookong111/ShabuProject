@@ -20,7 +20,7 @@ public class Order {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String oderId;
+	private int oderId;
 	
 	@Column(nullable = false)
 	@Temporal(TemporalType.DATE)
@@ -45,7 +45,7 @@ public class Order {
 	}
 
 
-	public Order(String oderId, Date orderDate, double totalPeice, String status, Tables table) {
+	public Order(int oderId, Date orderDate, double totalPeice, String status, Tables table) {
 		super();
 		this.oderId = oderId;
 		this.orderDate = orderDate;
@@ -55,12 +55,12 @@ public class Order {
 	}
 
 
-	public String getOderId() {
+	public int getOderId() {
 		return oderId;
 	}
 
 
-	public void setOderId(String oderId) {
+	public void setOderId(int oderId) {
 		this.oderId = oderId;
 	}
 

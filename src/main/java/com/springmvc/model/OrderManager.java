@@ -1,0 +1,131 @@
+package com.springmvc.model;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import java.util.Date;
+
+public class OrderManager {
+    
+    // Method สำหรับดึงข้อมูล MenuFood ตาม ID
+    public MenuFood getMenuFoodById(Integer foodId) {
+        Session session = null;
+        MenuFood menuFood = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            menuFood = session.get(MenuFood.class, foodId);
+            session.getTransaction().commit();
+            return menuFood;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return null;
+    }
+    
+    // Method สำหรับสร้าง Order ใหม่ (ถูกแก้ไขเพื่อให้ได้ oderId ทันที)
+    public Order createNewOrder(String tableid, String status) {
+        Session session = null;
+        Order newOrder = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            // 1. ดึงข้อมูล Tables
+            Tables table = session.get(Tables.class, tableid);
+            
+            if (table != null) {
+                // 2. สร้าง Order ใหม่
+                newOrder = new Order();
+                newOrder.setOrderDate(new Date()); // วันที่ปัจจุบัน
+                newOrder.setStatus(status);        // เช่น "Open"
+                newOrder.setTotalPeice(0.0);       // เริ่มต้นเป็น 0
+                newOrder.setTable(table);
+                
+                // บันทึก Order (Hibernate จะกำหนด ID ให้โดยอัตโนมัติ)
+                session.save(newOrder); 
+                // newOrder ออบเจกต์ตอนนี้จะมี oderId ที่ถูกกำหนดแล้ว
+                session.getTransaction().commit();
+            }
+            return newOrder; 
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+            return null;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
+    // Method สำหรับสร้าง Order Detail (รายการอาหารเริ่มต้น)
+    public boolean createOrderDetail(Order order, MenuFood menuFood, int quantity, double price, String status) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            OrderDetail detail = new OrderDetail();
+            detail.setOrders(order);
+            detail.setMenufood(menuFood);
+            detail.setQuantity(quantity);
+            detail.setPriceAtTimeOfOrder(price);
+            detail.setStatus(status); // เช่น "In Progress"
+            
+            session.save(detail);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    
+    // Method สำหรับอัปเดตราคารวมของ Order
+    public boolean updateOrderTotalPrice(Order order, double newTotalPeice) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            // ใช้ getOderId() ที่ถูกต้องจาก Order ที่ถูกสร้างแล้ว
+            Order existingOrder = session.get(Order.class, order.getOderId());
+            
+            if (existingOrder != null) {
+                existingOrder.setTotalPeice(newTotalPeice);
+                session.update(existingOrder);
+                session.getTransaction().commit();
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+            return false;
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+}

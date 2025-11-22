@@ -6,7 +6,15 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+//... (imports เดิมของคุณ)
 
+import com.springmvc.model.HibernateConnection;
+import com.springmvc.model.MenuFood;
+import com.springmvc.model.Order;
+import com.springmvc.model.OrderDetail;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -133,67 +141,30 @@ public class CustomerController {
         return mav;
     }
     
-    /**
-     * เมธอดที่ถูกแก้ไขเพื่อรองรับ AJAX:
-     * - ใช้ @ResponseBody เพื่อส่ง JSON กลับไป
-     * - ใช้ ResponseEntity เพื่อควบคุม HTTP Status Code
-     */
     @RequestMapping(value = "/updateQuantity", method = RequestMethod.POST)
-    @ResponseBody 
-    public ResponseEntity<Map<String, Object>> updateQuantity(
-            @RequestParam("foodId") String foodId,
-            @RequestParam("action") String action,
-            HttpSession session) {
+    public String updateQuantity(HttpServletRequest request, HttpSession session) {
+        String foodId = request.getParameter("foodId");
+        String action = request.getParameter("action");
 
         Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
         if (cart == null) {
             cart = new HashMap<>();
         }
 
-        try {
-            int id = Integer.parseInt(foodId);
-            int currentQty = cart.getOrDefault(id, 0);
-            int newQty = currentQty;
+        int id = Integer.parseInt(foodId);
+        int currentQty = cart.getOrDefault(id, 0);
 
-            if ("increase".equals(action)) {
-                newQty = currentQty + 1;
-                cart.put(id, newQty);
-            } else if ("decrease".equals(action) && currentQty > 0) {
-                newQty = currentQty - 1;
-                if (newQty == 0) {
-                    cart.remove(id);
-                } else {
-                    cart.put(id, newQty);
-                }
-            } else {
-                 // กรณีที่ currentQty == 0 และ action เป็น decrease
-                 newQty = currentQty;
+        if ("increase".equals(action)) {
+            cart.put(id, currentQty + 1);
+        } else if ("decrease".equals(action) && currentQty > 0) {
+            cart.put(id, currentQty - 1);
+            if (cart.get(id) == 0) {
+                cart.remove(id);
             }
-
-            session.setAttribute("cart", cart);
-
-            // สร้าง JSON object เพื่อส่งกลับไปให้ AJAX (HTTP 200 OK)
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("newQuantity", newQty);
-            response.put("foodId", id);
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
-        } catch (NumberFormatException e) {
-            // กรณีแปลงตัวเลขไม่ได้ (HTTP 400 BAD REQUEST)
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "รหัสอาหารไม่ถูกต้อง (Invalid foodId format)");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // ข้อผิดพลาดอื่น ๆ (HTTP 500 INTERNAL SERVER ERROR)
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้ง");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        session.setAttribute("cart", cart);
+        return "redirect:viewmenu";
     }
 
     @RequestMapping(value = "/viewCart", method = RequestMethod.GET)
@@ -214,12 +185,7 @@ public class CustomerController {
         return mav;
     }
     
-    
-    
-    
-    
-    
-    
+    // ... (โค้ดส่วนที่เหลือของคุณเหมือนเดิม) ...
     
     @RequestMapping(value = "/menurecomand", method = RequestMethod.GET)
     public ModelAndView showMenu() {
@@ -560,15 +526,131 @@ public class CustomerController {
     public String logoutCustomer() {
         return "Homecustomer"; 
     }
-   
-
     
-   
+ // ... (วางใน CustomerController.java) ...
+
+    @RequestMapping(value = "/confirmOrder", method = RequestMethod.POST)
+    public ModelAndView confirmOrder(HttpSession session, HttpServletRequest request) {
+        
+        // --- 1. ดึงข้อมูลจาก Session ---
+        Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
+        Customer user = (Customer) session.getAttribute("user");
+
+        // --- 2. ตรวจสอบเงื่อนไข ---
+        if (user == null) {
+            return new ModelAndView("loginCustomer", "error", "กรุณาเข้าสู่ระบบก่อนยืนยันคำสั่งซื้อ");
+        }
+        if (cart == null || cart.isEmpty()) {
+            return new ModelAndView("redirect:/viewmenu");
+        }
+
+        // --- 3. ค้นหาบิล (Order) ที่ "Open" อยู่ ---
+        Session hibernateSession = null;
+        Transaction tx = null;
+        Order openOrder = null;
+
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            hibernateSession = sessionFactory.openSession();
+            tx = hibernateSession.beginTransaction();
+
+            // ===================================================================
+            // VVVVV  นี่คือตรรกะที่แก้ไขใหม่  VVVVV
+            // ===================================================================
+
+            // ขั้น A: ค้นหาการจอง (Reserve) ล่าสุดของลูกค้า ที่สถานะยังไม่จบ (เช่น 'Reserved' หรือ 'In Use')
+            // (เราจะไม่ค้นหาแค่ "Reserved" อีกต่อไป)
+            Reserve activeReservation = (Reserve) hibernateSession.createQuery(
+                    "FROM Reserve WHERE customers.cusId = :cusId AND status NOT IN ('Cancelled', 'Completed') ORDER BY reservedate DESC")
+                    .setParameter("cusId", user.getCusId()) //
+                    .setMaxResults(1)
+                    .uniqueResult();
+
+            if (activeReservation == null) {
+                 // ถ้าหาไม่เจอจริงๆ ค่อยไปหน้า myReverve
+                 return new ModelAndView("myReverve", "error", "ไม่พบการจอง (Reserve) ที่กำลังใช้งานอยู่");
+            }
+
+            // ขั้น B: จากการจอง (Reserve) เราจะได้โต๊ะ (Table)
+            Tables table = activeReservation.getTables();
+            
+            // ขั้น C: ค้นหาบิล (Order) ที่ "Open" ของโต๊ะนี้
+            // (ขั้นนี้เหมือนเดิม และถูกต้องแล้ว เพราะ Order ของคุณคือ "Open")
+            openOrder = (Order) hibernateSession.createQuery(
+                    "FROM Order WHERE table.tableid = :tableId AND status = :status")
+                    .setParameter("tableId", table.getTableid())
+                    .setParameter("status", "Open") //
+                    .setMaxResults(1)
+                    .uniqueResult();
+            
+            if (openOrder == null) {
+                // ถ้าเจอการจอง แต่พนักงานยังไม่เปิดบิล (Order)
+                return new ModelAndView("myReverve", "error", "ไม่พบบิล (Order) ที่เปิดไว้สำหรับโต๊ะนี้ (กรุณาติดต่อพนักงาน)");
+            }
+            
+            // ===================================================================
+            // AAAAA  จบส่วนที่แก้ไข AAAAA
+            // ===================================================================
 
 
+            // --- 4. ย้ายของจากตะกร้า (Cart) ไปยัง OrderDetail ---
+            FoodITemManager foodManager = new FoodITemManager(); 
 
+            for (Map.Entry<Integer, Integer> entry : cart.entrySet()) {
+                int foodId = entry.getKey();
+                int qty = entry.getValue();
 
+                if (qty <= 0) continue; 
 
-    
-    
+                MenuFood menuFood = foodManager.getFoodById(foodId); //
+                
+                if (menuFood == null) {
+                     throw new Exception("ไม่พบข้อมูลอาหาร foodId: " + foodId);
+                }
+
+                // สร้างแถวใหม่สำหรับ order_detail (ตาราง `order_menu`)
+                OrderDetail detail = new OrderDetail();
+                detail.setOrders(openOrder);            
+                detail.setMenufood(menuFood);           
+                detail.setQuantity(qty); //
+                detail.setPriceAtTimeOfOrder(menuFood.getPrice()); //
+                detail.setStatus("Pending");            
+
+                hibernateSession.save(detail);
+            }
+
+            // --- 5. ล้างตะกร้า ---
+            session.removeAttribute("cart");
+
+            // --- 6. ยืนยันการบันทึก (Commit) ---
+            tx.commit();
+            
+            // --- 7. กลับไปหน้าเมนู พร้อมข้อความแจ้งเตือน ---
+            session.setAttribute("orderSuccess", "สั่งอาหารเรียบร้อยแล้ว!");
+            return new ModelAndView("redirect:/viewmenu");
+
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            
+            // ส่งกลับไปหน้าตะกร้า (cart.jsp) พร้อม Error
+            ModelAndView mav = new ModelAndView("cart");
+            mav.addObject("error", "เกิดข้อผิดพลาดในการยืนยันคำสั่งซื้อ: " + e.getMessage());
+            
+            // (โหลดข้อมูลตะกร้ากลับไปแสดงอีกครั้ง)
+            FoodITemManager foodManager = new FoodITemManager();
+            Map<Map.Entry<Integer, Integer>, MenuFood> cartItems = new HashMap<>();
+            if (cart != null) {
+                for (Map.Entry<Integer, Integer> entry : cart.entrySet()) {
+                    MenuFood food = foodManager.getFoodById(entry.getKey());
+                    cartItems.put(new SimpleEntry<>(entry.getKey(), entry.getValue()), food);
+                }
+            }
+            mav.addObject("cartItems", cartItems);
+            return mav;
+
+        } finally {
+            if (hibernateSession != null) hibernateSession.close();
+        }
+    }
 }
