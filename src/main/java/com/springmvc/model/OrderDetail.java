@@ -29,8 +29,7 @@ public class OrderDetail {
 	@Column(nullable = false)
 	private double priceAtTimeOfOrder; 
 	
-	@Column(nullable = false, length = 45)
-	private double priceAtTimeOfOrder; 
+	
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "orderId", nullable = false)
