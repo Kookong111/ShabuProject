@@ -1,6 +1,9 @@
 package com.springmvc.controller;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap; // ใช้ LinkedHashMap เพื่อรักษาลำดับการดึงข้อมูล
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,6 +14,7 @@ import com.springmvc.model.MenuFood;
 import com.springmvc.model.MenufoodManager;
 import com.springmvc.model.Order;
 import com.springmvc.model.OrderManager;
+import com.springmvc.model.OrderDetail; 
 import com.springmvc.model.WaiterManager;
 import com.springmvc.model.Employee;
 import com.springmvc.model.Reserve;
@@ -288,5 +292,108 @@ public class ManageWaiterControler {
     @RequestMapping(value = "/gohome", method = RequestMethod.GET)
     public String loadd() {
         return "welcomeWaiter"; 
+    }
+    
+    // ----------------------------------------------------------------------------------
+    // เมธอดสำหรับแสดงรายการคำสั่งซื้อที่ต้องจัดการ (Mapping: gotoViewOrders) - พร้อม Grouping
+    // ----------------------------------------------------------------------------------
+    @RequestMapping(value = "/gotoViewOrders", method = RequestMethod.GET)
+    public ModelAndView gotoViewOrders(HttpSession session) {
+        if (session.getAttribute("users") == null) {
+            return new ModelAndView("redirect:/LoginWaiter", "error", "กรุณาเข้าสู่ระบบ");
+        }
+        
+        WaiterManager waiterManager = new WaiterManager();
+        
+        // ดึงรายการอาหารที่ยังไม่เสร็จสิ้น (Pending, In Progress) เป็น List<OrderDetail>
+        List<OrderDetail> activeOrderDetails = waiterManager.getActiveOrderDetails();
+        
+        // *** Logic: จัดกลุ่ม Order Detail ตาม Order ID ***
+        // Key: Order ID, Value: List of OrderDetail
+        Map<Integer, List<OrderDetail>> groupedOrders = new LinkedHashMap<>();
+        
+        if (activeOrderDetails != null) {
+            for (OrderDetail detail : activeOrderDetails) {
+                int orderId = detail.getOrders().getOderId(); // ดึง Order ID
+                
+                // ตรวจสอบว่ามี Order ID นี้ใน Map หรือยัง
+                if (!groupedOrders.containsKey(orderId)) {
+                    groupedOrders.put(orderId, new ArrayList<>());
+                }
+                groupedOrders.get(orderId).add(detail);
+            }
+        }
+        // *** สิ้นสุด Logic จัดกลุ่ม ***
+
+        ModelAndView mav = new ModelAndView("viewOrdersForWaiter"); 
+        mav.addObject("groupedOrders", groupedOrders); // ส่ง Map ที่จัดกลุ่มแล้วไป JSP
+        
+        return mav;
+    }
+    
+    // ----------------------------------------------------------------------------------
+    // เมธอดสำหรับอัปเดตสถานะของ Order Detail (แบบธรรมดา)
+    // ----------------------------------------------------------------------------------
+ // ใน ManageWaiterControler.java
+
+    @RequestMapping(value = "/updateOrderDetailStatus", method = RequestMethod.POST)
+    public String updateOrderDetailStatus(
+            @RequestParam("odermenuId") int odermenuId, 
+            @RequestParam("newStatus") String newStatus, 
+            // เพิ่ม HttpSession เข้ามา
+            HttpSession session) { 
+        
+        WaiterManager waiterManager = new WaiterManager();
+        
+        boolean success = waiterManager.updateOrderDetailStatus(odermenuId, newStatus);
+
+        if (success) {
+            // เปลี่ยนมาเก็บข้อความใน Session Attribute
+            session.setAttribute("actionSuccess", "อัปเดตสถานะรายการอาหารสำเร็จ"); 
+        } else {
+            // เปลี่ยนมาเก็บข้อความใน Session Attribute
+            session.setAttribute("actionError", "เกิดข้อผิดพลาดในการอัปเดตสถานะ");
+        }
+        // Redirect กลับไปหน้าเดิม โดยไม่มี Query Parameter ภาษาไทย
+        return "redirect:/gotoViewOrders";
+    }
+    
+ // ใน ManageWaiterControler.java
+
+    @RequestMapping(value = "/updateOrderToInProgress", method = RequestMethod.POST)
+    public String updateOrderToInProgress(@RequestParam("orderId") int orderId, HttpSession session) { // เพิ่ม HttpSession
+        WaiterManager waiterManager = new WaiterManager();
+        int updatedCount = waiterManager.updateOrderDetailsStatusByOrderId(orderId, "Pending", "In Progress");
+
+        if (updatedCount > 0) {
+            // เปลี่ยนมาเก็บข้อความใน Session Attribute
+            session.setAttribute("actionSuccess", "เริ่มจัดเตรียมรายการอาหาร " + updatedCount + " รายการในบิล ID: " + orderId + " แล้ว");
+        } else {
+            // เปลี่ยนมาเก็บข้อความใน Session Attribute
+            session.setAttribute("actionError", "ไม่มีรายการอาหารที่สถานะ 'Pending' ในบิล ID: " + orderId);
+        }
+        // Redirect กลับไปหน้าเดิม โดยไม่มี Query Parameter ภาษาไทย
+        return "redirect:/gotoViewOrders";
+    }
+
+    // ----------------------------------------------------------------------------------
+    // เมธอดสำหรับอัปเดตสถานะทั้งหมดในบิลเป็น 'Served' (เสิร์ฟแล้ว)
+    // ----------------------------------------------------------------------------------
+ // ใน ManageWaiterControler.java
+
+    @RequestMapping(value = "/updateOrderToServed", method = RequestMethod.POST)
+    public String updateOrderToServed(@RequestParam("orderId") int orderId, HttpSession session) { // เพิ่ม HttpSession
+        WaiterManager waiterManager = new WaiterManager();
+        int updatedCount = waiterManager.updateOrderDetailsStatusByOrderId(orderId, "In Progress", "Served");
+
+        if (updatedCount > 0) {
+            // เปลี่ยนมาเก็บข้อความใน Session Attribute
+            session.setAttribute("actionSuccess", "เสิร์ฟรายการอาหาร " + updatedCount + " รายการในบิล ID: " + orderId + " แล้ว");
+        } else {
+            // เปลี่ยนมาเก็บข้อความใน Session Attribute
+            session.setAttribute("actionError", "ไม่มีรายการอาหารที่สถานะ 'In Progress' ในบิล ID: " + orderId);
+        }
+        // Redirect กลับไปหน้าเดิม โดยไม่มี Query Parameter ภาษาไทย
+        return "redirect:/gotoViewOrders";
     }
 }

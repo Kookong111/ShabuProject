@@ -233,8 +233,67 @@ public class ReserveManager {
         }
         return customer;
     }
-
     
+    /**
+     * ดึงข้อมูลการจองล่าสุดที่สถานะไม่ใช่ Cancelled หรือ Completed (Active)
+     */
+    public Reserve getReservationByActiveStatus(Integer cusid) {
+        Session session = null;
+        Reserve reservation = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            // HQL: ค้นหาการจองล่าสุดที่สถานะ NOT IN ('Cancelled', 'Completed')
+            String hql = "FROM Reserve r WHERE r.customers.cusId = :cusid AND r.status NOT IN ('Cancelled', 'Completed') ORDER BY r.reservedate DESC, r.reservetime DESC";
+            
+            Query<Reserve> query = session.createQuery(hql, Reserve.class);
+            query.setParameter("cusid", cusid);
+            query.setMaxResults(1);
+            
+            reservation = query.uniqueResult();
+            session.getTransaction().commit();
+            
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return reservation;
+    }
+    
+    /**
+     * ดึงรายการ OrderDetail ทั้งหมดที่เชื่อมโยงกับ Order ID ที่กำหนด
+     */
+    public List<OrderDetail> getOrderDetailsByOrderId(int orderId) {
+        Session session = null;
+        List<OrderDetail> orderDetails = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            
+            // HQL: ค้นหา OrderDetail โดยอ้างถึง oderId ของ Order
+            Query<OrderDetail> query = session.createQuery(
+                 "FROM OrderDetail WHERE orders.oderId = :orderId ORDER BY odermenuId DESC", OrderDetail.class);
+            query.setParameter("orderId", orderId);
+            
+            orderDetails = query.list();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return orderDetails;
+    }
+
     
 	public boolean cancelReservation(int int1) {
 		// TODO Auto-generated method stub

@@ -1,34 +1,22 @@
 package com.springmvc.controller;
  
-
 import java.sql.Date;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-//... (imports เดิมของคุณ)
+import java.util.Map; // สำหรับ Map ใน Cart
 
-import com.springmvc.model.HibernateConnection;
-import com.springmvc.model.MenuFood;
-import com.springmvc.model.Order;
-import com.springmvc.model.OrderDetail;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+// import com.springmvc.model.CartManager; // <<< ลบออก
+import com.springmvc.model.Cart; // <<< ใช้ Cart Object (Session-based)
+import com.springmvc.model.CartItem; // <<< ใช้ CartItem Object (Session-based)
 import com.springmvc.model.Customer;
 import com.springmvc.model.CustomerRegisterManager;
 import com.springmvc.model.FoodITemManager;
 import com.springmvc.model.FoodType;
-import com.springmvc.model.LoginManager;
 import com.springmvc.model.MenuFood;
 import com.springmvc.model.MenufoodManager;
 import com.springmvc.model.Reserve;
@@ -37,7 +25,6 @@ import com.springmvc.model.TableManager;
 import com.springmvc.model.Tables;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -48,9 +35,8 @@ public class CustomerController {
         return "registerCustomer"; 
     }
 	// จัดการการสมัครสมาชิก
- // จัดการการสมัครสมาชิก
     @RequestMapping(value = "/registercustomer", method = RequestMethod.POST)
-    public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView registerUser(HttpServletRequest request) throws Exception {
     	CustomerRegisterManager rm = new CustomerRegisterManager();
 
         // ดึงข้อมูลจากฟอร์ม
@@ -78,7 +64,6 @@ public class CustomerController {
 
         if (result) {
             // หากบันทึกสำเร็จ, ส่งไปยัง login.jsp
-           //response.sendRedirect("login");//
             ModelAndView mav = new ModelAndView("loginCustomer");
             return mav;
             
@@ -126,64 +111,86 @@ public class CustomerController {
         return "registerCustomer"; 
     }
     
+    // VVVV เมธอดจัดการการสแกน QR Code VVVV
+    @RequestMapping(value = "/orderScan", method = RequestMethod.GET)
+    public String handleQrCodeScan(
+            @RequestParam("tableId") String tableId,
+            @RequestParam("orderId") Integer orderId,
+            HttpSession session) {
+        
+        // 1. บันทึกข้อมูลที่ได้จาก QR Code ลงใน Session ชั่วคราว
+        session.setAttribute("scannedTableId", tableId);
+        session.setAttribute("scannedOrderId", orderId);
+        
+        // 2. Redirect ไปหน้าเมนูหลัก
+        return "redirect:/viewmenu";
+    }
+    // ^^^^ สิ้นสุดการเพิ่มเมธอด ^^^^
+    
+    /**
+     * Helper Method: คำนวณจำนวนรายการทั้งหมดในตะกร้าจาก Cart Object ใน Session
+     */
+    private int getCartTotalItems(HttpSession session) {
+        Cart cart = (Cart) session.getAttribute("cartObject");
+        if (cart == null) {
+            return 0;
+        }
+        // ใช้ logic ใน Cart.java เพื่อคำนวณจำนวนรายการ (quantity รวม)
+        int total = 0;
+        for (CartItem item : cart.getItems().values()) {
+            total += item.getQuantity();
+        }
+        return total;
+    }
+    
+    // VVVV แก้ไข: viewMenuFood ต้องใช้ HttpSession และส่ง activeTable VVVV
     @RequestMapping(value = "/viewmenu", method = RequestMethod.GET)
-    public ModelAndView viewMenuFood() {
+    public ModelAndView viewMenuFood(HttpSession session) { 
+        Customer user = (Customer) session.getAttribute("user");
+        
         FoodITemManager foodManager = new FoodITemManager();
         TableManager tables = new TableManager();
+        ReserveManager reserveManager = new ReserveManager(); 
+        Tables activeTable = null; 
+        
+        // 1. ค้นหาโต๊ะที่ลูกค้าใช้งานอยู่ (ถ้าล็อกอิน)
+        if (user != null) {
+            Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId()); 
+            
+            if (activeReservation != null && activeReservation.getTables() != null) {
+                activeTable = activeReservation.getTables();
+            }
+        }
+        
+        // 2. หากยังไม่มี Active Reservation แต่มีการสแกน QR Code มา ให้ดึงข้อมูลโต๊ะจาก Session
+        if (activeTable == null && session.getAttribute("scannedTableId") != null) {
+            String tableId = (String) session.getAttribute("scannedTableId");
+            TableManager tableManager = new TableManager();
+            activeTable = tableManager.getTableById(tableId); // ดึงข้อมูลโต๊ะจาก TableManager
+        }
+
+        // VVVV 3. Logic ใหม่: อัปเดต totalCartItems ใน Session VVVV
+        int totalItems = getCartTotalItems(session); 
+        session.setAttribute("totalCartItems", totalItems); 
+        // ^^^^ สิ้นสุด Logic ใหม่ ^^^^
+
         List<MenuFood> menuList = foodManager.getAllFoodItem();
         List<FoodType> foodTypeList = foodManager.getAllFoodTypes();
         List<Tables> tablee = tables.getAllTable();
 
-        ModelAndView mav = new ModelAndView("orderfoodCuatomer"); // ไปยังหน้า JSP ชื่อ menuCustomer.jsp
+        ModelAndView mav = new ModelAndView("orderfoodCuatomer"); 
         mav.addObject("menuList", menuList);
         mav.addObject("foodTypeList", foodTypeList);
         mav.addObject("tablesList",tablee);
+        
+        // VVVV ส่งข้อมูลโต๊ะที่ใช้งานอยู่ VVVV
+        mav.addObject("activeTable", activeTable); 
+        
         return mav;
     }
+    // ^^^^ สิ้นสุดการแก้ไข ^^^^
     
-    @RequestMapping(value = "/updateQuantity", method = RequestMethod.POST)
-    public String updateQuantity(HttpServletRequest request, HttpSession session) {
-        String foodId = request.getParameter("foodId");
-        String action = request.getParameter("action");
-
-        Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
-        if (cart == null) {
-            cart = new HashMap<>();
-        }
-
-        int id = Integer.parseInt(foodId);
-        int currentQty = cart.getOrDefault(id, 0);
-
-        if ("increase".equals(action)) {
-            cart.put(id, currentQty + 1);
-        } else if ("decrease".equals(action) && currentQty > 0) {
-            cart.put(id, currentQty - 1);
-            if (cart.get(id) == 0) {
-                cart.remove(id);
-            }
-        }
-
-        session.setAttribute("cart", cart);
-        return "redirect:viewmenu";
-    }
-
-    @RequestMapping(value = "/viewCart", method = RequestMethod.GET)
-    public ModelAndView viewCart(HttpSession session) {
-        FoodITemManager foodManager = new FoodITemManager();
-        Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
-        Map<Map.Entry<Integer, Integer>, MenuFood> cartItems = new HashMap<>();
-
-        if (cart != null) {
-            for (Map.Entry<Integer, Integer> entry : cart.entrySet()) {
-                MenuFood food = foodManager.getFoodById(entry.getKey());
-                cartItems.put(new SimpleEntry<>(entry.getKey(), entry.getValue()), food);
-            }
-        }
-
-        ModelAndView mav = new ModelAndView("cart");
-        mav.addObject("cartItems", cartItems);
-        return mav;
-    }
+    // *** เมธอด updateQuantity, viewCart, confirmOrder ถูกลบและย้ายไป OrderCustomerController.java ***
     
     // ... (โค้ดส่วนที่เหลือของคุณเหมือนเดิม) ...
     
@@ -192,7 +199,7 @@ public class CustomerController {
         MenufoodManager manager = new MenufoodManager();
         List<MenuFood> menulist = manager.getAllMenufood();
         ModelAndView mav = new ModelAndView("menu");
-        mav.addObject("menuItems", menulist); // ✅ ตรงกับ ${menuItems} ใน JSP แล้ว
+        mav.addObject("menuItems", menulist); 
         return mav;
     }
     
@@ -201,7 +208,7 @@ public class CustomerController {
         MenufoodManager manager = new MenufoodManager();
         List<Tables> tablelist = manager.getAllListTable();
         ModelAndView mav = new ModelAndView("listTable");
-        mav.addObject("tables", tablelist); // ✅ ตรงกับ ${menuItems} ใน JSP แล้ว
+        mav.addObject("tables", tablelist); 
         return mav;
     }
     
@@ -210,7 +217,7 @@ public class CustomerController {
         MenufoodManager manager = new MenufoodManager();
         List<Tables> tablelist = manager.getAllListTable();
         ModelAndView mav = new ModelAndView("listTable");
-        mav.addObject("tables", tablelist); // ✅ ตรงกับ ${menuItems} ใน JSP แล้ว
+        mav.addObject("tables", tablelist); 
         return mav;
     }
     
@@ -227,7 +234,7 @@ public class CustomerController {
         }
         
         ModelAndView mav = new ModelAndView("Detailtable");
-        mav.addObject("table", r != null ? r : new Tables()); // แก้ให้ไม่ส่งค่า null ไป JSP
+        mav.addObject("table", r != null ? r : new Tables()); 
         return mav;
     }
 
@@ -332,7 +339,7 @@ public class CustomerController {
                 TableManager tableManager = new TableManager();
                 boolean updated = tableManager.updateStatusToReserved(tableid);
                 if (!updated) {
-                    System.out.println("⚠️ ไม่สามารถอัปเดตสถานะโต๊ะได้ tableId = " + tableid);
+                    System.out.println("⚠️ ไม่สามารถอัปเดตสถานะโต๊ะได้ tableid = " + tableid);
                 }
 
                 // ✅ หากบันทึกสำเร็จ ไปหน้าแสดงผลการจองสำเร็จ
@@ -398,9 +405,6 @@ public class CustomerController {
     }
    
    
- // เพิ่ม methods เหล่านี้ใน CustomerController.java
-
- // 👇 เมธอดที่ได้รับการปรับปรุงเพื่อดึงข้อมูลการจองของลูกค้า
  	@RequestMapping(value = "/myReservess", method = RequestMethod.GET)
  	public ModelAndView myReservations(HttpSession session) {
  	    Customer user = (Customer) session.getAttribute("user");
@@ -527,130 +531,6 @@ public class CustomerController {
         return "Homecustomer"; 
     }
     
- // ... (วางใน CustomerController.java) ...
+    // *** เมธอด updateQuantity, viewCart, confirmOrder ถูกลบและย้ายไป OrderCustomerController.java ***
 
-    @RequestMapping(value = "/confirmOrder", method = RequestMethod.POST)
-    public ModelAndView confirmOrder(HttpSession session, HttpServletRequest request) {
-        
-        // --- 1. ดึงข้อมูลจาก Session ---
-        Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
-        Customer user = (Customer) session.getAttribute("user");
-
-        // --- 2. ตรวจสอบเงื่อนไข ---
-        if (user == null) {
-            return new ModelAndView("loginCustomer", "error", "กรุณาเข้าสู่ระบบก่อนยืนยันคำสั่งซื้อ");
-        }
-        if (cart == null || cart.isEmpty()) {
-            return new ModelAndView("redirect:/viewmenu");
-        }
-
-        // --- 3. ค้นหาบิล (Order) ที่ "Open" อยู่ ---
-        Session hibernateSession = null;
-        Transaction tx = null;
-        Order openOrder = null;
-
-        try {
-            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-            hibernateSession = sessionFactory.openSession();
-            tx = hibernateSession.beginTransaction();
-
-            // ===================================================================
-            // VVVVV  นี่คือตรรกะที่แก้ไขใหม่  VVVVV
-            // ===================================================================
-
-            // ขั้น A: ค้นหาการจอง (Reserve) ล่าสุดของลูกค้า ที่สถานะยังไม่จบ (เช่น 'Reserved' หรือ 'In Use')
-            // (เราจะไม่ค้นหาแค่ "Reserved" อีกต่อไป)
-            Reserve activeReservation = (Reserve) hibernateSession.createQuery(
-                    "FROM Reserve WHERE customers.cusId = :cusId AND status NOT IN ('Cancelled', 'Completed') ORDER BY reservedate DESC")
-                    .setParameter("cusId", user.getCusId()) //
-                    .setMaxResults(1)
-                    .uniqueResult();
-
-            if (activeReservation == null) {
-                 // ถ้าหาไม่เจอจริงๆ ค่อยไปหน้า myReverve
-                 return new ModelAndView("myReverve", "error", "ไม่พบการจอง (Reserve) ที่กำลังใช้งานอยู่");
-            }
-
-            // ขั้น B: จากการจอง (Reserve) เราจะได้โต๊ะ (Table)
-            Tables table = activeReservation.getTables();
-            
-            // ขั้น C: ค้นหาบิล (Order) ที่ "Open" ของโต๊ะนี้
-            // (ขั้นนี้เหมือนเดิม และถูกต้องแล้ว เพราะ Order ของคุณคือ "Open")
-            openOrder = (Order) hibernateSession.createQuery(
-                    "FROM Order WHERE table.tableid = :tableId AND status = :status")
-                    .setParameter("tableId", table.getTableid())
-                    .setParameter("status", "Open") //
-                    .setMaxResults(1)
-                    .uniqueResult();
-            
-            if (openOrder == null) {
-                // ถ้าเจอการจอง แต่พนักงานยังไม่เปิดบิล (Order)
-                return new ModelAndView("myReverve", "error", "ไม่พบบิล (Order) ที่เปิดไว้สำหรับโต๊ะนี้ (กรุณาติดต่อพนักงาน)");
-            }
-            
-            // ===================================================================
-            // AAAAA  จบส่วนที่แก้ไข AAAAA
-            // ===================================================================
-
-
-            // --- 4. ย้ายของจากตะกร้า (Cart) ไปยัง OrderDetail ---
-            FoodITemManager foodManager = new FoodITemManager(); 
-
-            for (Map.Entry<Integer, Integer> entry : cart.entrySet()) {
-                int foodId = entry.getKey();
-                int qty = entry.getValue();
-
-                if (qty <= 0) continue; 
-
-                MenuFood menuFood = foodManager.getFoodById(foodId); //
-                
-                if (menuFood == null) {
-                     throw new Exception("ไม่พบข้อมูลอาหาร foodId: " + foodId);
-                }
-
-                // สร้างแถวใหม่สำหรับ order_detail (ตาราง `order_menu`)
-                OrderDetail detail = new OrderDetail();
-                detail.setOrders(openOrder);            
-                detail.setMenufood(menuFood);           
-                detail.setQuantity(qty); //
-                detail.setPriceAtTimeOfOrder(menuFood.getPrice()); //
-                detail.setStatus("Pending");            
-
-                hibernateSession.save(detail);
-            }
-
-            // --- 5. ล้างตะกร้า ---
-            session.removeAttribute("cart");
-
-            // --- 6. ยืนยันการบันทึก (Commit) ---
-            tx.commit();
-            
-            // --- 7. กลับไปหน้าเมนู พร้อมข้อความแจ้งเตือน ---
-            session.setAttribute("orderSuccess", "สั่งอาหารเรียบร้อยแล้ว!");
-            return new ModelAndView("redirect:/viewmenu");
-
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            
-            // ส่งกลับไปหน้าตะกร้า (cart.jsp) พร้อม Error
-            ModelAndView mav = new ModelAndView("cart");
-            mav.addObject("error", "เกิดข้อผิดพลาดในการยืนยันคำสั่งซื้อ: " + e.getMessage());
-            
-            // (โหลดข้อมูลตะกร้ากลับไปแสดงอีกครั้ง)
-            FoodITemManager foodManager = new FoodITemManager();
-            Map<Map.Entry<Integer, Integer>, MenuFood> cartItems = new HashMap<>();
-            if (cart != null) {
-                for (Map.Entry<Integer, Integer> entry : cart.entrySet()) {
-                    MenuFood food = foodManager.getFoodById(entry.getKey());
-                    cartItems.put(new SimpleEntry<>(entry.getKey(), entry.getValue()), food);
-                }
-            }
-            mav.addObject("cartItems", cartItems);
-            return mav;
-
-        } finally {
-            if (hibernateSession != null) hibernateSession.close();
-        }
-    }
 }
