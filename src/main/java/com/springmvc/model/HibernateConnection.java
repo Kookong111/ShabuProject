@@ -17,12 +17,12 @@ public class HibernateConnection {
 		String dockerProfile = System.getProperty("spring.profiles.active");
 		if ("docker".equals(dockerProfile)) {
 			// Docker environment - connect to mysql container
-			url = "jdbc:mysql://mysql:3306/project_shabu2?characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC";
+			url = "jdbc:mysql://mysql:3307/project_shabu2?characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC";
 			uname = "root";
 			pwd = "1234";
 		} else {
 			// Local development environment
-			url = "jdbc:mysql://localhost:3306/project_shabu2?characterEncoding=UTF-8";
+			url = "jdbc:mysql://localhost:3307/project_shabu2?characterEncoding=UTF-8";
 			uname = "root";
 			pwd = "1234";
 		}
