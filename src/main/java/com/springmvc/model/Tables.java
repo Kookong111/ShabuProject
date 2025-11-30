@@ -20,7 +20,9 @@ public class Tables {
 	@Column(nullable = false, length = 55)
 	private String capacity;
 	
-    
+    @Column(name = "qr_token", unique = true, length = 255)
+    private String qrToken;
+	
 	public Tables() {
 		super();
 	}
@@ -28,11 +30,15 @@ public class Tables {
 
 
 	public Tables(String tableid, String capacity, String status) {
-		super();
-		this.tableid = tableid;
-		this.status = status;
-		this.capacity = capacity;
-	}
+        super();
+        this.tableid = tableid;
+        this.status = status;
+        this.capacity = capacity;
+
+        if (this.qrToken == null || this.qrToken.isEmpty()) {
+            this.qrToken = UUID.randomUUID().toString();
+        }
+    }
 
 
 
@@ -71,7 +77,15 @@ public class Tables {
 	}
 
 	
+	public String getQrToken() {
+        return qrToken;
+    }
 
+
+
+    public void setQrToken(String qrToken) {
+        this.qrToken = qrToken;
+    }
 
 	
 	
