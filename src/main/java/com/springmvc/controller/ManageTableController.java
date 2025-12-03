@@ -2,14 +2,21 @@
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import com.springmvc.model.LoginManager;
+import com.springmvc.model.QrCodeGenerator;
 import com.springmvc.model.TableManager;
 import com.springmvc.model.Tables;
 
@@ -141,4 +148,35 @@ public class ManageTableController {
 
         return mav;
     }
+    
+    @RequestMapping(value = "/generateQrForTable", method = RequestMethod.GET)
+    public void generateQrForTable(@RequestParam("token") String qrToken, HttpServletResponse response) {
+        
+        try {
+            TableManager tableManager = new TableManager();
+            Tables table = tableManager.getTableByQrToken(qrToken);
+
+            if (table == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "QR Token not found.");
+                return;
+            }
+
+            // 1. สร้าง URL สำหรับเข้ารหัส (ใช้ BASE_URL ที่กำหนดใน Helper)
+            String qrUrl = QrCodeGenerator.generateQrUrl(qrToken);
+
+            // 2. สร้างภาพ QR Code (เช่น ขนาด 200x200 pixels)
+            byte[] qrImageBytes = QrCodeGenerator.generateQrCodeImage(qrUrl, 200, 200);
+
+            // 3. กำหนด Header และส่งภาพกลับไป
+            response.setContentType(MediaType.IMAGE_PNG_VALUE);
+            response.setContentLength(qrImageBytes.length);
+            response.getOutputStream().write(qrImageBytes);
+            response.getOutputStream().flush();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error generating QR code.");
+            } catch (IOException ignored) {}
+        }}
 }

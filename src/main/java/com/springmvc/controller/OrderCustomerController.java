@@ -3,6 +3,8 @@ package com.springmvc.controller;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -21,10 +23,13 @@ import com.springmvc.model.FoodITemManager;
 import com.springmvc.model.HibernateConnection;
 import com.springmvc.model.MenuFood;
 import com.springmvc.model.Order;
+import com.springmvc.model.OrderManager; 
 import com.springmvc.model.OrderDetail;
 import com.springmvc.model.Reserve;
 import com.springmvc.model.ReserveManager;
 import com.springmvc.model.Tables;
+import com.springmvc.model.TableManager; 
+import com.springmvc.model.FoodType;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -34,11 +39,13 @@ public class OrderCustomerController {
     
     private FoodITemManager foodManager = new FoodITemManager();
     private ReserveManager reserveManager = new ReserveManager();
+    private TableManager tableManager = new TableManager(); 
+    private OrderManager orderManager = new OrderManager(); 
 
     /**
      * Helper Method: ดึง/สร้าง Cart Object จาก Session
      */
-    private Cart getOrCreateCart(HttpSession session) {
+    private Cart getCartFromSession(HttpSession session) {
         Cart cart = (Cart) session.getAttribute("cartObject");
         if (cart == null) {
             cart = new Cart();
@@ -46,55 +53,68 @@ public class OrderCustomerController {
         }
         return cart;
     }
-    
+
     /**
-     * Helper Method: คำนวณจำนวนรายการทั้งหมดในตะกร้าจาก Cart Object
+     * Helper Method: อัปเดตจำนวนสินค้าทั้งหมดในตะกร้า (totalCartItems) ใน Session
      */
-    private int getCartTotalItems(Cart cart) {
-        int total = 0;
-        for (CartItem item : cart.getItems().values()) {
-            total += item.getQuantity();
-        }
-        return total;
+    private void updateCartTotalItems(HttpSession session, Cart cart) {
+        int totalItems = cart.getItems().values().stream()
+                             .mapToInt(CartItem::getQuantity)
+                             .sum();
+        session.setAttribute("totalCartItems", totalItems);
     }
     
     // 1. เพิ่มสินค้าลงตะกร้า (ใช้ Session Cart)
     @RequestMapping(value = "/addToCart", method = RequestMethod.POST)
-    public ModelAndView addToCart(HttpSession session, @RequestParam("foodId") int foodId) {
-        Customer user = (Customer) session.getAttribute("user");
-        if (user == null) {
-            return new ModelAndView("redirect:/LoginCustomer", "error", "กรุณาเข้าสู่ระบบก่อนทำการสั่งอาหาร");
-        }
+    public ModelAndView addToCart(@RequestParam("foodId") int foodId, 
+                                @RequestParam("quantity") int quantity,
+                                HttpSession session) {
         
+        // เราจะสมมติว่า JSP ส่ง quantity มาเป็น 1 ในการกดปุ่ม "+"
+        if (quantity <= 0) quantity = 1; 
+        
+        // *** ตรวจสอบบริบทการสั่งอาหาร (Table/Order) แทน Customer Login ***
+        String sessionTableId = (String) session.getAttribute("tableId");
+        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
+        
+        if (sessionTableId == null || sessionOrderId == null) {
+            return new ModelAndView("redirect:/viewmenu", "error", "⚠️ กรุณาสแกน QR Code โต๊ะเพื่อเริ่มสั่งอาหาร");
+        }
+        // *************************************************************
+
         MenuFood food = foodManager.getFoodById(foodId);
         if (food == null) {
             return new ModelAndView("redirect:/viewmenu", "error", "ไม่พบรายการอาหาร");
         }
 
-        Cart cart = getOrCreateCart(session);
+        Cart cart = getCartFromSession(session);
         
         // VVVV สร้าง CartItem โดยใช้ Constructor ที่แก้ไขให้รับ priceAtTime VVVV
-        CartItem newItem = new CartItem(food, 1, food.getPrice()); 
+        CartItem newItem = new CartItem(food, quantity, food.getPrice()); 
         cart.addItem(newItem);
         
         // อัปเดต Session เพื่อให้ UI แสดงผลจำนวนรายการใหม่
-        session.setAttribute("totalCartItems", getCartTotalItems(cart));
+        updateCartTotalItems(session, cart);
         
         session.setAttribute("orderSuccess", "เพิ่ม " + food.getFoodname() + " ลงในตะกร้าแล้ว!");
         return new ModelAndView("redirect:/viewmenu");
     }
-
+    
     // 2. อัปเดตจำนวนสินค้า (เพิ่ม/ลด/ลบ)
     @RequestMapping(value = "/updateQuantity", method = RequestMethod.POST)
     public ModelAndView updateQuantity(HttpSession session, 
                                        @RequestParam("foodId") int foodId, 
                                        @RequestParam("action") String action) {
-        Customer user = (Customer) session.getAttribute("user");
-        if (user == null) {
-            return new ModelAndView("redirect:/LoginCustomer", "error", "กรุณาเข้าสู่ระบบก่อนดำเนินการ");
-        }
+        // *** ตรวจสอบบริบทการสั่งอาหาร (Table/Order) ***
+        String sessionTableId = (String) session.getAttribute("tableId");
+        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
         
-        Cart cart = getOrCreateCart(session);
+        if (sessionTableId == null || sessionOrderId == null) {
+            return new ModelAndView("redirect:/viewmenu", "error", "⚠️ กรุณาสแกน QR Code โต๊ะเพื่อเริ่มสั่งอาหาร");
+        }
+        // *********************************************
+        
+        Cart cart = getCartFromSession(session);
         Map<Integer, CartItem> items = cart.getItems();
         
         CartItem item = items.get(foodId);
@@ -116,7 +136,7 @@ public class OrderCustomerController {
         }
         
         // อัปเดต Session เพื่อให้ UI แสดงผลจำนวนรายการใหม่
-        session.setAttribute("totalCartItems", getCartTotalItems(cart));
+        updateCartTotalItems(session, cart);
 
         return new ModelAndView("redirect:/viewCart");
     }
@@ -124,62 +144,59 @@ public class OrderCustomerController {
     // 3. ดูตะกร้าสินค้า (ส่ง List<CartItem> ไป JSP)
     @RequestMapping(value = "/viewCart", method = RequestMethod.GET)
     public ModelAndView viewCart(HttpSession session) {
-        ModelAndView mav = new ModelAndView("cart");
-        Customer user = (Customer) session.getAttribute("user");
+        ModelAndView mav = new ModelAndView("cart"); // viewCart.jsp
         
-        if (user == null) {
-             return new ModelAndView("loginCustomer", "error", "กรุณาเข้าสู่ระบบก่อนเข้าสู่หน้าตะกร้า");
+        // *** ตรวจสอบบริบทการสั่งอาหาร (Table/Order) ***
+        String sessionTableId = (String) session.getAttribute("tableId");
+        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
+        
+        if (sessionTableId == null || sessionOrderId == null) {
+             return new ModelAndView("redirect:/viewmenu", "error", "⚠️ กรุณาสแกน QR Code โต๊ะเพื่อเริ่มสั่งอาหาร");
         }
+        // *********************************************
         
-        Cart cart = getOrCreateCart(session);
+        Cart cart = getCartFromSession(session);
         
         // ส่ง List<CartItem> ไปยัง JSP
         List<CartItem> cartItemsList = new ArrayList<>(cart.getItems().values());
         double total = cart.getTotalPrice(); 
         
-        session.setAttribute("totalCartItems", getCartTotalItems(cart));
+        updateCartTotalItems(session, cart);
         
         mav.addObject("cartItemsList", cartItemsList);
         mav.addObject("total", total);
         
         return mav;
     }
-
+    
     // 4. เมธอดสำหรับดูรายละเอียดรายการสั่งอาหารที่อยู่ในบิลปัจจุบัน
     @RequestMapping(value = "/viewCurrentOrder", method = RequestMethod.GET)
     public ModelAndView viewCurrentOrder(HttpSession session) {
-        Customer user = (Customer) session.getAttribute("user");
-        if (user == null) {
-            return new ModelAndView("loginCustomer", "error", "กรุณาเข้าสู่ระบบก่อนดูรายการสั่งอาหาร");
-        }
-
-        ReserveManager reserveManager = new ReserveManager();
+        // *** ตรวจสอบบริบทการสั่งอาหาร (Table/Order) ***
+        String sessionTableId = (String) session.getAttribute("tableId");
+        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
         
-        // 1. ค้นหา Active Reservation
-        Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId()); 
-        
-        if (activeReservation == null || activeReservation.getTables() == null) {
-            return new ModelAndView("viewCurrentOrder", "error", "ไม่พบการจองหรือโต๊ะที่ใช้งานอยู่ในขณะนี้");
+        if (sessionTableId == null || sessionOrderId == null) {
+            return new ModelAndView("viewCurrentOrder", "error", "⚠️ ไม่พบโต๊ะที่ใช้งานอยู่ในขณะนี้ กรุณาสแกน QR Code");
         }
+        // *********************************************
 
-        // 2. ค้นหา Order ที่ "Open" สำหรับโต๊ะนี้
+        // 1. ค้นหา Order ปัจจุบันจาก Order ID ใน Session
         Order currentOrder = null;
         try (Session hibernateSession = HibernateConnection.doHibernateConnection().openSession()) {
-            Query<Order> query = hibernateSession.createQuery(
-                "FROM Order WHERE table.tableid = :tableId AND status = :status", Order.class);
-            query.setParameter("tableId", activeReservation.getTables().getTableid());
-            query.setParameter("status", "Open");
-            currentOrder = query.uniqueResult();
+            currentOrder = hibernateSession.get(Order.class, sessionOrderId);
+            
+            // ตรวจสอบความถูกต้องของ Order ที่ดึงมา
+            if (currentOrder == null || !currentOrder.getTable().getTableid().equals(sessionTableId)) {
+                return new ModelAndView("viewCurrentOrder", "error", "ไม่พบบิลที่เชื่อมโยงกับโต๊ะนี้");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ModelAndView("viewCurrentOrder", "error", "เกิดข้อผิดพลาดในการค้นหาบิล");
         }
         
-        if (currentOrder == null) {
-            return new ModelAndView("viewCurrentOrder", "error", "ไม่พบบิล (Order) ที่เปิดไว้สำหรับโต๊ะนี้");
-        }
-        
-        // 3. ดึงรายการ OrderDetail ทั้งหมดของ Order นี้ โดยใช้ ReserveManager
+        // 2. ดึงรายการ OrderDetail ทั้งหมดของ Order นี้ โดยใช้ ReserveManager
         List<OrderDetail> orderDetails = reserveManager.getOrderDetailsByOrderId(currentOrder.getOderId());
 
         // VVVV Logic จัดเรียง VVVV
@@ -202,7 +219,7 @@ public class OrderCustomerController {
         ModelAndView mav = new ModelAndView("viewCurrentOrder"); 
         mav.addObject("currentOrder", currentOrder);
         mav.addObject("orderDetails", orderDetails);
-        mav.addObject("tableId", activeReservation.getTables().getTableid());
+        mav.addObject("tableId", sessionTableId);
         
         return mav;
     }
@@ -212,12 +229,18 @@ public class OrderCustomerController {
     @RequestMapping(value = "/confirmOrder", method = RequestMethod.POST)
     public ModelAndView confirmOrder(HttpSession session) {
         
-        Customer user = (Customer) session.getAttribute("user");
-        if (user == null) {
-            return new ModelAndView("loginCustomer", "error", "กรุณาเข้าสู่ระบบก่อนยืนยันคำสั่งซื้อ");
+        // *** ตรวจสอบบริบทการสั่งอาหาร (Table/Order) ***
+        String sessionTableId = (String) session.getAttribute("tableId");
+        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
+        
+        if (sessionTableId == null || sessionOrderId == null) {
+            ModelAndView errorMav = viewCart(session);
+            errorMav.addObject("error", "ไม่พบบิลที่ใช้งานอยู่ กรุณาสแกน QR Code โต๊ะอีกครั้ง");
+            return errorMav; 
         }
+        // *********************************************
 
-        Cart cart = getOrCreateCart(session);
+        Cart cart = getCartFromSession(session);
         Map<Integer, CartItem> cartItems = cart.getItems();
         
         if (cartItems.isEmpty()) {
@@ -233,40 +256,22 @@ public class OrderCustomerController {
             hibernateSession = sessionFactory.openSession();
             tx = hibernateSession.beginTransaction();
             
-            ReserveManager reserveManager = new ReserveManager();
+            // 1. ดึง Open Order โดยใช้ Order ID จาก Session
+            openOrder = hibernateSession.get(Order.class, sessionOrderId);
             
-            // 1. ค้นหา Active Reservation
-            Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId()); 
-
-            if (activeReservation == null || activeReservation.getTables() == null) {
-                 tx.rollback();
-                 ModelAndView errorMav = viewCart(session);
-                 errorMav.addObject("error", "ไม่พบการจองหรือโต๊ะที่ใช้งานอยู่, กรุณาจองโต๊ะหรือติดต่อพนักงาน");
-                 return errorMav; 
-            }
-
-            // 2. ค้นหา Open Order
-            Tables table = activeReservation.getTables();
-            
-            openOrder = (Order) hibernateSession.createQuery(
-                    "FROM Order WHERE table.tableid = :tableId AND status = :status", Order.class)
-                    .setParameter("tableId", table.getTableid())
-                    .setParameter("status", "Open")
-                    .uniqueResult();
-            
-            if (openOrder == null) {
+            if (openOrder == null || !openOrder.getStatus().equals("Open")) {
                 tx.rollback();
                 ModelAndView errorMav = viewCart(session);
-                errorMav.addObject("error", "ไม่พบบิล (Order) ที่เปิดไว้สำหรับโต๊ะที่จอง (" + table.getTableid() + ") - **กรุณาติดต่อพนักงานเสิร์ฟเพื่อเปิดบิลก่อน**");
+                errorMav.addObject("error", "ไม่พบบิล (Order) ที่เปิดไว้สำหรับโต๊ะที่สแกน - **กรุณาติดต่อพนักงานเสิร์ฟเพื่อเปิดบิลก่อน**");
                 return errorMav;
             }
             
-            // --- 3. ย้ายรายการจาก Cart Object ไป OrderDetail ---
-            
+            // 2. ตรวจสอบ CartItem ในตะกร้า
+            Map<Integer, CartItem> items = cart.getItems();
             double totalOrderPriceIncrease = 0.0;
             
-            for (CartItem item : cartItems.values()) {
-                // *** สร้าง OrderDetail โดยใช้ข้อมูลจาก CartItem Object ***
+            // 3. บันทึก CartItem แต่ละรายการเป็น OrderDetail
+            for (CartItem item : items.values()) {
                 OrderDetail detail = new OrderDetail();
                 detail.setOrders(openOrder);
                 detail.setMenufood(item.getMenufood()); 
@@ -302,5 +307,81 @@ public class OrderCustomerController {
         } finally {
             if (hibernateSession != null) hibernateSession.close();
         }
+    }
+    
+    // *** NEW/MODIFIED VIEW METHOD ***
+    @RequestMapping(value = "/viewmenu", method = RequestMethod.GET)
+    public ModelAndView viewmenu(HttpSession session, 
+                                 @RequestParam(value = "qrToken", required = false) String qrToken) {
+        
+        // 1. ตรวจสอบบริบทการสั่งอาหารใน Session ก่อน
+        String sessionTableId = (String) session.getAttribute("tableId");
+        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
+
+        // 2. ถ้ามี qrToken มาด้วย (การสแกนครั้งแรก) ให้ดำเนินการตรวจสอบสถานะ
+        if (qrToken != null && !qrToken.isEmpty()) { 
+            Tables table = tableManager.getTableByQrToken(qrToken);
+            
+            // 2.1. ไม่พบโต๊ะจาก QR Token
+            if (table == null) {
+                ModelAndView mav = new ModelAndView("Homecustomer");
+                mav.addObject("error", "⚠️ QR Code ไม่ถูกต้อง ไม่พบโต๊ะในระบบ");
+                return mav;
+            }
+            
+            // 2.2. ตรวจสอบสถานะโต๊ะ ต้องถูก "Occupied" (หรือ "In Use")
+            // ใช้ "Occupied" ตามข้อมูลฐานข้อมูลของคุณและรวม "In Use"
+            if (!"Occupied".equals(table.getStatus()) && !"In Use".equals(table.getStatus())) { 
+                ModelAndView mav = new ModelAndView("Homecustomer");
+                mav.addObject("error", "🚫 โต๊ะ " + table.getTableid() + " ยังไม่เปิดให้บริการ กรุณาติดต่อพนักงาน");
+                session.removeAttribute("tableId");
+                session.removeAttribute("orderId");
+                return mav;
+            }
+            
+            // 2.3. โต๊ะเปิดแล้ว: ค้นหา Active Order ที่กำลังทำงานอยู่
+            Order activeOrder = orderManager.getActiveOrderByTableId(table.getTableid());
+            
+            if (activeOrder == null) {
+                // โต๊ะเป็น "Occupied" แต่ไม่พบบิลที่ Active -> บล็อก
+                ModelAndView mav = new ModelAndView("Homecustomer");
+                mav.addObject("error", "🚫 โต๊ะ " + table.getTableid() + " เปิดใช้งานแล้ว แต่ไม่พบบิล กรุณาติดต่อพนักงานเพื่อเปิดบิล");
+                session.removeAttribute("tableId");
+                session.removeAttribute("orderId");
+                return mav;
+            }
+            
+            // 2.4. ตรวจสอบผ่าน: บันทึก context ลงใน Session
+            session.setAttribute("tableId", table.getTableid());
+            session.setAttribute("orderId", activeOrder.getOderId());
+            
+            // 2.5. Redirect เพื่อตัด qrToken ออกจาก URL และใช้ Session Context ในการทำงานต่อ
+            return new ModelAndView("redirect:/viewmenu");
+        } 
+        
+        // 3. ถ้ามาถึงตรงนี้ ต้องตรวจสอบ Session Context
+        if (sessionTableId == null || sessionOrderId == null) {
+            // หากไม่มี context ใน session และไม่มี qrToken (เข้าตรงๆ)
+            ModelAndView mav = new ModelAndView("Homecustomer");
+            mav.addObject("error", "⚠️ กรุณาสแกน QR Code ที่โต๊ะเพื่อเริ่มสั่งอาหาร");
+            return mav;
+        }
+
+        // 4. ถ้ามี context ใน Session ดำเนินการแสดงเมนู (ส่งข้อมูลทั้งหมดที่ JSP ต้องการ)
+        List<MenuFood> menuList = foodManager.getAllFoodItem();
+        List<FoodType> foodTypeList = foodManager.getAllFoodTypes(); 
+
+        // จัดการ Cart (Logic เดิม)
+        Cart cart = getCartFromSession(session);
+        updateCartTotalItems(session, cart);
+
+        // ส่งข้อมูล TableId, OrderId, Menu List, Food Type List ไปยัง JSP
+        ModelAndView mav = new ModelAndView("orderfoodCuatomer"); 
+        mav.addObject("menuList", menuList);
+        mav.addObject("foodTypeList", foodTypeList); 
+        mav.addObject("tableId", sessionTableId); 
+        mav.addObject("orderId", sessionOrderId); 
+
+        return mav;
     }
 }

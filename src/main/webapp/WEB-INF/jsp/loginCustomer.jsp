@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 
@@ -23,6 +23,9 @@
       --text-gray: #7a8391;
       --text-light: #adb5c2;
       --shadow: 0 20px 40px -15px rgba(155, 149, 168, 0.15);
+      /* NEW COLOR FOR ORDERING BUTTON */
+      --order-color: #4CAF50; /* Green for Call-to-Action */
+      --order-dark: #388E3C;
     }
 
     body {
@@ -133,6 +136,48 @@
       background: linear-gradient(135deg, #7a4fa6, #8b5fbf);
       box-shadow: 0 8px 20px rgba(139, 95, 191, 0.3);
     }
+    
+    /* NEW STYLE: Order Button */
+    .btn-order-test {
+        background-color: var(--order-color);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 28px;
+        font-size: 1rem;
+        font-weight: 600;
+        width: 100%;
+        margin-top: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none; /* Make it look like a button */
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-order-test:hover {
+        background-color: var(--order-dark);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+        color: white;
+    }
+    
+    .divider {
+        margin: 20px 0;
+        text-align: center;
+        border-bottom: 1px dashed var(--border-color);
+        line-height: 0.1em;
+    }
+    
+    .divider span {
+        background: #fff;
+        padding: 0 10px;
+        font-size: 0.9em;
+        color: var(--text-gray);
+    }
+    /* End NEW STYLE */
+
 
     .register-link {
       text-align: center;
@@ -180,7 +225,35 @@
         <h2>เข้าสู่ระบบลูกค้า</h2>
         <p>ระบบจัดการร้านอาหาร</p>
       </div>
+      
+      <c:choose>
+        <c:when test="${not empty error}">
+             <div class="alert alert-danger text-center" role="alert">
+                ${error}
+             </div>
+        </c:when>
+         <c:when test="${not empty param.error}">
+             <div class="alert alert-danger text-center" role="alert">
+                ${param.error}
+             </div>
+        </c:when>
+      </c:choose>
 
+      <h5 class="text-center mb-3" style="color: var(--order-dark); font-weight: 600;">
+          ช่องทางสั่งอาหาร (สำหรับลูกค้าที่โต๊ะ)
+      </h5>
+      
+      <%-- 
+          Note: ในการใช้งานจริง ลูกค้าต้องสแกน QR Code 
+          โค้ดนี้จำลองการสแกนโดยการกำหนด qrToken เพื่อเข้าสู่หน้าสั่งอาหาร 
+          TEST_T01 คือตัวอย่าง qrToken ที่ต้องมีใน DB
+      --%>
+      
+      <a href="viewmenu?qrToken=250c7919-37e0-4284-8e3e-9e564b0eb5b9" class="btn-order-test">
+          <i class="fas fa-qrcode"></i> สั่งอาหาร (ทดลองสแกนโต๊ะ T01)
+      </a>
+
+      <div class="divider"><span>หรือ</span></div>
       <form action="loginCustomer" method="post" id="loginForm">
         <input type="hidden" id="role" name="role" value="customer">
 
