@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -55,8 +56,9 @@
         }
         .status-Free { background-color: #4caf50; color: white; }
         .status-Occupied { background-color: #f44336; color: white; }
-        .status-Reserved { background-color: #ffeb3b; color: #333; }
+        .status-Already_reserved { background-color: #ffeb3b; color: #333; }
         .status-Cleaning { background-color: #2196f3; color: white; }
+        .status-In_Use { background-color: #f44336; color: white; }
 
         .table-info {
             font-size: 1.5rem;
@@ -85,11 +87,41 @@
         .btn-clean { background-color: #607d8b; }
         .btn-clean:hover { background-color: #455a64; }
         .btn-walk-in { 
-             background-color: #4caf50; /* สีเขียวสำหรับปุ่มเปิดโต๊ะ */
+             background-color: #4caf50; 
              margin-top: 15px;
         }
         .btn-walk-in:hover {
              background-color: #388e3c;
+        }
+        .btn-no-action {
+             background-color: #9e9e9e; 
+             cursor: default;
+             text-decoration: none;
+        }
+        .btn-no-action:hover {
+            background-color: #9e9e9e;
+        }
+        /* NEW QR STYLE */
+        .qr-display {
+            margin: 10px 0;
+            padding: 5px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+        }
+        .qr-display img {
+            width: 100px;
+            height: 100px;
+            display: block;
+            margin: auto;
+        }
+        /* NEW PRINT BUTTON STYLE */
+        .btn-print { 
+             background-color: #7b1fa2; /* ม่วงเข้ม */
+             margin-top: 5px; 
+             font-size: 0.85rem; /* ทำให้ปุ่มไม่ใหญ่เกินไป */
+        }
+        .btn-print:hover {
+             background-color: #5d00a8;
         }
     </style>
 </head>
@@ -112,31 +144,59 @@
                 <div class="table-card">
                     <div class="table-info">โต๊ะ ${table.tableid}</div>
                     <div class="table-capacity"><i class="fas fa-users"></i> ${table.capacity} ที่นั่ง</div>
-                    <div class="status-badge status-${table.status}">${table.status}</div>
+                    
+                    <%-- ใช้ fn:replace เพื่อจัดการช่องว่างในชื่อสถานะสำหรับ CSS --%>
+                    <c:set var="statusCss" value="${fn:replace(table.status, ' ', '_')}" /> 
+                    <div class="status-badge status-${statusCss}">${table.status}</div>
 
+                    <c:if test="${not empty table.qrToken}">
+                        <div class="qr-display">
+                            <img src="generateQrForTable?token=${table.qrToken}" 
+                                 alt="QR Code for Table ${table.tableid}" 
+                            />
+                        </div>
+                    </c:if>
                     <c:choose>
-                        <c:when test="${table.status == 'Reserved'}">
-                            <%-- ปุ่มเมื่อลูกค้าที่จองมาถึง --%>
-                            <a href="updateTableStatus?tableid=${table.tableid}&status=Occupied" 
-                               class="action-button btn-check-in">เปิดโต๊ะ (Check-In)</a>
+                        
+                        <%-- 1. โต๊ะว่าง -> เปิดโต๊ะ Walk-in --%>
+						<c:when test="${table.status == 'Free'}">
+						    <a href="gotoOpenTable?tableid=${table.tableid}" 
+						       class="action-button btn-walk-in">เปิดโต๊ะ (Walk-in)</a>
+						</c:when>
+
+                        <%-- 2. โต๊ะถูกจอง (Already reserved) -> เปิดโต๊ะ Check-in --%>
+                        <c:when test="${table.status == 'Already reserved'}">
+                            <a href="gotoViewReservations" 
+                               class="action-button btn-check-in">ไปหน้า Check-in การจอง</a>
                         </c:when>
-                        <c:when test="${table.status == 'Occupied'}">
-                            <%-- ปุ่มเมื่อลูกค้าจ่ายเงินแล้ว --%>
+                        
+                        <%-- 3. โต๊ะกำลังถูกใช้งาน (Occupied/In Use) -> ปุ่ม Print และ ปุ่ม Finish --%>
+                        <c:when test="${table.status == 'Occupied' || table.status == 'In Use'}">
+                            
+                            <%-- VVVV 3.1 ปุ่มพิมพ์ (เปิดหน้าต่างใหม่เพื่อพิมพ์) VVVV --%>
+                            <a href="#" 
+                               onclick="window.open('findAndPrintOrder?tableId=${table.tableid}', '_blank', 'width=600,height=800'); return false;" 
+                               class="action-button btn-print">
+                                <i class="fas fa-print"></i> พิมพ์ Order Info
+                            </a>
+                            <%-- ^^^^ 3.1 สิ้นสุดปุ่มพิมพ์ ^^^^ --%>
+                            
+                            <%-- VVVV 3.2 ปุ่มปิดบิลหลัก VVVV --%>
                             <a href="updateTableStatus?tableid=${table.tableid}&status=Cleaning" 
                                class="action-button btn-finish">ลูกค้าเสร็จสิ้น (ไปทำความสะอาด)</a>
                         </c:when>
+                        
+                        <%-- 4. โต๊ะรอทำความสะอาด (Cleaning) -> เสร็จสิ้น --%>
                         <c:when test="${table.status == 'Cleaning'}">
                             <%-- ปุ่มเมื่อทำความสะอาดเสร็จแล้ว --%>
                             <a href="updateTableStatus?tableid=${table.tableid}&status=Free" 
                                class="action-button btn-clean">ทำความสะอาดเสร็จสิ้น</a>
                         </c:when>
                         
-                        <%-- ✨ โค้ดส่วนที่เพิ่มเข้ามาสำหรับการรับลูกค้า Walk-in ✨ --%>
-						 <c:when test="${table.status == 'Free'}">
-						    <a href="gotoOpenTable?tableid=${table.tableid}" 
-						       class="action-button btn-walk-in">เปิดโต๊ะ (Walk-in)</a>
-						</c:when>
-                        <%-- ---------------------------------------------------- --%>
+                        <%-- 5. สถานะอื่นๆ (ไม่มี action) --%>
+                        <c:otherwise>
+                            <span class="action-button btn-no-action">ไม่มี Action ที่เกี่ยวข้อง</span>
+                        </c:otherwise>
                         
                     </c:choose>
                 </div>

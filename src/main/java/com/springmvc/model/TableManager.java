@@ -3,10 +3,12 @@ package com.springmvc.model;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID; // *** NEW IMPORT: สำหรับการสร้าง QR Token ***
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query; 
 
 public class TableManager {
 	public List<Tables> getAllTable() {
@@ -32,6 +34,11 @@ public class TableManager {
     public boolean insertTable(Tables tables) {
         Session session = null;
         try {
+            // *** NEW LOGIC: ตรวจสอบและสร้าง qrToken หากยังไม่มี ***
+            if (tables.getQrToken() == null || tables.getQrToken().isEmpty()) {
+                tables.setQrToken(UUID.randomUUID().toString());
+            }
+            // ****************************************************
             SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
             session = sessionFactory.openSession();
             session.beginTransaction();
@@ -72,6 +79,11 @@ public class TableManager {
     
     public boolean updateTable(Tables r) {
     	try {
+            // *** NEW LOGIC: ตรวจสอบและสร้าง qrToken หากยังไม่มี ***
+            if (r.getQrToken() == null || r.getQrToken().isEmpty()) {
+                r.setQrToken(UUID.randomUUID().toString());
+            }
+            // ****************************************************
     		SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
     		Session session = sessionFactory.openSession();
     		session.beginTransaction();
@@ -108,6 +120,11 @@ public class TableManager {
             // ดึงข้อมูลโต๊ะที่ต้องการอัปเดต
             Tables table = (Tables) session.get(Tables.class, tableId);
             if (table != null) {
+                // *** NEW LOGIC: ตรวจสอบและสร้าง qrToken หากยังไม่มี ***
+                if (table.getQrToken() == null || table.getQrToken().isEmpty()) {
+                    table.setQrToken(UUID.randomUUID().toString());
+                }
+                // ****************************************************
                 table.setStatus("Already reserved"); // เปลี่ยนสถานะโต๊ะ
                 session.update(table);       // อัปเดตลงฐานข้อมูล
                 session.getTransaction().commit();
@@ -165,6 +182,11 @@ public class TableManager {
 
  			Tables table = (Tables) session.get(Tables.class, tableid);
  			if (table != null) {
+                // *** NEW LOGIC: ตรวจสอบและสร้าง qrToken หากยังไม่มี ***
+                if (table.getQrToken() == null || table.getQrToken().isEmpty()) {
+                    table.setQrToken(UUID.randomUUID().toString());
+                }
+                // ****************************************************
  				table.setStatus(newStatus); // ตั้งสถานะตามที่ส่งมา
  				session.update(table);
  				session.getTransaction().commit();
@@ -182,5 +204,30 @@ public class TableManager {
  		}
  		return false;
  	}
+    
+    // *** NEW METHOD: ค้นหาโต๊ะจาก QR Token ***
+    /**
+     * ดึงข้อมูล Tables จาก qrToken ที่ลูกค้าสแกนมา
+     */
+    public Tables getTableByQrToken(String qrToken) {
+        Session session = null;
+        Tables table = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            // ใช้ HQL ค้นหา Tables โดย qrToken
+            Query<Tables> query = session.createQuery(
+                "FROM Tables WHERE qrToken = :qrToken", Tables.class);
+            query.setParameter("qrToken", qrToken);
+            table = query.uniqueResult(); 
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return table;
+    }
 
 }

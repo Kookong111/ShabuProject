@@ -2,7 +2,7 @@ package com.springmvc.controller;
  
 import java.sql.Date;
 import java.util.List;
-import java.util.Map; // สำหรับ Map ใน Cart
+import java.util.Map; 
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-// import com.springmvc.model.CartManager; // <<< ลบออก
-import com.springmvc.model.Cart; // <<< ใช้ Cart Object (Session-based)
-import com.springmvc.model.CartItem; // <<< ใช้ CartItem Object (Session-based)
+import com.springmvc.model.Cart; 
+import com.springmvc.model.CartItem; 
 import com.springmvc.model.Customer;
 import com.springmvc.model.CustomerRegisterManager;
 import com.springmvc.model.FoodITemManager;
@@ -111,21 +110,18 @@ public class CustomerController {
         return "registerCustomer"; 
     }
     
-    // VVVV เมธอดจัดการการสแกน QR Code VVVV
+    // VVVV เมธอดจัดการการสแกน QR Code (แบบเดิม) ถูกลบแล้ว VVVV
+    /*
     @RequestMapping(value = "/orderScan", method = RequestMethod.GET)
     public String handleQrCodeScan(
             @RequestParam("tableId") String tableId,
             @RequestParam("orderId") Integer orderId,
             HttpSession session) {
-        
-        // 1. บันทึกข้อมูลที่ได้จาก QR Code ลงใน Session ชั่วคราว
-        session.setAttribute("scannedTableId", tableId);
-        session.setAttribute("scannedOrderId", orderId);
-        
-        // 2. Redirect ไปหน้าเมนูหลัก
+        // Logic นี้ถูกย้ายไปที่ OrderCustomerController.viewmenu โดยตรง
         return "redirect:/viewmenu";
     }
-    // ^^^^ สิ้นสุดการเพิ่มเมธอด ^^^^
+    */
+    // ^^^^ สิ้นสุดการลบเมธอด ^^^^
     
     /**
      * Helper Method: คำนวณจำนวนรายการทั้งหมดในตะกร้าจาก Cart Object ใน Session
@@ -143,54 +139,15 @@ public class CustomerController {
         return total;
     }
     
-    // VVVV แก้ไข: viewMenuFood ต้องใช้ HttpSession และส่ง activeTable VVVV
+    // VVVV เมธอด viewMenuFood ถูกลบเนื่องจากย้าย Logic ไป OrderCustomerController VVVV
+    /*
     @RequestMapping(value = "/viewmenu", method = RequestMethod.GET)
     public ModelAndView viewMenuFood(HttpSession session) { 
-        Customer user = (Customer) session.getAttribute("user");
-        
-        FoodITemManager foodManager = new FoodITemManager();
-        TableManager tables = new TableManager();
-        ReserveManager reserveManager = new ReserveManager(); 
-        Tables activeTable = null; 
-        
-        // 1. ค้นหาโต๊ะที่ลูกค้าใช้งานอยู่ (ถ้าล็อกอิน)
-        if (user != null) {
-            Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId()); 
-            
-            if (activeReservation != null && activeReservation.getTables() != null) {
-                activeTable = activeReservation.getTables();
-            }
-        }
-        
-        // 2. หากยังไม่มี Active Reservation แต่มีการสแกน QR Code มา ให้ดึงข้อมูลโต๊ะจาก Session
-        if (activeTable == null && session.getAttribute("scannedTableId") != null) {
-            String tableId = (String) session.getAttribute("scannedTableId");
-            TableManager tableManager = new TableManager();
-            activeTable = tableManager.getTableById(tableId); // ดึงข้อมูลโต๊ะจาก TableManager
-        }
-
-        // VVVV 3. Logic ใหม่: อัปเดต totalCartItems ใน Session VVVV
-        int totalItems = getCartTotalItems(session); 
-        session.setAttribute("totalCartItems", totalItems); 
-        // ^^^^ สิ้นสุด Logic ใหม่ ^^^^
-
-        List<MenuFood> menuList = foodManager.getAllFoodItem();
-        List<FoodType> foodTypeList = foodManager.getAllFoodTypes();
-        List<Tables> tablee = tables.getAllTable();
-
-        ModelAndView mav = new ModelAndView("orderfoodCuatomer"); 
-        mav.addObject("menuList", menuList);
-        mav.addObject("foodTypeList", foodTypeList);
-        mav.addObject("tablesList",tablee);
-        
-        // VVVV ส่งข้อมูลโต๊ะที่ใช้งานอยู่ VVVV
-        mav.addObject("activeTable", activeTable); 
-        
+        // ... (Logic เก่า) ...
         return mav;
     }
-    // ^^^^ สิ้นสุดการแก้ไข ^^^^
-    
-    // *** เมธอด updateQuantity, viewCart, confirmOrder ถูกลบและย้ายไป OrderCustomerController.java ***
+    */
+    // ^^^^ สิ้นสุดการลบเมธอด ^^^^
     
     // ... (โค้ดส่วนที่เหลือของคุณเหมือนเดิม) ...
     
@@ -531,6 +488,4 @@ public class CustomerController {
         return "Homecustomer"; 
     }
     
-    // *** เมธอด updateQuantity, viewCart, confirmOrder ถูกลบและย้ายไป OrderCustomerController.java ***
-
 }

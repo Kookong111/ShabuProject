@@ -386,5 +386,12 @@
         </c:choose>
 
     </div>
+        <script>
+        // ตั้งค่าให้รีโหลดหน้าทุก 5 วินาที เพื่อดึงสถานะล่าสุดจาก Server
+        // การรีโหลดนี้จะทำให้ Progress Bar มี Animation ผ่าน CSS Transition
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000); 
+    </script>
 </body>
 </html>

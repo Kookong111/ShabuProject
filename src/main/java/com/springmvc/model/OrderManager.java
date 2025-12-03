@@ -2,7 +2,9 @@ package com.springmvc.model;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import java.util.Date;
+import java.util.List;
 
 public class OrderManager {
     
@@ -18,6 +20,32 @@ public class OrderManager {
             menuFood = session.get(MenuFood.class, foodId);
             session.getTransaction().commit();
             return menuFood;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return null;
+    }
+    
+    // *** เพิ่มเมธอดนี้เพื่อแก้ไขข้อผิดพลาดในการคอมไพล์ ***
+    /**
+     * ดึงข้อมูล Order หลักตาม ID
+     */
+    public Order getOrderById(Integer orderId) {
+        Session session = null;
+        Order order = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+            
+            order = session.get(Order.class, orderId); // ใช้ session.get() เพื่อดึง Order
+            
+            session.getTransaction().commit();
+            return order;
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -127,5 +155,33 @@ public class OrderManager {
                 session.close();
             }
         }
+    }
+    
+    /**
+     * ดึง Order ที่มีสถานะ 'Open' สำหรับ TableId ที่ระบุ
+     */
+    public Order getActiveOrderByTableId(String tableid) {
+        Session session = null;
+        Order activeOrder = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+
+            // HQL: ค้นหา Order โดย TableId และสถานะ 'Open'
+            Query<Order> query = session.createQuery(
+                 "FROM Order WHERE table.tableid = :tableId AND status = 'Open' ORDER BY oderId DESC", Order.class);
+            query.setParameter("tableId", tableid);
+            query.setMaxResults(1); 
+            
+            activeOrder = query.uniqueResult();
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return activeOrder;
     }
 }

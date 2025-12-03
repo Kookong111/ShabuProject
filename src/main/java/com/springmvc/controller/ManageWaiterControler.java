@@ -14,6 +14,7 @@ import com.springmvc.model.MenuFood;
 import com.springmvc.model.MenufoodManager;
 import com.springmvc.model.Order;
 import com.springmvc.model.OrderManager;
+import com.springmvc.model.QrCodeGenerator;
 import com.springmvc.model.OrderDetail; 
 import com.springmvc.model.WaiterManager;
 import com.springmvc.model.Employee;
@@ -395,5 +396,56 @@ public class ManageWaiterControler {
         }
         // Redirect กลับไปหน้าเดิม โดยไม่มี Query Parameter ภาษาไทย
         return "redirect:/gotoViewOrders";
+    }
+    
+    @RequestMapping(value = "/printOrderInfo", method = RequestMethod.GET)
+    public ModelAndView printOrderInfo(@RequestParam("orderId") Integer orderId) {
+        
+        OrderManager orderManager = new OrderManager();
+        // เพิ่ม ReserveManager สำหรับดึง Order Details
+        ReserveManager reserveManager = new ReserveManager(); // หรือใช้ Dependency Injection
+        
+        // 1. ดึงข้อมูล Order หลัก
+        Order orderInfo = orderManager.getOrderById(orderId); // <<< โค้ดนี้จะไม่แดงแล้ว
+        
+        if (orderInfo == null) {
+            return new ModelAndView("errorPage", "errorMessage", "ไม่พบข้อมูล Order ID: " + orderId);
+        }
+        
+        Tables table = orderInfo.getTable();
+        
+        if (table == null || table.getQrToken() == null) {
+             return new ModelAndView("errorPage", "errorMessage", "ไม่พบข้อมูลโต๊ะหรือ QR Token สำหรับ Order นี้");
+        }
+        
+        // 2. สร้าง URL สำหรับ QR Code (จาก QrCodeGenerator Helper)
+        String qrUrl = QrCodeGenerator.generateQrUrl(table.getQrToken());
+        
+        // 3. ดึงรายการ OrderDetails
+        List<OrderDetail> details = reserveManager.getOrderDetailsByOrderId(orderId);
+        
+        // 4. ส่งข้อมูลทั้งหมดไปยัง Print JSP
+        ModelAndView mav = new ModelAndView("printOrderSheet"); // ชี้ไปที่ JSP ใหม่
+        mav.addObject("orderInfo", orderInfo);
+        mav.addObject("table", table);
+        mav.addObject("qrUrl", qrUrl); 
+        mav.addObject("orderDetails", details); // <<< เพิ่ม Order Details
+        
+        return mav;
+    }
+    @RequestMapping(value = "/findAndPrintOrder", method = RequestMethod.GET)
+    public ModelAndView findAndPrintOrder(@RequestParam("tableId") String tableId) {
+        
+        OrderManager orderManager = new OrderManager();
+        // 1. ค้นหา Order ที่ Active ที่สุดสำหรับโต๊ะนี้ (ใช้เมธอดที่สร้างไว้)
+        Order activeOrder = orderManager.getActiveOrderByTableId(tableId);
+
+        if (activeOrder != null) {
+            // 2. ถ้าพบ Order ที่ Active ให้ Redirect ไปยังเมธอด Print หลัก
+            return new ModelAndView("redirect:/printOrderInfo?orderId=" + activeOrder.getOderId());
+        } else {
+            // 3. ถ้าไม่พบ (เป็นไปได้ว่าบิลถูกปิดไปแล้ว หรือมีปัญหา)
+            return new ModelAndView("errorPage", "errorMessage", "ไม่พบบิลที่เปิดใช้งานอยู่สำหรับโต๊ะ " + tableId);
+        }
     }
 }

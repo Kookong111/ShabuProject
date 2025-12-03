@@ -1,6 +1,7 @@
 package com.springmvc.model;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -100,6 +101,12 @@ public class WaiterManager {
             
             Tables table = session.get(Tables.class, tableid);
             if (table != null) {
+                // *** NEW LOGIC: ตรวจสอบและสร้าง qrToken หากยังไม่มี ***
+                if (table.getQrToken() == null || table.getQrToken().isEmpty()) {
+                    table.setQrToken(UUID.randomUUID().toString());
+                }
+                // ****************************************************
+                
                 table.setStatus(newStatus);
                 session.update(table);
                 session.getTransaction().commit();

@@ -50,7 +50,8 @@
 
         /* === 2. Header === */
         .header {
-            background-color: #1a1a1a; /* Dark Header */
+            background-color: #1a1a1a;
+            /* Dark Header */
             border-bottom: 1px solid var(--border);
             padding: 16px 20px;
             display: flex;
@@ -72,11 +73,11 @@
         }
         
         .table-info i {
-            display: none; 
+            display: none;
         }
         
         .table-id {
-             font-size: 1.2em; 
+             font-size: 1.2em;
              font-weight: 700;
              color: var(--white);
              margin-left: 5px;
@@ -107,15 +108,18 @@
             background-color: var(--primary-dark);
             color: var(--white);
             padding: 8px 10px; /* แก้ไขให้เล็กลง */
-            border-radius: 50%; /* ทำให้เป็นวงกลม */
-            font-size: 18px; /* เพิ่มขนาดไอคอน */
+            border-radius: 50%;
+            /* ทำให้เป็นวงกลม */
+            font-size: 18px;
+            /* เพิ่มขนาดไอคอน */
             font-weight: 500;
             cursor: pointer;
             text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center; /* จัดไอคอนให้อยู่ตรงกลาง */
-            width: 40px; /* กำหนดความกว้าง/สูงเท่ากัน */
+            width: 40px;
+            /* กำหนดความกว้าง/สูงเท่ากัน */
             height: 40px;
             transition: all 0.2s ease;
         }
@@ -126,7 +130,8 @@
         }
         
         .btn-view-order span {
-            display: none; /* ซ่อนข้อความ */
+            display: none;
+            /* ซ่อนข้อความ */
         }
         
         .header-actions {
@@ -488,8 +493,11 @@
         <div class="header">
             <div class="table-info">
                 โต๊ะ
-                <c:if test="${not empty activeTable}">
-                    <span class="table-id">${activeTable.tableid}</span>
+                <c:if test="${not empty tableId}">
+                    <span class="table-id">${tableId}</span>
+                </c:if>
+                <c:if test="${not empty orderId}">
+                    <span style="font-size: 0.8em; margin-left: 10px;">บิล ID: ${orderId}</span>
                 </c:if>
             </div>
             
@@ -499,6 +507,7 @@
                     <i class="fas fa-list-alt"></i> 
                     <span>รายการสั่งอาหาร</span>
                 </a>
+     
                 
                 <form action="gotowelcomeCustomer" method="get" style="display: inline;">
                     <button type="submit" class="back-btn">
@@ -512,71 +521,83 @@
         <div class="menu-container">
             <c:set var="totalItems" value="${sessionScope.totalCartItems}" />
             
-            <c:forEach var="foodType" items="${foodTypeList}">
-                <c:if test="${foodType.foodtypeName != 'ต่อคน'}">
-                    <div class="foodtype-section">
-                        <div class="foodtype-name">
-                            ${foodType.foodtypeName}
-                        </div>
-                        
-                        <c:forEach var="menu" items="${menuList}">
-                            <c:if test="${menu.foodtype.foodtypeId == foodType.foodtypeId}">
-                                
-                                <c:set var="currentQty" value="${sessionScope.cart[menu.foodId]}" />
-                                <c:set var="currentQty" value="${currentQty == null ? 0 : currentQty}" />
-                                
-                                <div class="menu-item ${currentQty > 0 ? 'has-items' : ''}">
-                                    <div class="menu-content">
-                                        <img src="${menu.foodImage}" alt="${menu.foodname}" class="menu-image">
-                                        
-                                        <div class="menu-details">
-                                            <div class="menu-name">${menu.foodname}</div>
-                                            
-                                            <div class="menu-price">
-                                                ฿<fmt:formatNumber value="${menu.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
+            <c:if test="${not empty foodTypeList and not empty menuList}">
+                <c:forEach var="foodType" items="${foodTypeList}">
+                    <c:if test="${foodType.foodtypeName != 'ต่อคน'}">
+                        <div class="foodtype-section">
+                            <div class="foodtype-name">
+                                ${foodType.foodtypeName}
+                            </div>
+                            
+                            <c:forEach var="menu" items="${menuList}">
+                            
+                                <c:if test="${menu.foodtype.foodtypeId == foodType.foodtypeId}">
+                                    
+                                    <c:set var="currentQty" value="${sessionScope.cartObject.items[menu.foodId].quantity}" />
+                                    <c:set var="currentQty" value="${currentQty == null ? 0 : currentQty}" />
+                                    
+                                    <div class="menu-item ${currentQty > 0 ? 'has-items' : ''}">
+                                        <div class="menu-content">
+                                            <img src="${menu.foodImage}" alt="${menu.foodname}" class="menu-image">
+                                    
+                                            <div class="menu-details">
+                                                <div class="menu-name">${menu.foodname}</div>
+                                                
+                                                <div class="menu-price">
+                                                    ฿<fmt:formatNumber value="${menu.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="item-actions">
-                                        <c:if test="${currentQty > 0}">
-                                            <div class="qty-control">
-                                                <form action="updateQuantity" method="post" style="display:inline;">
-                                                    <input type="hidden" name="foodId" value="${menu.foodId}" />
-                                                    <input type="hidden" name="action" value="decrease" />
-                                                    <button type="submit" class="qty-btn">
-                                                        <i class="fas fa-minus"></i>
-                                                    </button>
-                                                </form>
-                                                
-                                                <div class="qty-number">
-                                                    <c:out value="${currentQty}" />
+                                  
+                                        <div class="item-actions">
+                                            <c:if test="${currentQty > 0}">
+                                                <div class="qty-control">
+                                                    <form action="updateQuantity" method="post" style="display:inline;">
+                                                        <input type="hidden" name="foodId" value="${menu.foodId}" />
+                                                        <input type="hidden" name="action" value="decrease" />
+                                                        <button type="submit" class="qty-btn">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                    </form>
+                                                    
+                                                    <div class="qty-number">
+                                                        <c:out value="${currentQty}" />
+                                                    </div>
+                                                    
+                                                    <form action="addToCart" method="post" style="display:inline;" class="add-to-cart-form">
+                                                        <input type="hidden" name="foodId" value="${menu.foodId}" />
+                                                        <input type="hidden" name="quantity" value="1" />
+                                                        <button type="submit" class="qty-btn">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
-                                                
+                                            </c:if>
+
+                                            <c:if test="${currentQty == 0}">
                                                 <form action="addToCart" method="post" style="display:inline;" class="add-to-cart-form">
                                                     <input type="hidden" name="foodId" value="${menu.foodId}" />
-                                                    <button type="submit" class="qty-btn">
-                                                        <i class="fas fa-plus"></i>
+                                                    <input type="hidden" name="quantity" value="1" />
+                                                    <button type="submit">
+                                                        <i class="fas fa-plus"></i> เพิ่ม
                                                     </button>
                                                 </form>
-                                            </div>
-                                        </c:if>
-
-                                        <c:if test="${currentQty == 0}">
-                                            <form action="addToCart" method="post" style="display:inline;" class="add-to-cart-form">
-                                                <input type="hidden" name="foodId" value="${menu.foodId}" />
-                                                <button type="submit">
-                                                    <i class="fas fa-plus"></i> เพิ่ม
-                                                </button>
-                                            </form>
-                                        </c:if>
+                                            </c:if>
+                                        </div>
                                     </div>
-                                </div>
-                            </c:if>
-                        </c:forEach>
-                    </div>
-                </c:if>
-            </c:forEach>
+                                </c:if>
+                            </c:forEach>
+                        </div>
+                    </c:if>
+                </c:forEach>
+            </c:if>
+            
+            <c:if test="${empty foodTypeList or empty menuList}">
+                 <div style="text-align: center; padding: 40px; color: #7f8c8d;">
+                     ไม่พบรายการอาหาร กรุณาตรวจสอบข้อมูลในฐานข้อมูล
+                 </div>
+            </c:if>
+
         </div>
         
     </div>
@@ -600,6 +621,7 @@
 
     <script>
         // Loading effect
+        
         document.querySelectorAll('.container form').forEach(form => {
             form.addEventListener('submit', function(e) {
                 document.querySelector('.container').classList.add('loading');
@@ -609,7 +631,6 @@
         window.addEventListener('load', function() {
             document.querySelector('.container').classList.remove('loading');
         });
-        
         // Auto remove success message
         const successMessage = document.querySelector('.message-alert.success-message');
         if (successMessage) {
