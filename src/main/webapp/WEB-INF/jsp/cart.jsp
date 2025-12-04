@@ -342,7 +342,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1><i class="fas fa-shopping-cart"></i> ตะกร้าอาหาร</h1>
+        <h1><i class=""></i> ตะกร้าอาหาร</h1>
         <a href="viewmenu" class="back-btn"><i class="fas fa-arrow-left"></i> กลับไปเมนู</a>
     </div>
 
@@ -365,7 +365,7 @@
                         <c:set var="subtotal" value="${item.totalPrice}" />
                         
                         <div class="subtotal">
-                            <i class="fas fa-coins"></i>
+                            <i class=""></i>
                             รวม: <span class="subtotal-price">฿<fmt:formatNumber value="${subtotal}" type="number" minFractionDigits="2" maxFractionDigits="2" /></span>
                         </div>
                         
