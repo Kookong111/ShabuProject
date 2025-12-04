@@ -7,7 +7,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
 public class HibernateConnection {
-	public static SessionFactory sessionFactory;
+	public static SessionFactory sessionFactory = null;
 	static String url;
 	static String uname;
 	static String pwd;
@@ -28,7 +28,10 @@ public class HibernateConnection {
 		}
 	}
 
-	public static SessionFactory doHibernateConnection() {
+	public static SessionFactory doHibernateConnection(){
+		if (sessionFactory == null) {
+			
+		
 		Properties database = new Properties();
 		database.setProperty("hibernate.hbm2ddl.auto", "update"); // หลังจากสร้างตารางแล้วให้เอาออก
 		database.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
@@ -54,6 +57,8 @@ public class HibernateConnection {
 
 		StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties());
 		sessionFactory = cfg.buildSessionFactory(ssrb.build());
+		}
 		return sessionFactory;
 	}
+	
 }
