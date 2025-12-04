@@ -35,11 +35,6 @@ services:
       # suspend JVM until debugger attaches (useful for diagnosing attach issues)
       #JPDA_SUSPEND: "y"
       CATALINA_OPTS: "-Dspring.profiles.active=docker -Xmx512m -Xms256m"
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: project_shabu2
-      DB_USER: root
-      DB_PASSWORD: 1234
     entrypoint: ["catalina.sh", "jpda", "run"]
     depends_on:
       mysql:

@@ -28,7 +28,7 @@ public class HibernateConnection {
 		}
 	}
 
-	public static SessionFactory doHibernateConnection(){
+	public static SessionFactory doHibernateConnection() {
 		if (sessionFactory == null) {
 			Properties database = new Properties();
 			database.setProperty("hibernate.hbm2ddl.auto", "update"); // หลังจากสร้างตารางแล้วให้เอาออก
@@ -36,6 +36,7 @@ public class HibernateConnection {
 			database.setProperty("hibernate.connection.username", uname);
 			database.setProperty("hibernate.connection.password", pwd);
 			database.setProperty("hibernate.connection.url", url);
+
 			database.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
 			Configuration cfg = new Configuration()
 					.setProperties(database)
@@ -49,13 +50,12 @@ public class HibernateConnection {
 					.addAnnotatedClass(Customer.class)
 					.addAnnotatedClass(Employee.class)
 					.addAnnotatedClass(Manager.class)
-					.addAnnotatedClass(FoodType.class)
-					;
-	
+					.addAnnotatedClass(FoodType.class);
+
 			StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties());
 			sessionFactory = cfg.buildSessionFactory(ssrb.build());
 		}
 		return sessionFactory;
 	}
-	
+
 }
