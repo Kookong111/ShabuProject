@@ -239,21 +239,9 @@
         </c:when>
       </c:choose>
 
-      <h5 class="text-center mb-3" style="color: var(--order-dark); font-weight: 600;">
-          ช่องทางสั่งอาหาร (สำหรับลูกค้าที่โต๊ะ)
-      </h5>
+      	
+     
       
-      <%-- 
-          Note: ในการใช้งานจริง ลูกค้าต้องสแกน QR Code 
-          โค้ดนี้จำลองการสแกนโดยการกำหนด qrToken เพื่อเข้าสู่หน้าสั่งอาหาร 
-          TEST_T01 คือตัวอย่าง qrToken ที่ต้องมีใน DB
-      --%>
-      
-      <a href="viewmenu?qrToken=250c7919-37e0-4284-8e3e-9e564b0eb5b9" class="btn-order-test">
-          <i class="fas fa-qrcode"></i> สั่งอาหาร (ทดลองสแกนโต๊ะ T01)
-      </a>
-
-      <div class="divider"><span>หรือ</span></div>
       <form action="loginCustomer" method="post" id="loginForm">
         <input type="hidden" id="role" name="role" value="customer">
 
