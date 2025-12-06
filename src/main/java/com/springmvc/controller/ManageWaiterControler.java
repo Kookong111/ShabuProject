@@ -3,7 +3,8 @@ package com.springmvc.controller;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.LinkedHashMap; // ใช้ LinkedHashMap เพื่อรักษาลำดับการดึงข้อมูล
+import java.util.LinkedHashMap;
+import java.util.UUID; 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +29,9 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ManageWaiterControler {
+    
+    // ✅ เพิ่ม Field นี้: ตัวจัดการโต๊ะ เพื่อแก้ปัญหา "tableManager cannot be resolved"
+    private final TableManager tableManager = new TableManager(); 
 	
     @RequestMapping(value = "/LoginWaiter", method = RequestMethod.POST)
     public ModelAndView loginWaiter(HttpServletRequest request,HttpSession session) {
@@ -144,10 +148,18 @@ public class ManageWaiterControler {
 
         // --- 2. ดำเนินการเปิดโต๊ะ/เปิดบิล ---
         
-        // A. อัปเดตสถานะโต๊ะเป็น 'Occupied'
-        boolean statusUpdated = waiterManager.updateTableStatus(tableid, "Occupied");
+        // VVVV สร้าง QR Token ใหม่ VVVV
+        String newQrToken = UUID.randomUUID().toString();
+        table.setQrToken(newQrToken);
+        // ^^^^ สิ้นสุดการสร้าง ^^^^
+
+        // A. อัปเดตสถานะโต๊ะเป็น 'Occupied' และบันทึก QR Token ใหม่
+        // ✅ ตั้งสถานะเป็น Occupied ก่อนบันทึก
+        table.setStatus("Occupied"); 
+        
+        boolean statusUpdated = tableManager.updateTable(table); 
         if (!statusUpdated) {
-             return new ModelAndView("redirect:/gotoManageTable", "error", "เกิดข้อผิดพลาดในการอัปเดตสถานะโต๊ะ");
+             return new ModelAndView("redirect:/gotoManageTable", "error", "เกิดข้อผิดพลาดในการอัปเดตสถานะโต๊ะ/QR Token");
         }
 
         // B. สร้าง Order ใหม่
@@ -182,7 +194,7 @@ public class ManageWaiterControler {
         boolean totalUpdated = orderManager.updateOrderTotalPrice(newOrder, calculatedTotalPeice);
         
         if (!totalUpdated) {
-             return new ModelAndView("redirect:/gotoManageTable", "error", "สร้างบิลสำเร็จ แต่ไม่สามารถอัปเดตราคารวมเริ่มต้นได้");
+             return new ModelAndView("redirect:/gotoManageTable", "error", "สร้างบิลสำเร็จ แต่ไม่สามารถอัปตราคารวมเริ่มต้นได้");
         }
 
 
@@ -251,8 +263,17 @@ public class ManageWaiterControler {
 
         // --- 2. ดำเนินการเปิดบิล ---
         
-        // A. อัปเดตสถานะโต๊ะเป็น 'Occupied'
-        boolean tableUpdated = waiterManager.updateTableStatus(tableid, "Occupied");
+        // VVVV สร้าง QR Token ใหม่ VVVV
+        Tables table = waiterManager.getTableById(tableid);
+        String newQrToken = UUID.randomUUID().toString();
+        table.setQrToken(newQrToken);
+        // ^^^^ สิ้นสุดการสร้าง ^^^^
+        
+        // A. อัปเดตสถานะโต๊ะเป็น 'Occupied' และบันทึก QR Token ใหม่
+        // ✅ ตั้งสถานะเป็น Occupied ก่อนบันทึก
+        table.setStatus("Occupied");
+        
+        boolean tableUpdated = tableManager.updateTable(table);
         
         // B. อัปเดตสถานะ Reserve เป็น 'CheckedIn'
         boolean reserveUpdated = reserveManager.updateReservationStatus(reserveid, "CheckedIn");
@@ -335,8 +356,6 @@ public class ManageWaiterControler {
     // ----------------------------------------------------------------------------------
     // เมธอดสำหรับอัปเดตสถานะของ Order Detail (แบบธรรมดา)
     // ----------------------------------------------------------------------------------
- // ใน ManageWaiterControler.java
-
     @RequestMapping(value = "/updateOrderDetailStatus", method = RequestMethod.POST)
     public String updateOrderDetailStatus(
             @RequestParam("odermenuId") int odermenuId, 
@@ -359,8 +378,6 @@ public class ManageWaiterControler {
         return "redirect:/gotoViewOrders";
     }
     
- // ใน ManageWaiterControler.java
-
     @RequestMapping(value = "/updateOrderToInProgress", method = RequestMethod.POST)
     public String updateOrderToInProgress(@RequestParam("orderId") int orderId, HttpSession session) { // เพิ่ม HttpSession
         WaiterManager waiterManager = new WaiterManager();
@@ -380,8 +397,6 @@ public class ManageWaiterControler {
     // ----------------------------------------------------------------------------------
     // เมธอดสำหรับอัปเดตสถานะทั้งหมดในบิลเป็น 'Served' (เสิร์ฟแล้ว)
     // ----------------------------------------------------------------------------------
- // ใน ManageWaiterControler.java
-
     @RequestMapping(value = "/updateOrderToServed", method = RequestMethod.POST)
     public String updateOrderToServed(@RequestParam("orderId") int orderId, HttpSession session) { // เพิ่ม HttpSession
         WaiterManager waiterManager = new WaiterManager();
@@ -406,7 +421,7 @@ public class ManageWaiterControler {
         ReserveManager reserveManager = new ReserveManager(); // หรือใช้ Dependency Injection
         
         // 1. ดึงข้อมูล Order หลัก
-        Order orderInfo = orderManager.getOrderById(orderId); // <<< โค้ดนี้จะไม่แดงแล้ว
+        Order orderInfo = orderManager.getOrderById(orderId); 
         
         if (orderInfo == null) {
             return new ModelAndView("errorPage", "errorMessage", "ไม่พบข้อมูล Order ID: " + orderId);
