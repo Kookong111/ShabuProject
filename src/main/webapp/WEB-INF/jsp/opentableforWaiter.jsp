@@ -149,46 +149,43 @@
                     <c:set var="statusCss" value="${fn:replace(table.status, ' ', '_')}" /> 
                     <div class="status-badge status-${statusCss}">${table.status}</div>
 
-                    <c:if test="${not empty table.qrToken}">
-                        <div class="qr-display">
-                            <img src="generateQrForTable?token=${table.qrToken}" 
-                                 alt="QR Code for Table ${table.tableid}" 
-                            />
-                        </div>
-                    </c:if>
                     <c:choose>
                         
-                        <%-- 1. โต๊ะว่าง -> เปิดโต๊ะ Walk-in --%>
+                        <%-- 1. โต๊ะว่าง -> เปิดโต๊ะ Walk-in (ไม่ต้องแสดง QR) --%>
 						<c:when test="${table.status == 'Free'}">
 						    <a href="gotoOpenTable?tableid=${table.tableid}" 
 						       class="action-button btn-walk-in">เปิดโต๊ะ (Walk-in)</a>
 						</c:when>
-
-                        <%-- 2. โต๊ะถูกจอง (Already reserved) -> เปิดโต๊ะ Check-in --%>
+                        
+                        <%-- VVVV 2. โต๊ะถูกจอง -> ไปหน้า Check-in (ไม่แสดง QR) VVVV --%>
                         <c:when test="${table.status == 'Already reserved'}">
-                            <a href="gotoViewReservations" 
+                             <a href="gotoViewReservations" 
                                class="action-button btn-check-in">ไปหน้า Check-in การจอง</a>
                         </c:when>
-                        
-                        <%-- 3. โต๊ะกำลังถูกใช้งาน (Occupied/In Use) -> ปุ่ม Print และ ปุ่ม Finish --%>
+
+                        <%-- VVVV 3. โต๊ะกำลังถูกใช้งาน (Occupied/In Use) -> แสดง QR และแสดงปุ่ม Print/Finish VVVV --%>
                         <c:when test="${table.status == 'Occupied' || table.status == 'In Use'}">
                             
-                            <%-- VVVV 3.1 ปุ่มพิมพ์ (เปิดหน้าต่างใหม่เพื่อพิมพ์) VVVV --%>
+                            <%-- ✅ โค้ดแสดง QR Code จะอยู่ตรงนี้เท่านั้น! ✅ --%>
+                            <c:if test="${not empty table.qrToken}">
+                                <div class="qr-display">
+                                    <img src="generateQrForTable?token=${table.qrToken}" 
+                                         alt="QR Code for Table ${table.tableid}" 
+                                    />
+                                </div>
+                            </c:if>
+
                             <a href="#" 
                                onclick="window.open('findAndPrintOrder?tableId=${table.tableid}', '_blank', 'width=600,height=800'); return false;" 
                                class="action-button btn-print">
                                 <i class="fas fa-print"></i> พิมพ์ Order Info
                             </a>
-                            <%-- ^^^^ 3.1 สิ้นสุดปุ่มพิมพ์ ^^^^ --%>
-                            
-                            <%-- VVVV 3.2 ปุ่มปิดบิลหลัก VVVV --%>
                             <a href="updateTableStatus?tableid=${table.tableid}&status=Cleaning" 
                                class="action-button btn-finish">ลูกค้าเสร็จสิ้น (ไปทำความสะอาด)</a>
                         </c:when>
                         
-                        <%-- 4. โต๊ะรอทำความสะอาด (Cleaning) -> เสร็จสิ้น --%>
+                        <%-- 4. โต๊ะรอทำความสะอาด (Cleaning) -> เสร็จสิ้น (ไม่ต้องแสดง QR) --%>
                         <c:when test="${table.status == 'Cleaning'}">
-                            <%-- ปุ่มเมื่อทำความสะอาดเสร็จแล้ว --%>
                             <a href="updateTableStatus?tableid=${table.tableid}&status=Free" 
                                class="action-button btn-clean">ทำความสะอาดเสร็จสิ้น</a>
                         </c:when>

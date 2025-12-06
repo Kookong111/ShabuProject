@@ -118,70 +118,79 @@ public class ManageCashierController {
      mav.addObject("editorder", r != null ? r : new Order());
      return mav;
  }
-//ในไฟล์ ManageCashierController.java
-//...
+
 @RequestMapping(value="/confirmEditOrder", method=RequestMethod.POST)
 public ModelAndView confirmEditCashier(HttpServletRequest request) {
-   CashierManager rm = new CashierManager();
+ CashierManager rm = new CashierManager();
 
-   String oderIdStr = request.getParameter("oderId"); // รับมาเป็น String
-   String tableId = request.getParameter("tableid");
-   String orderDateStr = request.getParameter("orderDate");
-   String totalPeiceStr = request.getParameter("totalPeice");
-   String status = request.getParameter("status");
+ String oderIdStr = request.getParameter("oderId"); // รับมาเป็น String
+ String tableId = request.getParameter("tableid");
+ String orderDateStr = request.getParameter("orderDate");
+ String totalPeiceStr = request.getParameter("totalPeice");
+ String status = request.getParameter("status");
 
-   // แปลง oderId เป็น int และจัดการ Exception
-   int oderId = 0;
-   try {
-       oderId = Integer.parseInt(oderIdStr); // 👈 แก้ไข: แปลง String เป็น int
-   } catch (NumberFormatException e) {
-       // หากแปลงไม่ได้ ให้จัดการ Error เช่น ส่งกลับไปหน้าเดิมพร้อมข้อความ
-       System.err.println("Error parsing oderId: " + oderIdStr);
-       // หากเกิดข้อผิดพลาดในการแปลงรหัสออเดอร์ จะไม่สามารถดำเนินการต่อได้
-       ModelAndView errorMav = new ModelAndView("Edit_order");
-       errorMav.addObject("edit_result", "รหัสออเดอร์ไม่ถูกต้อง");
-       return errorMav;
-   }
+ // แปลง oderId เป็น int และจัดการ Exception
+ int oderId = 0;
+ try {
+     oderId = Integer.parseInt(oderIdStr);
+ } catch (NumberFormatException e) {
+     System.err.println("Error parsing oderId: " + oderIdStr);
+     ModelAndView errorMav = new ModelAndView("Edit_order");
+     // ควรส่งข้อมูลเดิมกลับไปเพื่อให้หน้าไม่ว่างเปล่า
+     Order tempOrder = new Order(); // ต้องสร้าง Object สำหรับส่งกลับ
+     tempOrder.setOderId(0);
+     // ... ตั้งค่า field อื่นๆ ที่จำเป็น
+     errorMav.addObject("editorder", tempOrder); 
+     errorMav.addObject("edit_result", "รหัสออเดอร์ไม่ถูกต้อง");
+     return errorMav;
+ }
+ 
+ // ... (โค้ดแปลงข้อมูลที่เหลือ) ...
+ double totalPeice = 0.0;
+ try {
+     totalPeice = Double.parseDouble(totalPeiceStr);
+ } catch (Exception e) {
+     e.printStackTrace();
+ }
 
-   // แปลง totalPeice เป็น double
-   double totalPeice = 0.0;
-   try {
-       totalPeice = Double.parseDouble(totalPeiceStr);
-   } catch (Exception e) {
-       e.printStackTrace();
-   }
+ java.sql.Date orderDate = null;
+ try {
+     orderDate = java.sql.Date.valueOf(orderDateStr);
+ } catch (Exception e) {
+     e.printStackTrace();
+ }
+ 
+ // ดึงข้อมูล table จาก CashierManager (หรือสร้าง object เปล่าไว้ก่อน)
+ Tables table = new Tables();
+ table.setTableid(tableId);
 
-   java.sql.Date orderDate = null;
-   try {
-       orderDate = java.sql.Date.valueOf(orderDateStr);
-   } catch (Exception e) {
-       e.printStackTrace();
-   }
+ // ✅ สร้าง object แบบใช้ set() ทีละตัว
+ Order rest = new Order();
+ rest.setOderId(oderId); 
+ rest.setTable(table);
+ rest.setOrderDate(orderDate);
+ rest.setTotalPeice(totalPeice);
+ rest.setStatus(status);
 
-   // ดึงข้อมูล table จาก CashierManager (หรือสร้าง object เปล่าไว้ก่อน)
-   Tables table = new Tables();
-   table.setTableid(tableId);
+ boolean result = rm.updateOrder(rest);
 
-   // ✅ สร้าง object แบบใช้ set() ทีละตัว
-   Order rest = new Order();
-   rest.setOderId(oderId); // 👈 แก้ไข: ใช้ oderId ที่ถูกแปลงเป็น int แล้ว
-   rest.setTable(table);
-   rest.setOrderDate(orderDate);
-   rest.setTotalPeice(totalPeice);
-   rest.setStatus(status);
-
-   boolean result = rm.updateOrder(rest);
-
-   ModelAndView mav = new ModelAndView("Edit_order");
-   mav.addObject("order", rest);
-
-   if(result) {
-       mav.addObject("add_result","บันทึกสำเร็จ"); 
-   } else {
-       mav.addObject("edit_result","ไม่สามารถบันทึกได้"); 
-   }
-   return mav;
+ if(result) {
+      // ✅ 1. ถ้าบันทึกสำเร็จ ให้ Redirect กลับไปที่เมธอด GET (geteditOrderStatus) 
+      //    พร้อมส่ง ID เพื่อให้เมธอดนั้นดึงข้อมูลที่อัปเดตล่าสุดจาก DB มาแสดง
+      ModelAndView mav = new ModelAndView("redirect:/geteditOrderStatus");
+      mav.addObject("oderId", oderIdStr); // ส่ง ID กลับไปเป็น Query Parameter
+      mav.addObject("add_result","บันทึกสำเร็จ"); // ส่งข้อความสำเร็จ
+      return mav;
+      
+ } else {
+     // ✅ 2. ถ้าบันทึกไม่สำเร็จ ให้อยู่หน้าเดิมและส่ง Object ที่ผู้ใช้พยายามบันทึกกลับไป 
+     ModelAndView mav = new ModelAndView("Edit_order"); 
+     mav.addObject("editorder", rest); // ใช้ชื่อ editorder เพื่อให้ JSP แสดงผล
+     mav.addObject("edit_result","ไม่สามารถบันทึกได้"); 
+     return mav;
+ }
 }
+//...
 //...
 //▼▼▼ เมธอดใหม่สำหรับหน้าเช็คบิล ▼▼▼
  
