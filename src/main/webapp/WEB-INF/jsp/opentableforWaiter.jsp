@@ -156,9 +156,15 @@
 						    <a href="gotoOpenTable?tableid=${table.tableid}" 
 						       class="action-button btn-walk-in">เปิดโต๊ะ (Walk-in)</a>
 						</c:when>
+                        
+                        <%-- VVVV 2. โต๊ะถูกจอง -> ไปหน้า Check-in (ไม่แสดง QR) VVVV --%>
+                        <c:when test="${table.status == 'Already reserved'}">
+                             <a href="gotoViewReservations" 
+                               class="action-button btn-check-in">ไปหน้า Check-in การจอง</a>
+                        </c:when>
 
-                        <%-- VVVV 2. โต๊ะถูกจอง/ใช้งาน -> แสดง QR และแสดงปุ่ม Action VVVV --%>
-                        <c:when test="${table.status == 'Already reserved' || table.status == 'Occupied' || table.status == 'In Use'}">
+                        <%-- VVVV 3. โต๊ะกำลังถูกใช้งาน (Occupied/In Use) -> แสดง QR และแสดงปุ่ม Print/Finish VVVV --%>
+                        <c:when test="${table.status == 'Occupied' || table.status == 'In Use'}">
                             
                             <%-- ✅ โค้ดแสดง QR Code จะอยู่ตรงนี้เท่านั้น! ✅ --%>
                             <c:if test="${not empty table.qrToken}">
@@ -169,32 +175,22 @@
                                 </div>
                             </c:if>
 
-                            <c:choose>
-                                <c:when test="${table.status == 'Already reserved'}">
-                                    <a href="gotoViewReservations" 
-                                       class="action-button btn-check-in">ไปหน้า Check-in การจอง</a>
-                                </c:when>
-                                
-                                <c:when test="${table.status == 'Occupied'}">
-                                    <a href="#" 
-                                       onclick="window.open('findAndPrintOrder?tableId=${table.tableid}', '_blank', 'width=600,height=800'); return false;" 
-                                       class="action-button btn-print">
-                                        <i class="fas fa-print"></i> พิมพ์ Order Info
-                                    </a>
-                                    <a href="updateTableStatus?tableid=${table.tableid}&status=Cleaning" 
-                                       class="action-button btn-finish">ลูกค้าเสร็จสิ้น (ไปทำความสะอาด)</a>
-                                </c:when>
-                            </c:choose>
-                            
+                            <a href="#" 
+                               onclick="window.open('findAndPrintOrder?tableId=${table.tableid}', '_blank', 'width=600,height=800'); return false;" 
+                               class="action-button btn-print">
+                                <i class="fas fa-print"></i> พิมพ์ Order Info
+                            </a>
+                            <a href="updateTableStatus?tableid=${table.tableid}&status=Cleaning" 
+                               class="action-button btn-finish">ลูกค้าเสร็จสิ้น (ไปทำความสะอาด)</a>
                         </c:when>
                         
-                        <%-- 3. โต๊ะรอทำความสะอาด (Cleaning) -> เสร็จสิ้น (ไม่ต้องแสดง QR) --%>
+                        <%-- 4. โต๊ะรอทำความสะอาด (Cleaning) -> เสร็จสิ้น (ไม่ต้องแสดง QR) --%>
                         <c:when test="${table.status == 'Cleaning'}">
                             <a href="updateTableStatus?tableid=${table.tableid}&status=Free" 
                                class="action-button btn-clean">ทำความสะอาดเสร็จสิ้น</a>
                         </c:when>
                         
-                        <%-- 4. สถานะอื่นๆ (ไม่มี action) --%>
+                        <%-- 5. สถานะอื่นๆ (ไม่มี action) --%>
                         <c:otherwise>
                             <span class="action-button btn-no-action">ไม่มี Action ที่เกี่ยวข้อง</span>
                         </c:otherwise>

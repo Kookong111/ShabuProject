@@ -29,12 +29,14 @@
             --border: #ecf0f1;
             
             --white: #ffffff;
-            --bg: #fafafa; /* พื้นหลังของเมนู items */
-            --bg-page: #f8f9fa; /* พื้นหลังของหน้า */
+            --bg: #fafafa; 
+            --bg-page: #f8f9fa; 
             --header-dark: #1a1a1a;
             
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
             --shadow-md: 0 2px 6px rgba(0,0,0,0.1);
+
+            --remove-color-icon: var(--primary-dark); /* สีแดงเข้มสำหรับไอคอน */
         }
 
         body {
@@ -69,17 +71,21 @@
             justify-content: space-between;
             align-items: center;
             padding-bottom: 20px;
-            border-bottom: 3px solid var(--primary); /* เส้นแบ่งสีแดง */
+            border-bottom: 3px solid var(--primary);
             margin-bottom: 25px;
         }
 
         .header h1 {
             font-size: 28px;
             font-weight: 800;
-            color: var(--primary-dark); /* สีแดงเข้ม */
+            color: var(--primary-dark);
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        
+        .header h1 i {
+             color: var(--primary);
         }
 
         .back-btn {
@@ -128,10 +134,16 @@
         }
 
         .item-details {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             flex-grow: 1;
+            flex-wrap: wrap; 
+        }
+        
+        .item-info-group {
+             flex-basis: 60%;
+             min-width: 200px;
         }
 
         .item-name {
@@ -148,26 +160,29 @@
         }
         
         .subtotal {
-            grid-column: 1 / 2;
             margin-top: 8px;
             font-size: 18px;
-            color: var(--primary-dark); /* สีแดงเข้ม */
+            color: var(--primary-dark);
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
-        .subtotal i {
-            color: var(--primary);
+
+        /* === Action Group (Quantity + Remove) === */
+        .item-actions-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            flex-basis: 35%; 
+            min-width: 120px;
         }
 
-        /* === Quantity Control === */
         .quantity-control {
             display: flex;
             align-items: center;
             gap: 8px;
-            justify-self: end;
         }
 
         .qty-form {
@@ -175,7 +190,7 @@
         }
 
         .qty-btn {
-            background-color: var(--primary); /* สีแดงอ่อน */
+            background-color: var(--primary); 
             border: none;
             color: white;
             width: 32px;
@@ -202,17 +217,42 @@
         .qty-number {
             font-size: 18px;
             font-weight: 700;
-            padding: 5px 12px;
+            padding: 5px 0;
             min-width: 30px;
             text-align: center;
             color: var(--text-dark);
         }
+        
+        /* === Remove Button Style (ปรับให้เป็นไอคอนถังขยะสีแดงเพียวๆ) === */
+        .remove-form {
+             display: block;
+        }
+        .remove-btn {
+            background: none; /* ไม่มีพื้นหลัง */
+            border: none; /* ไม่มีกรอบ */
+            color: var(--remove-color-icon); /* สีแดงเข้ม */
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px; /* ทำให้ไอคอนใหญ่ขึ้นเล็กน้อย */
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .remove-btn:hover {
+            color: #aa2424; /* แดงอ่อนลงเล็กน้อยเมื่อ hover */
+            transform: scale(1.1); /* ขยายเล็กน้อย */
+        }
+
 
         /* === Summary Bar & Actions === */
         .summary-bar {
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 2px solid var(--primary); /* เส้นแบ่งสีแดง */
+            border-top: 2px solid var(--primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -225,7 +265,7 @@
         }
 
         .confirm-btn {
-            background-color: var(--primary-dark); /* สีแดงเข้ม */
+            background-color: var(--primary-dark);
             color: white;
             padding: 12px 25px;
             border: none;
@@ -293,7 +333,7 @@
             }
 
             .cart-item {
-                flex-wrap: wrap;
+                flex-direction: column; 
                 gap: 10px;
                 padding: 10px;
             }
@@ -303,25 +343,39 @@
                 height: 60px;
                 margin-right: 10px;
             }
-
+            
             .item-details {
-                grid-template-columns: 1fr;
-                gap: 5px;
-                padding: 5px 0;
+                 flex-direction: column; 
+                 align-items: flex-start;
             }
             
-            .subtotal {
-                grid-column: 1 / 2;
-                margin-top: 0;
-                font-size: 16px;
+            .item-info-group,
+            .item-actions-group {
+                 flex-basis: 100%;
+                 min-width: unset;
+                 width: 100%;
+            }
+
+            .item-actions-group {
+                flex-direction: row; 
+                justify-content: flex-end; /* จัดปุ่มไปทางขวา */
+                align-items: center;
+                margin-top: 10px;
+                gap: 20px;
             }
             
             .quantity-control {
-                justify-content: flex-start;
-                margin-top: 10px;
-                width: 100%;
+                order: 1; 
             }
-
+            
+            .remove-form {
+                order: 2; 
+            }
+            
+            .subtotal {
+                font-size: 16px;
+            }
+            
             .summary-bar {
                 flex-direction: column;
                 gap: 15px;
@@ -339,10 +393,13 @@
         }
     </style>
 </head>
+
 <body>
+
 <div class="container">
+
     <div class="header">
-        <h1><i class=""></i> ตะกร้าอาหาร</h1>
+        <h1><i class="fas fa-shopping-cart"></i> ตะกร้าอาหาร</h1>
         <a href="viewmenu" class="back-btn"><i class="fas fa-arrow-left"></i> กลับไปเมนู</a>
     </div>
 
@@ -356,34 +413,52 @@
                 <div class="cart-item">
                     <img src="${item.menufood.foodImage}" alt="${item.menufood.foodname}" class="item-img" />
                     <div class="item-details">
-                        <div class="item-name">
-                            ${item.menufood.foodname} 
-                            <span class="price-per-unit">(฿<fmt:formatNumber value="${item.priceAtTime}" type="number" minFractionDigits="2" maxFractionDigits="2" />/หน่วย)</span>
+                        
+                        <%-- VVVV 1. Info Group (Name, Price/Unit) VVVV --%>
+                        <div class="item-info-group">
+                            <div class="item-name">
+                                ${item.menufood.foodname} 
+                                <span class="price-per-unit">(฿<fmt:formatNumber value="${item.priceAtTime}" type="number" minFractionDigits="2" maxFractionDigits="2" />/หน่วย)</span>
+                            </div>
+                            
+                            <c:set var="subtotal" value="${item.totalPrice}" />
+                            <div class="subtotal">
+                                รวม: <span class="subtotal-price">฿<fmt:formatNumber value="${subtotal}" type="number" minFractionDigits="2" maxFractionDigits="2" /></span>
+                            </div>
                         </div>
+                        <%-- ^^^^ 1. Info Group ^^^^ --%>
                         
-                        <c:set var="qty" value="${item.quantity}" />
-                        <c:set var="subtotal" value="${item.totalPrice}" />
-                        
-                        <div class="subtotal">
-                            <i class=""></i>
-                            รวม: <span class="subtotal-price">฿<fmt:formatNumber value="${subtotal}" type="number" minFractionDigits="2" maxFractionDigits="2" /></span>
-                        </div>
-                        
-                        <div class="quantity-control">
-                            <form action="updateQuantity" method="post" class="qty-form">
-                                <input type="hidden" name="foodId" value="${item.menufood.foodId}" />
-                                <input type="hidden" name="action" value="decrease" />
-                                <button class="qty-btn" ${qty <= 1 ? 'disabled' : ''}>−</button>
-                            </form>
+                        <%-- VVVV 2. Action Group (Quantity Control + Remove Button) VVVV --%>
+                        <div class="item-actions-group">
+                            <c:set var="qty" value="${item.quantity}" />
+                            
+                            <%-- 2.1 Quantity Control --%>
+                            <div class="quantity-control">
+                                <form action="updateQuantity" method="post" class="qty-form">
+                                    <input type="hidden" name="foodId" value="${item.menufood.foodId}" />
+                                    <input type="hidden" name="action" value="decrease" />
+                                    <button class="qty-btn" ${qty <= 1 ? 'disabled' : ''}>−</button>
+                                </form>
 
-                            <div class="qty-number">${qty}</div>
+                                <div class="qty-number">${qty}</div>
 
-                            <form action="updateQuantity" method="post" class="qty-form">
+                                <form action="updateQuantity" method="post" class="qty-form">
+                                    <input type="hidden" name="foodId" value="${item.menufood.foodId}" />
+                                    <input type="hidden" name="action" value="increase" />
+                                    <button class="qty-btn">+</button>
+                                </form>
+                            </div>
+
+                            <%-- 2.2 Remove Button (ไอคอนถังขยะสีแดงเพียวๆ) --%>
+                            <form action="removeFromCart" method="post" class="remove-form">
                                 <input type="hidden" name="foodId" value="${item.menufood.foodId}" />
-                                <input type="hidden" name="action" value="increase" />
-                                <button class="qty-btn">+</button>
+                                <button type="submit" class="remove-btn" title="ลบรายการนี้" onclick="return confirm('คุณต้องการลบ ${item.menufood.foodname} ออกจากตะกร้าหรือไม่?');">
+                                    <i class="fas fa-trash"></i> 
+                                </button>
                             </form>
                         </div>
+                        <%-- ^^^^ 2. Action Group ^^^^ --%>
+                        
                     </div>
                 </div>
             </c:forEach>
@@ -398,13 +473,17 @@
             </form>
         </div>
     </c:if>
+
     <c:if test="${empty cartItemsList or cartItemsList.size() == 0}">
-         <div class="empty-cart-state">
-            <i class="fas fa-box-open"></i>
-            <p>ตะกร้าสินค้าว่างเปล่า</p>
-            <a href="viewmenu" class="action-btn">ไปสั่งอาหาร</a>
-        </div>
+          <div class="empty-cart-state">
+              <i class="fas fa-box-open"></i>
+              <p>ตะกร้าสินค้าว่างเปล่า</p>
+              <a href="viewmenu" class="action-btn">ไปสั่งอาหาร</a>
+          </div>
     </c:if>
+
 </div>
+
 </body>
+
 </html>

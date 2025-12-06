@@ -621,7 +621,7 @@
     <nav>
         <div class="nav-container">
             <a href="#" class="logo">
-                <span>🍲</span>
+                <span></span>
                 <span>ShaBu</span>
             </a>
             

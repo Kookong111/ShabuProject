@@ -10,7 +10,7 @@ import java.io.IOException;
 public class QrCodeGenerator {
     
     // URL พื้นฐานของแอปพลิเคชัน (ต้องเปลี่ยนตาม ngrok หรือโดเมนจริง)
-    private static final String BASE_URL = "https://subbranchial-triboluminescent-hallie.ngrok-free.dev/Zproject_shabu2/viewmenu";
+    private static final String BASE_URL = "https://subbranchial-triboluminescent-hallie.ngrok-free.dev/viewmenu";
 
     /**
      * สร้าง URL เต็มรูปแบบสำหรับการสั่งอาหารของโต๊ะนั้น

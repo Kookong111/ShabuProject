@@ -480,12 +480,19 @@ public class CustomerController {
  	    }
  	}
     @RequestMapping(value = "/gotoContact", method = RequestMethod.GET)
+
     public String contact() {
         return "conTact"; 
     }
     @RequestMapping(value = "/logoutCustomer", method = RequestMethod.GET)
-    public String logoutCustomer() {
-        return "Homecustomer"; 
+public String logoutCustomer(HttpSession session) {
+    // *** การแก้ไขที่สำคัญที่สุด: ทำลาย Session ทั้งหมด ***
+    if (session != null) {
+        session.invalidate(); // คำสั่งนี้จะลบทุกอย่างออกจาก Session และสร้าง Session ใหม่
     }
+    
+    // Redirect ไปยังหน้าหลักหรือหน้า Login
+    return "Homecustomer"; // หรือหน้า WelcomeCustomer ที่ไม่มี Session
+}
     
 }
