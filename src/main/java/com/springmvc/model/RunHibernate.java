@@ -7,6 +7,6 @@ public class RunHibernate {
 	public static void main(String[] args) {
 		SessionFactory sessionfactory = HibernateConnection.doHibernateConnection();
 		System.out.print(sessionfactory);
-		
+
 	}
 }

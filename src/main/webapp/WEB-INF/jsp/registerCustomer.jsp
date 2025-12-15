@@ -3,6 +3,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - Customer</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -37,9 +38,11 @@
       border-radius: 20px;
       box-shadow: var(--shadow);
       border: 3px solid var(--border-strong);
-      width: 650px;
-      max-width: 95%;
-      padding: 50px 40px;
+      width: 100%;
+      max-width: 650px;
+      padding: 48px 36px;
+      margin: 20px;
+      box-sizing: border-box;
     }
 
     .header {
@@ -85,6 +88,8 @@
       font-size: 0.95rem;
       color: var(--text-dark);
       transition: all 0.3s ease;
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .form-control:focus {
@@ -138,9 +143,38 @@
     .alt-link a:hover {
       text-decoration: underline;
     }
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 28px 20px;
+        margin: 12px;
+        border-width: 2px;
+      }
+
+      .header h2 { font-size: 1.6rem; }
+
+      .form-control { padding: 12px 14px 12px 42px; font-size: 0.95rem; }
+      .input-icon { left: 12px; }
+      .btn-primary-modern { padding: 12px 18px; font-size: 0.98rem; }
+    }
+
+    @media (max-width: 420px) {
+      .main-container { padding: 18px 14px; margin: 8px; }
+      .header h2 { font-size: 1.4rem; }
+      .form-label { font-size: 0.95rem; }
+      .form-control { padding: 10px 12px 10px 40px; }
+      .btn-primary-modern { padding: 10px 14px; font-size: 0.95rem; }
+    }
   </style>
 </head>
 
+  <script>
+    // small enhancement: focus first input on load (mobile friendly)
+    document.addEventListener('DOMContentLoaded', function() {
+      var el = document.getElementById('username');
+      if (el) el.focus();
+    });
+  </script>
 <body>
   <div class="main-container">
     <div class="header">
@@ -148,7 +182,7 @@
       <p>ระบบจัดการร้านอาหาร</p>
     </div>
 
-    <form action="registercustomer" method="post" id="registerForm">
+    <form action="registercustomer" method="post" id="registerForm" onsubmit="return validateRegisterForm()">
       <div class="form-group">
         <label class="form-label" for="username">ชื่อผู้ใช้</label>
         <div class="input-wrapper">
@@ -206,5 +240,42 @@
       </div>
     </form>
   </div>
+
+  <script>
+    function validateRegisterForm() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phonenumber') ? document.getElementById('phonenumber').value.trim() : '';
+        const email = document.getElementById('email') ? document.getElementById('email').value.trim() : '';
+        const age = document.getElementById('age') ? document.getElementById('age').value.trim() : '';
+
+        if (!username) {
+            alert('กรุณาระบุชื่อผู้ใช้');
+            return false;
+        }
+        if (password.length < 6) {
+            alert('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
+            return false;
+        }
+        if (!name) {
+            alert('กรุณาระบุชื่อจริง');
+            return false;
+        }
+        if (phone && !/^\d{9,11}$/.test(phone)) {
+            alert('เบอร์โทรศัพท์ควรเป็นตัวเลข 9-11 หลัก');
+            return false;
+        }
+        if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+            alert('รูปแบบอีเมลไม่ถูกต้อง');
+            return false;
+        }
+        if (age && (isNaN(age) || age < 1 || age > 120)) {
+            alert('อายุควรเป็นตัวเลข 1-120 ปี');
+            return false;
+        }
+        return true;
+    }
+  </script>
 </body>
 </html>

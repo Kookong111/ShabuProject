@@ -52,7 +52,8 @@ public class HibernateConnection {
 					.addAnnotatedClass(Manager.class)
 					.addAnnotatedClass(FoodType.class);
 
-			StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder().applySettings(cfg.getProperties());
+			StandardServiceRegistryBuilder ssrb = new StandardServiceRegistryBuilder()
+					.applySettings(cfg.getProperties());
 			sessionFactory = cfg.buildSessionFactory(ssrb.build());
 		}
 		return sessionFactory;

@@ -363,10 +363,20 @@
 <body>
     <div class="header-bar">
         <div class="header-content">
-            <a href="gotowelcomeCustomer" class="back-link">
-                <i class="fas fa-arrow-left"></i>
-                <span>กลับหน้าหลัก</span>
-            </a>
+            <c:choose>
+                <c:when test="${not empty user}">
+                    <a href="gotohomecustomer" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>กลับหน้าหลัก</span>
+                    </a>
+                </c:when>
+                <c:otherwise>
+                    <a href="gotowelcomeCustomer" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>กลับหน้าหลัก</span>
+                    </a>
+                </c:otherwise>
+            </c:choose>
             <h1>THE SIGNATURE MENU</h1>
             <span style="width: 140px;"></span>
         </div>

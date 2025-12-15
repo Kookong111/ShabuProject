@@ -5,6 +5,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Customer</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -44,8 +45,8 @@
       border-radius: 20px;
       box-shadow: var(--shadow);
       border: 3px solid var(--border-strong);
-      width: 900px;
-      max-width: 95%;
+      width: 100%;
+      max-width: 900px;
       display: flex;
       overflow: hidden;
       position: relative;
@@ -55,6 +56,31 @@
       flex: 1;
       padding: 60px 50px;
       background: var(--white);
+    }
+
+    /* Side panel for larger screens (optional visual) */
+    .side-panel {
+      width: 320px;
+      background: linear-gradient(135deg, rgba(139,95,191,0.08), rgba(165,105,217,0.03));
+      padding: 40px 30px;
+      display: none; /* shown only on larger screens */
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .side-panel .promo-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #5d4e6b;
+      text-align: center;
+    }
+
+    .side-panel .promo-text {
+      font-size: 0.95rem;
+      color: var(--text-gray);
+      text-align: center;
     }
 
     .login-header {
@@ -214,12 +240,38 @@
       .form-control {
         padding: 12px 16px 12px 40px;
       }
+      .btn-login, .btn-order-test {
+        padding: 12px 18px;
+      }
+      .side-panel { display: none; }
+    }
+
+    /* Extra small devices adjustments */
+    @media (max-width: 420px) {
+      .login-header h2 { font-size: 1.4rem; }
+      .login-section { padding: 24px 18px; }
+      .form-label { font-size: 0.9rem; }
+      .input-icon { left: 12px; }
+      .form-control { padding-left: 42px; }
+      .btn-login { padding: 12px; font-size: 0.95rem; }
+      .main-container { border-radius: 14px; }
+    }
+
+    /* Show side-panel on wide screens */
+    @media (min-width: 992px) {
+      .side-panel { display: flex; }
+      .main-container { align-items: stretch; }
     }
   </style>
 </head>
 
 <body>
   <div class="main-container">
+    <div class="side-panel" aria-hidden="true">
+      <div class="promo-title">ยินดีต้อนรับสู่ ShaBu</div>
+      <div class="promo-text">จองโต๊ะ จัดการการสั่งอาหาร และติดตามคำสั่งซื้อได้อย่างง่ายดาย</div>
+      <img src="image/shabu-illustration.png" alt="ShaBu" style="max-width:100%; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.06);">
+    </div>
     <div class="login-section">
       <div class="login-header">
         <h2>เข้าสู่ระบบลูกค้า</h2>

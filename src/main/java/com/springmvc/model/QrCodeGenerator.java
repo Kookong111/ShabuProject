@@ -8,12 +8,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class QrCodeGenerator {
-    
+
     // URL พื้นฐานของแอปพลิเคชัน (ต้องเปลี่ยนตาม ngrok หรือโดเมนจริง)
-    private static final String BASE_URL = "https://subbranchial-triboluminescent-hallie.ngrok-free.dev/viewmenu";
+    private static final String BASE_URL = "https://unparalleled-therese-octagonal.ngrok-free.dev/viewmenu";
 
     /**
      * สร้าง URL เต็มรูปแบบสำหรับการสั่งอาหารของโต๊ะนั้น
+     * 
      * @param qrToken โทเคนที่ไม่ซ้ำกันของโต๊ะ
      * @return URL เต็ม
      */
@@ -23,21 +24,22 @@ public class QrCodeGenerator {
 
     /**
      * สร้างภาพ QR Code ในรูปแบบ PNG byte array
-     * @param text ข้อความ (URL) ที่จะเข้ารหัส
-     * @param width ความกว้างของภาพ
+     * 
+     * @param text   ข้อความ (URL) ที่จะเข้ารหัส
+     * @param width  ความกว้างของภาพ
      * @param height ความสูงของภาพ
      * @return byte array ของภาพ PNG
      */
     public static byte[] generateQrCodeImage(String text, int width, int height) throws Exception {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            
+
             // 1. สร้าง BitMatrix จากข้อความ
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, width, height);
-            
+
             // 2. แปลง BitMatrix เป็นภาพ PNG และเขียนลง OutputStream
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", os);
-            
+
             return os.toByteArray();
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -614,6 +614,15 @@
             .quick-action-btn .btn-text {
                 font-size: 14px;
             }
+
+            .logout-nav-link {
+                color: #ff6b6b !important;
+                font-weight: 500;
+            }
+
+            .logout-nav-link:hover {
+                color: #ff5252 !important;
+            }
         }
     </style>
 </head>
@@ -633,7 +642,7 @@
             </ul>
             
             <div class="user-actions">
-                <c:if test="${not empty user}">
+                <c:if test="${not empty customer}">
                     <div class="user-info">
                         <div class="user-icon">
                             <i class="fas fa-user"></i>
@@ -658,20 +667,20 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-text">
-                <div class="hero-subtitle">Authentic Japanese Experience</div>
-                <h1 class="hero-title">ShaBu Buffet</h1>
+                <div class="hero-subtitle">🍲 ชาบูญี่ปุ่นแท้ 100% - Premium Hot Pot Experience</div>
+                <h1 class="hero-title">ยินดีต้อนรับสู่ ShaBu</h1>
                 <p class="hero-description">
                     เสพความอร่อยแบบญี่ปุ่นแท้ ด้วยชาบูพรีเมียม วัตถุดิบสด ๆ คุณภาพเยี่ยม 
-                    ในบรรยากาศอบอุ่นที่จะทำให้ทุกมื้อเป็นประสบการณ์พิเศษ
+                    ในบรรยากาศอบอุ่นที่จะทำให้ทุกมื้อเป็นประสบการณ์พิเศษ ที่คุณจะจำได้นาน
                 </p>
                 
                 <div class="hero-buttons">
-                    <a href="viewmenu" class="btn btn-primary">
-                        <span>ดูเมนู</span>
-                        <i class="fas fa-arrow-right"></i>
+                    <a href="menurecomand" class="btn btn-primary">
+                        <i class="fas fa-utensils"></i>
+                        <span>สำรวจเมนู</span>
                     </a>
-                    <a href="reserve&listTable" class="btn btn-secondary">
-                        <i class="fas fa-calendar"></i>
+                    <a href="listTable" class="btn btn-secondary">
+                        <i class="fas fa-calendar-alt"></i>
                         <span>จองโต๊ะ</span>
                     </a>
                 </div>
@@ -679,17 +688,110 @@
 
             <div class="hero-image">
                 <div class="hero-image-container">
-                    <img src="<c:url value='https://image.makewebeasy.net/makeweb/m_1920x0/Ommd4Syoj/DefaultData/%E0%B9%80%E0%B8%A1%E0%B8%99%E0%B8%B9_%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%8B%E0%B8%B8%E0%B8%9B%E0%B8%8A%E0%B8%B2%E0%B8%9A%E0%B8%B9_%E0%B9%92%E0%B9%91%E0%B9%90%E0%B9%95%E0%B9%91%E0%B9%91_18.jpg?v=202012190947' />" alt="ShaBu Restaurant" />
+                    <img src="<c:url value='/image/sss.jpg' />" alt="ShaBu Restaurant Premium" />
                     <div class="hero-badge">
-                        <span>⭐</span>
-                        <span>Premium Quality</span>
+                        <span>⭐⭐⭐⭐⭐</span>
+                        <span>ชาบูพรีเมียม</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <c:if test="${not empty user}">
+    <!-- Features Section -->
+    <section class="features" style="padding: 100px 5%; background: white;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 80px;">
+                <h2 style="font-size: 3rem; font-weight: 600; margin-bottom: 16px; color: #1a1a1a;">ทำไมต้องเลือก ShaBu</h2>
+                <p style="font-size: 18px; color: #6c757d; max-width: 600px; margin: 0 auto;">
+                    เรามอบประสบการณ์การรับประทานอาหารที่สุดยอด พร้อมบริการที่ดีเยี่ยมและราคาที่ยุติธรรม
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div style="font-size: 48px; margin-bottom: 24px;">🥩</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a;">วัตถุดิบสดใหม่</h3>
+                    <p class="feature-description">
+                        เลือกวัตถุดิบสดใหม่ทุกวัน จากผู้จัดส่งที่มีความเชี่ยวชาญ เพื่อให้ได้รสชาติที่ดีที่สุด
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div style="font-size: 48px; margin-bottom: 24px;">👨‍🍳</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a;">เชฟมืออาชีพ</h3>
+                    <p class="feature-description">
+                        ทีมเชฟที่มีประสบการณ์สูงจากญี่ปุ่น พร้อมให้คำแนะนำเรื่องการหุงและวิธีการรับประทาน
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div style="font-size: 48px; margin-bottom: 24px;">🏡</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a;">บรรยากาศอบอุ่น</h3>
+                    <p class="feature-description">
+                        ห้องพักดำรมที่ออกแบบมาเพื่อให้นั่งสบาย อบอุ่น และสวยงาม เหมาะสำหรับทุกโอกาส
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div style="font-size: 48px; margin-bottom: 24px;">💰</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a;">ราคาพิเศษ</h3>
+                    <p class="feature-description">
+                        บุฟเฟต์อร่อย ราคาสมเหตุสมผล พร้อมโปรโมชั่นพิเศษและสิทธิสำหรับสมาชิกประจำ
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card">
+                    <div style="font-size: 48px; margin-bottom: 24px;">⏰</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a;">ไม่มีเวลาจำกัด</h3>
+                    <p class="feature-description">
+                        บุฟเฟต์นั่งเท่านั้นที่ไม่มีเวลาจำกัด เพลิดเพลินกับการรับประทานอย่างสบายใจ
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card">
+                    <div style="font-size: 48px; margin-bottom: 24px;">🎉</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a;">ส่วนลดพิเศษ</h3>
+                    <p class="feature-description">
+                        ส่วนลดสำหรับการจองกลุ่ม การเฉลิมฉลองวันเกิด และโปรแกรมเพื่อน
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            padding: 40px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-card:hover {
+            border-color: rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+    </style>
+
+    <!-- Quick Actions -->
+    <c:if test="${not empty customer}">
         <div class="quick-actions">
             <a href="myReservess" class="quick-action-btn" title="ดูการจองของฉัน">
                 <i class="fas fa-list"></i>
@@ -698,10 +800,70 @@
         </div>
     </c:if>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-bottom">
-                <p>&copy; 2024 ShaBu Restaurant. All rights reserved.</p>
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); color: white; padding: 80px 5% 40px; margin-top: 100px;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 60px; margin-bottom: 60px;">
+                <!-- Company Info -->
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: white;">ShaBu Restaurant</h3>
+                    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 16px;">
+                        ชาบูญี่ปุ่นแท้ที่ดีที่สุด ด้วยบรรยากาศและบริการที่ไม่มีใครเทียบ
+                    </p>
+                    <div style="display: flex; gap: 12px;">
+                        <a href="#" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s;"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 20px; color: white;">ลิงค์ด่วน</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px;"><a href="menurecomand" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='white'; this.style.marginLeft='4px';" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.marginLeft='0';">📋 เมนูอาหาร</a></li>
+                        <li style="margin-bottom: 12px;"><a href="listTable" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='white'; this.style.marginLeft='4px';" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.marginLeft='0';">📅 จองโต๊ะ</a></li>
+                        <li style="margin-bottom: 12px;"><a href="gotoContact" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='white'; this.style.marginLeft='4px';" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.marginLeft='0';">📞 ติดต่อเรา</a></li>
+                        <li><a href="myReservess" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: all 0.3s;" onmouseover="this.style.color='white'; this.style.marginLeft='4px';" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'; this.style.marginLeft='0';">🎫 การจองของฉัน</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 20px; color: white;">ติดต่อเรา</h4>
+                    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 12px;">
+                        <i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>
+                        123 ถนนสุขุมวิท กรุงเทพฯ
+                    </p>
+                    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 12px;">
+                        <i class="fas fa-phone" style="margin-right: 8px;"></i>
+                        02-123-4567
+                    </p>
+                    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 12px;">
+                        <i class="fas fa-envelope" style="margin-right: 8px;"></i>
+                        contact@shabu.com
+                    </p>
+                    <p style="color: rgba(255, 255, 255, 0.7);">
+                        <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                        เปิด: 11:00 - 22:00 น.
+                    </p>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 20px; color: white;">รับข่าวสาร</h4>
+                    <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 16px;">
+                        สมัครรับโปรโมชั่นและข่าวสารพิเศษจาก ShaBu
+                    </p>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="email" placeholder="อีเมลของคุณ" style="flex: 1; padding: 12px; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2);" />
+                        <button style="padding: 12px 20px; background: #1a1a1a; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s;">ส่ง</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 30px; text-align: center; color: rgba(255, 255, 255, 0.5);">
+                <p>&copy; 2024 ShaBu Restaurant. All rights reserved. | <a href="#" style="color: rgba(255, 255, 255, 0.5); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: rgba(255, 255, 255, 0.5); text-decoration: none;">Terms of Service</a></p>
             </div>
         </div>
     </footer>
