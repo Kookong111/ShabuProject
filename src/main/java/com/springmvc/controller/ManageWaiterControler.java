@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+// NEW IMPORTS FOR QR CODE IMAGE RESPONSE
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+// END NEW IMPORTS
+
 import com.springmvc.model.MenuFood;
 import com.springmvc.model.MenufoodManager;
 import com.springmvc.model.Order;
@@ -40,6 +47,31 @@ public class ManageWaiterControler {
         String usernames = request.getParameter("empUsername");
         String passwords = request.getParameter("empPassword");
         
+        // ✅ [NEW] Validation 1: Check username starts with "WAT"
+        if (usernames == null || !usernames.toUpperCase().startsWith("WAT")) {
+            ModelAndView mav = new ModelAndView("loginWaiter");
+            mav.addObject("error", "ชื่อผู้ใช้ต้องขึ้นต้นด้วย WAT เท่านั้น");
+            return mav;
+        }
+        
+        // ✅ [NEW] Validation 2: Check password length >= 8
+        if (passwords == null || passwords.length() < 8) {
+            ModelAndView mav = new ModelAndView("loginWaiter");
+            mav.addObject("error", "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
+            return mav;
+        }
+        
+        // ✅ [NEW] Validation 3: Check password has letters
+        boolean hasLetters = passwords.matches(".*[a-zA-Z].*");
+        // ✅ [NEW] Validation 4: Check password has numbers
+        boolean hasNumbers = passwords.matches(".*[0-9].*");
+        
+        if (!hasLetters || !hasNumbers) {
+            ModelAndView mav = new ModelAndView("loginWaiter");
+            mav.addObject("error", "รหัสผ่านต้องมีตัวอักษรและตัวเลขรวมกัน");
+            return mav;
+        }
+        
         Employee user = rm.authenticateWaiter(usernames, passwords);
         
         if (user != null) {
@@ -49,7 +81,7 @@ public class ManageWaiterControler {
             return mav;
         } else {
             ModelAndView mav = new ModelAndView("loginWaiter");
-            mav.addObject("error", "Email หรือรหัสผ่านไม่ถูกต้อง");
+            mav.addObject("error", "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
             return mav;
         }
     }
@@ -101,6 +133,7 @@ public class ManageWaiterControler {
             return new ModelAndView("redirect:/gotoManageTable", "error", "โต๊ะไม่ว่างแล้ว กรุณาเลือกใหม่");
         }
         
+        // แก้ไขชื่อเมธอดตามที่ตกลงกัน
         List<MenuFood> menuList = menuManager.getAllMenufood(); 
         System.out.println("DEBUG: Menu List Size pulled from Manager: " + menuList.size());
         
@@ -154,7 +187,6 @@ public class ManageWaiterControler {
         // ^^^^ สิ้นสุดการสร้าง ^^^^
 
         // A. อัปเดตสถานะโต๊ะเป็น 'Occupied' และบันทึก QR Token ใหม่
-        // ✅ ตั้งสถานะเป็น Occupied ก่อนบันทึก
         table.setStatus("Occupied"); 
         
         boolean statusUpdated = tableManager.updateTable(table); 
@@ -198,8 +230,12 @@ public class ManageWaiterControler {
         }
 
 
-        // 3. กลับไปหน้าจัดการโต๊ะ
-        return new ModelAndView("redirect:/gotoManageTable", "successMessage", "เปิดโต๊ะ " + tableid + " สำเร็จ! (เปิดบิล Order ID: " + newOrder.getOderId() + ", ราคารวมเริ่มต้น: " + calculatedTotalPeice + " บาท)");
+        // 3. [MODIFIED] กลับไปหน้าจัดการโต๊ะ และส่ง ID, TableId, QrToken เพื่อให้ JavaScript เปิด Pop-up
+        ModelAndView mav = new ModelAndView("redirect:/gotoManageTable");
+        mav.addObject("orderIdToPrint", newOrder.getOderId()); 
+        mav.addObject("tableId", tableid);
+        mav.addObject("qrToken", newQrToken);
+        return mav;
     }
     
     // ----------------------------------------------------------------------------------
@@ -215,6 +251,7 @@ public class ManageWaiterControler {
         MenufoodManager menuManager = new MenufoodManager();
 
         Reserve reserveInfo = reserveManager.getReservationById(reserveid);
+        // แก้ไขชื่อเมธอดตามที่ตกลงกัน
         List<MenuFood> menuList = menuManager.getAllMenufood(); 
 
         if (reserveInfo == null) {
@@ -270,7 +307,6 @@ public class ManageWaiterControler {
         // ^^^^ สิ้นสุดการสร้าง ^^^^
         
         // A. อัปเดตสถานะโต๊ะเป็น 'Occupied' และบันทึก QR Token ใหม่
-        // ✅ ตั้งสถานะเป็น Occupied ก่อนบันทึก
         table.setStatus("Occupied");
         
         boolean tableUpdated = tableManager.updateTable(table);
@@ -307,8 +343,12 @@ public class ManageWaiterControler {
              return new ModelAndView("redirect:/gotoViewReservations", "error", "เปิดบิลสำเร็จ แต่สร้างรายการอาหารเริ่มต้น/ราคารวมไม่สำเร็จ");
         }
 
-        // 3. กลับไปหน้าจัดการการจอง
-        return new ModelAndView("redirect:/gotoViewReservations", "successMessage", "Check-in โต๊ะ " + tableid + " สำเร็จ! (เปิดบิล Order ID: " + newOrder.getOderId() + ")");
+        // 3. [MODIFIED] กลับไปหน้าจัดการการจอง และส่ง ID, TableId, QrToken เพื่อให้ JavaScript เปิด Pop-up
+        ModelAndView mav = new ModelAndView("redirect:/gotoManageTable"); // <<< แก้ไข Redirect ตรงนี้
+        mav.addObject("orderIdToPrint", newOrder.getOderId()); 
+        mav.addObject("tableId", tableid);
+        mav.addObject("qrToken", newQrToken);
+        return mav;
     }
     
     @RequestMapping(value = "/gohome", method = RequestMethod.GET)
@@ -448,6 +488,7 @@ public class ManageWaiterControler {
         
         return mav;
     }
+    
     @RequestMapping(value = "/findAndPrintOrder", method = RequestMethod.GET)
     public ModelAndView findAndPrintOrder(@RequestParam("tableId") String tableId) {
         
@@ -460,7 +501,34 @@ public class ManageWaiterControler {
             return new ModelAndView("redirect:/printOrderInfo?orderId=" + activeOrder.getOderId());
         } else {
             // 3. ถ้าไม่พบ (เป็นไปได้ว่าบิลถูกปิดไปแล้ว หรือมีปัญหา)
-            return new ModelAndView("errorPage", "errorMessage", "ไม่พบบิลที่เปิดใช้งานอยู่สำหรับโต๊ะ " + tableId);
+            return new ModelAndView("opentableforWaiter", "errorMessage", "ไม่พบบิลที่เปิดใช้งานอยู่สำหรับโต๊ะ " + tableId);
+        }
+    }
+    
+    // ----------------------------------------------------------------------------------
+    // ✅ NEW METHOD: สำหรับสร้างและส่งรูปภาพ QR Code กลับไปที่ Browser
+    // ----------------------------------------------------------------------------------
+    @RequestMapping(value = "/generateQrForTable", method = RequestMethod.GET, produces = "image/png")
+    public ResponseEntity<byte[]> generateQrCodeForTable(@RequestParam("token") String token) {
+        try {
+            // 1. สร้าง URL เต็มรูปแบบที่ QR Code จะชี้ไป
+            String qrContent = QrCodeGenerator.generateQrUrl(token); 
+            
+            // 2. สร้างภาพ QR Code ในรูปแบบ byte array
+            byte[] qrImageBytes = QrCodeGenerator.generateQrCodeImage(qrContent, 200, 200); 
+
+            // 3. ตั้งค่า Header เพื่อบอก Browser ว่านี่คือรูปภาพ PNG
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            headers.setContentLength(qrImageBytes.length);
+
+            // 4. ส่งรูปภาพกลับไป
+            return new ResponseEntity<>(qrImageBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // ถ้าเกิดข้อผิดพลาดในการสร้าง ให้ส่งสถานะ Internal Server Error
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
         }
     }
 }

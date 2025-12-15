@@ -68,209 +68,202 @@ public class OrderCustomerController {
     // -----------------------------------------------------------
     // 0. GUARD LOGIC: ตรวจสอบสิทธิ์การเข้าถึงเมนูสั่งอาหาร
     // -----------------------------------------------------------
-    @RequestMapping(value = "/checkAccessAndRedirectToMenu", method = RequestMethod.GET)
-    public ModelAndView checkAccessAndRedirectToMenu(
-            HttpSession session, 
-            @RequestParam(value = "qrToken", required = false) String qrToken) {
-        
-        Customer user = (Customer) session.getAttribute("user");
-        String sessionTableId = (String) session.getAttribute("tableId");
-        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
-        
-        // 1. ตรวจสอบการล็อกอิน
-        if (user == null) {
-            ModelAndView mav = new ModelAndView("loginCustomer");
-            mav.addObject("error", "⚠️ กรุณาเข้าสู่ระบบก่อนจึงจะสามารถสั่งอาหารได้");
-            return mav;
-        }
+    // OrderCustomerController.java - (focus on user null check)
 
-        // --- NEW LOGIC FOR SESSION VALIDATION ---
-        if (sessionOrderId != null) {
-            Order currentOrder = orderManager.getOrderById(sessionOrderId); // ดึง Order ปัจจุบัน
+// OrderCustomerController.java
 
-            // 1. ถ้ามี Order ใน Session แต่ Order นั้นถูกปิดไปแล้ว (ไม่เป็น 'Open') -> ล้าง Session
-            if (currentOrder == null || !currentOrder.getStatus().equals("Open")) {
-                 sessionOrderId = null; // ถือว่า Order นี้ใช้ไม่ได้แล้ว
-                 sessionTableId = null;
-                 session.removeAttribute("tableId");
-                 session.removeAttribute("orderId");
-            } 
-            
-            // 2. ถ้า Order ID ยังอยู่: ตรวจสอบความเป็นเจ้าของผ่าน Reservation (ถ้ามี)
-            if (sessionOrderId != null) {
-                Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId());
-                
-                // ถ้าลูกค้ามี Reservation Active แต่ Order ใน Session ไม่ใช่ Order ของโต๊ะที่จองไว้
-                if (activeReservation != null && currentOrder != null && !activeReservation.getTables().getTableid().equals(currentOrder.getTable().getTableid())) {
-                    // นี่คือ Order ของคนอื่นที่หลงเหลือใน Session
-                    sessionOrderId = null; 
-                    sessionTableId = null;
-                    session.removeAttribute("tableId");
-                    session.removeAttribute("orderId");
-                } else {
-                     // ผ่านการตรวจสอบ Order ยัง Open หรือเป็น Walk-in ที่ไม่มี Reservation
-                     return new ModelAndView("redirect:/viewmenu");
-                }
-            }
-        }
-        // --- END NEW LOGIC ---
-        
-
-        // 2. ตรวจสอบบริบทการสั่งอาหาร (ถ้าไม่มี QR Token มาด้วย)
-        // ถ้าล็อกอินแล้ว แต่ไม่มี context
-        if (qrToken == null && (sessionTableId == null || sessionOrderId == null)) {
-            // ให้ลูกค้าไปหน้า error
-            ModelAndView mav = new ModelAndView("orderErrorPage"); 
-            mav.addObject("errorMessage", "🚫 คุณยังไม่มีบิลสั่งอาหารที่เปิดใช้งานอยู่ กรุณาจองโต๊ะหรือสแกน QR Code ที่โต๊ะคุณนั่ง");
-            return mav;
-        }
-        
-        // 3. ผ่านการตรวจสอบเบื้องต้น หรือมี QR Token มาด้วย
+@RequestMapping(value = "/checkAccessAndRedirectToMenu", method = RequestMethod.GET)
+public ModelAndView checkAccessAndRedirectToMenu(
+        HttpSession session, 
+        @RequestParam(value = "qrToken", required = false) String qrToken) {
+    
+    Customer user = (Customer) session.getAttribute("user");
+    String sessionTableId = (String) session.getAttribute("tableId");
+    Integer sessionOrderId = (Integer) session.getAttribute("orderId");
+    
+    // VVVV MODIFIED LOGIC VVVV
+    
+    // 1. **เงื่อนไขที่อนุญาตให้ผ่านได้ทันที:**
+    //    - มี qrToken มาด้วย (หมายถึง Scan-to-Order)
+    //    - หรือมี Order/Table ID ใน Session แล้ว
+    if (qrToken != null && !qrToken.isEmpty()) {
+        // อนุญาตให้ผ่านไป viewmenu ทันที เพื่อให้ viewmenu ไปจัดการบริบทของ Order/Table ต่อ
+        return new ModelAndView("redirect:/viewmenu");
+    }
+    if (sessionTableId != null && sessionOrderId != null) {
+        // อนุญาตให้ผ่านไป viewmenu ทันที (ใช้บริบทเดิม)
         return new ModelAndView("redirect:/viewmenu");
     }
 
-    // -----------------------------------------------------------
-    // 1. VIEW MENU (Entry Point for QR Scan)
-    // -----------------------------------------------------------
-    @RequestMapping(value = "/viewmenu", method = RequestMethod.GET)
-    public ModelAndView viewmenu(HttpSession session, 
-                                 @RequestParam(value = "qrToken", required = false) String qrToken) {
-        
-        // 1. ดึงบริบทปัจจุบันและข้อมูลผู้ใช้ที่ล็อกอิน
-        String sessionTableId = (String) session.getAttribute("tableId");
-        Integer sessionOrderId = (Integer) session.getAttribute("orderId");
-        Customer user = (Customer) session.getAttribute("user"); 
-
-        Tables activeTable = null;
-        Order activeOrder = null;
-        String errorMsg = null;
-        boolean contextUpdated = false;
-
-        // A. 🎯 ตรวจสอบจาก QR Code (Walk-in/Primary Entry Point)
-        if (qrToken != null && !qrToken.isEmpty()) { 
-            activeTable = tableManager.getTableByQrToken(qrToken);
-            
-            if (activeTable != null && ("Occupied".equals(activeTable.getStatus()) || "In Use".equals(activeTable.getStatus()))) {
-                activeOrder = orderManager.getActiveOrderByTableId(activeTable.getTableid());
-            }
-
-            if (activeTable == null) {
-                errorMsg = "ไม่พบข้อมูลโต๊ะที่เกี่ยวข้อง, กรุณาตรวจสอบ QR Code อีกครั้ง";
-            } else if (activeOrder == null) {
-                errorMsg = "โต๊ะ " + activeTable.getTableid() + " เปิดใช้งานแล้ว แต่ไม่พบบิลสั่งอาหาร, กรุณาติดต่อพนักงานเพื่อเปิดบิล";
-            } else {
-                // *** NEW LOGIC 1: Verify Order Ownership via Reservation ***
-                Reserve reservationForCustomer = reserveManager.getReservationByActiveStatus(user.getCusId()); 
-                
-                // ถ้ามี Reservation Active และ Order นี้ไม่ใช่ Order ของโต๊ะที่ถูกจอง
-                if (reservationForCustomer != null && !reservationForCustomer.getTables().getTableid().equals(activeOrder.getTable().getTableid())) {
-                    errorMsg = "🚫 บัญชีของคุณมีการจองโต๊ะ " + reservationForCustomer.getTables().getTableid() + " ที่ยัง Active อยู่, คุณไม่สามารถสแกน Order ของโต๊ะอื่นได้";
-                } else {
-                     contextUpdated = true;
-                }
-                // *** END NEW LOGIC 1 ***
-            }
-            
-        // B. 🎯 ตรวจสอบจาก Active Reservation (ถ้าลูกค้าล็อกอินและไม่มี Session/QR Code)
-        } else if (sessionTableId == null && sessionOrderId == null && user != null) {
-            Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId());
-            
-            if (activeReservation != null && ("Occupied".equals(activeReservation.getTables().getStatus()) || "In Use".equals(activeReservation.getTables().getStatus()))) {
-                activeTable = activeReservation.getTables();
-                activeOrder = orderManager.getActiveOrderByTableId(activeTable.getTableid()); 
-            
-                if (activeOrder != null) {
-                     contextUpdated = true;
-                } else {
-                     errorMsg = "การจองของคุณถูก Check-in แล้ว แต่ไม่พบบิลสั่งอาหาร กรุณาติดต่อพนักงาน";
-                }
-
-            } else if (user != null) {
-                 errorMsg = "ไม่พบการจองที่ Active ของคุณ กรุณาจองโต๊ะก่อนสั่งอาหาร";
-            }
-
-        // C. 🎯 ตรวจสอบจาก Session Context (สั่งต่อ)
-        } else if (sessionTableId != null && sessionOrderId != null) {
-            
-            // *** NEW LOGIC 2: Validate Existing Session Context ***
-            Order sessionOrder = orderManager.getOrderById(sessionOrderId);
-            
-            // 1. ถ้า Order ถูกปิดแล้ว หรือไม่ตรงกับ Table ID ใน Session
-            if (sessionOrder == null || !sessionOrder.getStatus().equals("Open") || !sessionOrder.getTable().getTableid().equals(sessionTableId)) {
-                errorMsg = "บิล (Order ID: " + sessionOrderId + ") ถูกปิดแล้ว หรือไม่ถูกต้อง กรุณาสแกน QR ใหม่";
-                session.removeAttribute("tableId");
-                session.removeAttribute("orderId");
-            } else {
-                // 2. ถ้า Order ยัง Open, ตรวจสอบว่าเป็น Order ของลูกค้าคนนี้หรือไม่
-                Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId());
-                
-                if (activeReservation != null) {
-                    // Order ที่ Active ใน Session ไม่ใช่ Order ของ Reservation ที่ Active ของลูกค้าคนนี้
-                    if (!activeReservation.getTables().getTableid().equals(sessionTableId)) {
-                         errorMsg = "🚫 Order ID: " + sessionOrderId + " ไม่ตรงกับการจอง Active ของคุณ (" + activeReservation.getTables().getTableid() + ")";
-                         session.removeAttribute("tableId");
-                         session.removeAttribute("orderId");
-                    }
-                }
-            }
-            // *** END NEW LOGIC 2 ***
-            
-        }
-
-
-        // ----------------------------------------------------------------------
-        // 3. สรุปผลและกำหนด Session Context
-        // ----------------------------------------------------------------------
-        if (errorMsg != null) {
-            // หากเกิด Error จากการตรวจสอบ QR หรือ Reservation
-            session.removeAttribute("tableId");
-            session.removeAttribute("orderId");
-            ModelAndView mav = new ModelAndView("orderErrorPage");
-            mav.addObject("errorMessage", errorMsg);
-            return mav;
-            
-        } else if (activeOrder != null && contextUpdated) {
-             // หากตรวจสอบผ่านด้วย QR Code หรือ Reservation และมีการอัปเดตข้อมูล: บันทึก Context ใหม่
-             session.setAttribute("tableId", activeOrder.getTable().getTableid());
-             session.setAttribute("orderId", activeOrder.getOderId());
-             
-             // Redirect เพื่อล้าง qrToken หรือเพื่อโหลด UI ใหม่ (ถ้ามาจาก Reservation Check)
-             if (qrToken != null || sessionTableId == null) {
-                 return new ModelAndView("redirect:/viewmenu");
-             }
-        } 
-        
-        // ----------------------------------------------------------------------
-        // 4. การแสดงผล (ใช้ Session Context ที่ผ่านการตรวจสอบแล้ว)
-        // ----------------------------------------------------------------------
-        // อัปเดตตัวแปร Session อีกครั้ง หลังการตรวจสอบ
-        sessionTableId = (String) session.getAttribute("tableId");
-        sessionOrderId = (Integer) session.getAttribute("orderId");
-
-        if (sessionTableId == null || sessionOrderId == null) {
-             // ถ้ายังไม่มี Context แสดงว่าเข้าถึงโดยตรง/Session หมดอายุ (ถูกบล็อกในเงื่อนไขด้านบน)
-             ModelAndView mav = new ModelAndView("orderErrorPage");
-             mav.addObject("errorMessage", "⚠️ คุณไม่ได้สแกน QR Code โต๊ะหรือบริบทการสั่งอาหารหมดอายุ, กรุณาจองโต๊ะหรือสแกน QR Code เพื่อเริ่มสั่งอาหาร");
-             return mav;
-        }
-
-        // ดึงข้อมูลเมนู (Logic เดิม)
-        List<MenuFood> menuList = foodManager.getAllFoodItem();
-        List<FoodType> foodTypeList = foodManager.getAllFoodTypes(); 
-
-        // จัดการ Cart (Logic เดิม)
-        Cart cart = getCartFromSession(session);
-        updateCartTotalItems(session, cart);
-
-        // สร้าง ModelAndView และส่งข้อมูล
-        ModelAndView mav = new ModelAndView("orderfoodCuatomer"); 
-        mav.addObject("menuList", menuList);
-        mav.addObject("foodTypeList", foodTypeList); 
-        mav.addObject("tableId", sessionTableId); 
-        mav.addObject("orderId", sessionOrderId); 
-
+    // 2. **ถ้าไม่มีบริบท (No QR / No Session Context)**: ต้องบังคับล็อกอินเพื่อเข้าถึงการจอง
+    if (user == null) {
+        ModelAndView mav = new ModelAndView("loginCustomer");
+        mav.addObject("error", "⚠️ กรุณาเข้าสู่ระบบก่อนจึงจะสามารถใช้ฟังก์ชันจองโต๊ะและสั่งอาหารได้");
         return mav;
     }
+
+    // 3. **ถ้าล็อกอินแล้วแต่ไม่มีบริบทการสั่งอาหาร** (บังคับตรวจสอบการจอง)
+    //    โค้ดส่วนนี้ยังคงเป็น Logic ของการสั่งผ่านเว็บ/การจอง
+    if (sessionTableId == null || sessionOrderId == null) {
+        ModelAndView mav = new ModelAndView("orderErrorPage");
+        mav.addObject("errorMessage", "🚫 คุณยังไม่มีบิลสั่งอาหารที่เปิดใช้งานอยู่ กรุณาจองโต๊ะหรือสแกน QR Code ที่โต๊ะคุณนั่ง");
+        return mav;
+    }
+    
+    // ^^^^ END MODIFIED LOGIC ^^^^
+    
+    return new ModelAndView("redirect:/viewmenu");
+}
+
+   
+
+@RequestMapping(value = "/viewmenu", method = RequestMethod.GET)
+public ModelAndView viewmenu(HttpSession session, 
+                             @RequestParam(value = "qrToken", required = false) String qrToken) {
+    
+    // 1. ดึงบริบทปัจจุบันและข้อมูลผู้ใช้ที่ล็อกอิน
+    String sessionTableId = (String) session.getAttribute("tableId");
+    Integer sessionOrderId = (Integer) session.getAttribute("orderId");
+    Customer user = (Customer) session.getAttribute("user"); 
+
+    Tables activeTable = null;
+    Order activeOrder = null;
+    String errorMsg = null;
+    boolean contextUpdated = false;
+    boolean isScanToOrder = (qrToken != null && !qrToken.isEmpty()); // Flag สำหรับ QR
+
+    
+    if (isScanToOrder) { 
+        activeTable = tableManager.getTableByQrToken(qrToken);
+        
+        if (activeTable != null && ("Occupied".equals(activeTable.getStatus()) || "In Use".equals(activeTable.getStatus()))) {
+            activeOrder = orderManager.getActiveOrderByTableId(activeTable.getTableid());
+        }
+
+        if (activeTable == null) {
+            errorMsg = "ไม่พบข้อมูลโต๊ะที่เกี่ยวข้อง, กรุณาตรวจสอบ QR Code อีกครั้ง";
+        } else if (activeOrder == null) {
+            errorMsg = "โต๊ะ " + activeTable.getTableid() + " เปิดใช้งานแล้ว แต่ไม่พบบิลสั่งอาหาร, กรุณาติดต่อพนักงานเพื่อเปิดบิล";
+        } else {
+            // *** BUG FIX 1: ตรวจสอบความเป็นเจ้าของ Order เมื่อ user ล็อกอินอยู่ ***
+            if (user != null) {
+                Reserve reservationForOrder = reserveManager.getReservationByActiveStatus(user.getCusId()); 
+                
+                // ถือว่าถ้าสแกน QR ผ่าน จะเป็น Walk-in/Scan-to-Order แต่ถ้ามี Reservation ที่ Active ผูกอยู่
+                // ต้องแน่ใจว่า Order ที่สแกนตรงกับการจองของตัวเอง
+                if (reservationForOrder != null && !reservationForOrder.getTables().getTableid().equals(activeOrder.getTable().getTableid())) {
+                    errorMsg = "🚫 บัญชีของคุณมีการจองโต๊ะ " + reservationForOrder.getTables().getTableid() 
+                    + " ที่ยัง Active อยู่, คุณไม่สามารถสแกน Order ของโต๊ะอื่นได้";
+                } else {
+                     contextUpdated = true;
+                }
+            } else {
+                // ถ้า user เป็น null (ไม่ได้ล็อกอิน) และสแกน QR ผ่าน: ถือว่าผ่าน
+                contextUpdated = true;
+            }
+        }
+        
+    // B. 🎯 ตรวจสอบจาก Active Reservation (ถ้าลูกค้าล็อกอินและไม่มี Session/QR Code)
+    } else if (sessionTableId == null && sessionOrderId == null && user != null) {
+        // *** BUG FIX 2: ส่วนนี้ user ถูกบังคับให้ไม่เป็น null แล้ว ***
+        Reserve activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId());
+        
+        if (activeReservation != null && ("Occupied".equals(activeReservation.getTables().getStatus()) || "In Use".equals(activeReservation.getTables().getStatus()))) {
+            activeTable = activeReservation.getTables();
+            activeOrder = orderManager.getActiveOrderByTableId(activeTable.getTableid()); 
+        
+            if (activeOrder != null) {
+                 contextUpdated = true;
+            } else {
+                 errorMsg = "การจองของคุณถูก Check-in แล้ว แต่ไม่พบบิลสั่งอาหาร กรุณาติดต่อพนักงาน";
+            }
+
+        } else { // activeReservation == null
+             errorMsg = "ไม่พบการจองที่ Active ของคุณ กรุณาจองโต๊ะก่อนสั่งอาหาร";
+        }
+
+    // C. 🎯 ตรวจสอบจาก Session Context (สั่งต่อ)
+    } else if (sessionTableId != null && sessionOrderId != null) {
+        
+        Order sessionOrder = orderManager.getOrderById(sessionOrderId);
+        
+        // *** BUG FIX 3: ตรวจสอบความเป็นเจ้าของ Order เมื่อ user ล็อกอินอยู่ ***
+        Reserve activeReservation = null;
+        if (user != null) {
+            activeReservation = reserveManager.getReservationByActiveStatus(user.getCusId()); 
+        }
+
+        // 1. ถ้า Order ถูกปิดแล้ว หรือไม่ตรงกับ Table ID ใน Session
+        if (sessionOrder == null || !sessionOrder.getStatus().equals("Open") || !sessionOrder.getTable().getTableid().equals(sessionTableId)) {
+            errorMsg = "บิล (Order ID: " + sessionOrderId + ") ถูกปิดแล้ว หรือไม่ถูกต้อง กรุณาสแกน QR ใหม่";
+            session.removeAttribute("tableId");
+            session.removeAttribute("orderId");
+            sessionOrderId = null; 
+            sessionTableId = null;
+        } 
+        
+        // 2. ถ้า Order ยัง Open และมี Reservation Active ที่ผูกกับ Customer คนนี้
+        if (sessionOrderId != null && activeReservation != null) {
+            // Order ที่ Active ใน Session ไม่ใช่ Order ของ Reservation ที่ Active ของลูกค้าคนนี้
+            if (!activeReservation.getTables().getTableid().equals(sessionTableId)) {
+                 errorMsg = "🚫 Order ID: " + sessionOrderId + " ไม่ตรงกับการจอง Active ของคุณ (" + activeReservation.getTables().getTableid() + ")";
+                 session.removeAttribute("tableId");
+                 session.removeAttribute("orderId");
+            }
+        } 
+        
+    }
+
+
+    // ----------------------------------------------------------------------
+    // 3. สรุปผลและกำหนด Session Context
+    // ----------------------------------------------------------------------
+    if (errorMsg != null) {
+        session.removeAttribute("tableId");
+        session.removeAttribute("orderId");
+        ModelAndView mav = new ModelAndView("orderErrorPage");
+        mav.addObject("errorMessage", errorMsg);
+        return mav;
+        
+    } else if (activeOrder != null && contextUpdated) {
+         // หากตรวจสอบผ่านด้วย QR Code หรือ Reservation และมีการอัปเดตข้อมูล: บันทึก Context ใหม่
+         session.setAttribute("tableId", activeOrder.getTable().getTableid());
+         session.setAttribute("orderId", activeOrder.getOderId());
+         
+         // Redirect เพื่อล้าง qrToken หรือเพื่อโหลด UI ใหม่ (ถ้ามาจาก Reservation Check)
+         if (isScanToOrder || sessionTableId == null) {
+             return new ModelAndView("redirect:/viewmenu");
+         }
+    } 
+    
+    // ----------------------------------------------------------------------
+    // 4. การแสดงผล (ใช้ Session Context ที่ผ่านการตรวจสอบแล้ว)
+    // ----------------------------------------------------------------------
+    sessionTableId = (String) session.getAttribute("tableId");
+    sessionOrderId = (Integer) session.getAttribute("orderId");
+
+    if (sessionTableId == null || sessionOrderId == null) {
+         // ถ้ายังไม่มี Context แสดงว่าเข้าถึงโดยตรง/Session หมดอายุ
+         ModelAndView mav = new ModelAndView("orderErrorPage");
+         mav.addObject("errorMessage", " ไม่พบบิลที่เปิดใช้งานสำหรับโต๊ะนี้ กรุณาติดต่อพนักงานเสิร์ฟ");
+         return mav;
+    }
+    
+    // ... (โค้ดส่วนที่เหลือ: ดึงเมนู, Cart, แสดงผล)
+    List<MenuFood> menuList = foodManager.getAllFoodItem();
+    List<FoodType> foodTypeList = foodManager.getAllFoodTypes(); 
+
+    Cart cart = getCartFromSession(session);
+    updateCartTotalItems(session, cart);
+
+    ModelAndView mav = new ModelAndView("orderfoodCuatomer"); 
+    mav.addObject("menuList", menuList);
+    mav.addObject("foodTypeList", foodTypeList); 
+    mav.addObject("tableId", sessionTableId); 
+    mav.addObject("orderId", sessionOrderId); 
+
+    return mav;
+}
     
     // -----------------------------------------------------------
     // 2. ADD TO CART

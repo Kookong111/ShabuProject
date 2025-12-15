@@ -5,6 +5,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Waiter - Restaurant Management System</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -291,62 +292,244 @@
     }
 
     /* Responsive Design */
+    @media (max-width: 1024px) {
+      .main-container {
+        width: 90%;
+      }
+    }
+
     @media (max-width: 768px) {
       .main-container {
         flex-direction: column;
         width: 95%;
         min-height: auto;
         border: 2px solid var(--border-strong);
+        border-radius: 16px;
       }
 
       .roles-section {
         width: 100%;
-        padding: 30px 20px;
+        padding: 25px 20px;
         border-right: none;
         border-bottom: 2px solid var(--border-strong);
       }
 
+      .roles-header h3 {
+        font-size: 1.2rem;
+      }
+
+      .roles-header p {
+        font-size: 0.8rem;
+      }
+
       .roles-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 10px;
       }
 
       .role-button {
-        padding: 14px 16px;
-        font-size: 0.9rem;
+        padding: 12px 14px;
+        font-size: 0.85rem;
       }
 
       .role-button i {
-        font-size: 1rem;
-        margin-right: 10px;
+        font-size: 0.95rem;
+        margin-right: 8px;
       }
 
       .login-section {
-        padding: 40px 30px;
+        padding: 35px 25px;
+      }
+
+      .login-header {
+        margin-bottom: 35px;
       }
 
       .login-header h2 {
-        font-size: 1.7rem;
+        font-size: 1.5rem;
+      }
+
+      .login-header p {
+        font-size: 0.9rem;
+      }
+
+      .form-label {
+        font-size: 0.8rem;
       }
 
       .form-control {
-        padding: 12px 16px 12px 40px;
+        padding: 12px 14px 12px 40px;
+        font-size: 0.9rem;
+      }
+
+      .btn-login {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+      }
+
+      .error-message {
+        font-size: 0.75rem;
+      }
+
+      .login-error-alert {
+        padding: 12px 16px;
+        margin-bottom: 20px;
+      }
+
+      .login-error-alert p {
+        font-size: 0.9rem;
       }
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
+      .main-container {
+        width: 100%;
+        border-radius: 12px;
+        min-height: 100vh;
+      }
+
+      .roles-section {
+        padding: 20px 15px;
+        width: 100%;
+      }
+
+      .roles-header {
+        margin-bottom: 25px;
+      }
+
+      .roles-header h3 {
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+      }
+
+      .roles-header p {
+        font-size: 0.75rem;
+      }
+
       .roles-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .role-button {
+        padding: 10px 12px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+      }
+
+      .role-button i {
+        font-size: 0.9rem;
+        margin-right: 6px;
+        width: 16px;
       }
 
       .login-section {
         padding: 30px 20px;
       }
 
+      .login-header {
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+      }
+
+      .login-header h2 {
+        font-size: 1.3rem;
+        margin-bottom: 6px;
+      }
+
+      .login-header p {
+        font-size: 0.85rem;
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .form-label {
+        font-size: 0.75rem;
+        margin-bottom: 6px;
+      }
+
+      .form-control {
+        padding: 11px 12px 11px 36px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+      }
+
+      .input-icon {
+        left: 12px;
+        font-size: 0.9rem;
+      }
+
+      .btn-login {
+        padding: 11px 20px;
+        font-size: 0.9rem;
+        margin-top: 16px;
+        border-radius: 8px;
+      }
+
+      .error-message {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+        margin-top: 4px;
+      }
+
+      .login-error-alert {
+        padding: 10px 12px;
+        gap: 10px;
+        margin-bottom: 16px;
+        border-radius: 8px;
+      }
+
+      .login-error-alert i {
+        font-size: 1.1rem;
+      }
+
+      .login-error-alert p {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 400px) {
       .main-container {
-        margin: 20px;
-        width: calc(100% - 40px);
-        border-width: 2px;
+        min-height: 100vh;
+        border-width: 0;
+        border-radius: 0;
+      }
+
+      .roles-section {
+        padding: 15px 12px;
+      }
+
+      .roles-header h3 {
+        font-size: 1rem;
+      }
+
+      .roles-header p {
+        font-size: 0.7rem;
+      }
+
+      .role-button {
+        padding: 9px 10px;
+        font-size: 0.7rem;
+      }
+
+      .login-section {
+        padding: 25px 15px;
+      }
+
+      .login-header h2 {
+        font-size: 1.2rem;
+      }
+
+      .form-control {
+        padding: 10px 10px 10px 34px;
+        font-size: 0.8rem;
+      }
+
+      .btn-login {
+        padding: 10px 18px;
+        font-size: 0.85rem;
       }
     }
 
@@ -404,6 +587,74 @@
       border-color: rgba(139, 125, 184, 0.15);
       background: rgba(251, 250, 252, 0.5);
     }
+
+    /* Error message styles */
+    .error-message {
+      color: #d32f2f;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      display: none;
+      padding: 8px 12px;
+      background-color: #ffebee;
+      border-left: 3px solid #d32f2f;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .form-control.error {
+      border-color: #d32f2f;
+      background-color: #ffebee;
+    }
+
+    .form-control.error:focus {
+      border-color: #d32f2f;
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.08);
+    }
+
+    /* Backend error alert styles */
+    .login-error-alert {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      border: 2px solid #d32f2f;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .login-error-alert.hidden {
+      display: none;
+    }
+
+    .login-error-alert i {
+      color: #d32f2f;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .login-error-alert p {
+      color: #c62828;
+      font-weight: 500;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
@@ -452,23 +703,32 @@
         <p>ระบบจัดการร้านอาหาร</p>
       </div>
 
+      <c:if test="${not empty error}">
+        <div class="login-error-alert" id="errorAlert">
+          <i class="fas fa-exclamation-circle"></i>
+          <p>${error}</p>
+        </div>
+      </c:if>
+
       <form action="LoginWaiter" method="post" id="loginForm">
         <input type="hidden" id="role" name="role">
         
         <div class="form-group">
           <label class="form-label">ชื่อผู้ใช้</label>
           <div class="input-wrapper">
-            <input type="text" class="form-control" name="empUsername" required placeholder="กรอกชื่อผู้ใช้">
+            <input type="text" class="form-control" id="usernameInput" name="empUsername" required placeholder="กรอกชื่อผู้ใช้ (เริ่มต้นด้วย WAT)">
             <i class="fas fa-user input-icon"></i>
           </div>
+          <div class="error-message" id="usernameError">ชื่อผู้ใช้ต้องขึ้นต้นด้วย WAT เท่านั้น</div>
         </div>
         
         <div class="form-group">
           <label class="form-label">รหัสผ่าน</label>
           <div class="input-wrapper">
-            <input type="password" class="form-control" name="empPassword" required placeholder="กรอกรหัสผ่าน">
+            <input type="password" class="form-control" id="passwordInput" name="empPassword" required placeholder="กรอกรหัสผ่าน (ตัวอักษรและตัวเลขรวมกัน 8 ตัวขึ้นไป)">
             <i class="fas fa-lock input-icon"></i>
           </div>
+          <div class="error-message" id="passwordError">รหัสผ่านต้องมีตัวอักษรและตัวเลข รวมกัน 8 ตัวขึ้นไป</div>
         </div>
         
         <button type="submit" class="btn-login" id="loginBtn">
@@ -479,11 +739,90 @@
   </div>
 
   <script>
+    // Validation functions
+    function validateUsername(username) {
+      return username.toUpperCase().startsWith('WAT');
+    }
+
+    function validatePassword(password) {
+      // ต้องมีความยาว >= 8
+      if (password.length < 8) {
+        return false;
+      }
+      
+      // ต้องมีตัวอักษรภาษาอังกฤษ (a-z, A-Z)
+      const hasLetters = /[a-zA-Z]/.test(password);
+      
+      // ต้องมีตัวเลข (0-9)
+      const hasNumbers = /[0-9]/.test(password);
+      
+      return hasLetters && hasNumbers;
+    }
+
+    // Clear error on input
+    document.getElementById('usernameInput').addEventListener('input', function() {
+      this.classList.remove('error');
+      document.getElementById('usernameError').classList.remove('show');
+    });
+
+    document.getElementById('passwordInput').addEventListener('input', function() {
+      this.classList.remove('error');
+      document.getElementById('passwordError').classList.remove('show');
+    });
+
+    // Auto-hide error alert after 5 seconds
+    const errorAlert = document.getElementById('errorAlert');
+    if (errorAlert) {
+      setTimeout(() => {
+        errorAlert.style.animation = 'slideUp 0.3s ease-out forwards';
+        setTimeout(() => {
+          errorAlert.classList.add('hidden');
+        }, 300);
+      }, 5000);
+    }
+
+    // Add keydown listener to focus first input if error is shown
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        }
+      });
+    });
+
     // Add loading animation on form submit
-    document.getElementById('loginForm').addEventListener('submit', function() {
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      
+      let hasError = false;
+
+      // Validate username
+      if (!validateUsername(username)) {
+        document.getElementById('usernameInput').classList.add('error');
+        document.getElementById('usernameError').classList.add('show');
+        hasError = true;
+      }
+
+      // Validate password
+      if (!validatePassword(password)) {
+        document.getElementById('passwordInput').classList.add('error');
+        document.getElementById('passwordError').classList.add('show');
+        hasError = true;
+      }
+
+      if (hasError) {
+        return false;
+      }
+
+      // If validation passed, submit the form
       const btn = document.getElementById('loginBtn');
       btn.classList.add('loading');
       btn.innerHTML = '<span>กำลังโหลด...</span>';
+      this.submit();
     });
 
     // Add smooth focus transitions
