@@ -5,6 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Table Details</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -30,6 +31,37 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         animation: fadeIn 0.6s ease;
         position: relative; /* ให้ปุ่ม Home อยู่ภายใน */
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+            align-items: flex-start;
+        }
+        .container {
+            padding: 18px 6px 28px;
+            max-width: 98vw;
+        }
+        h1 {
+            font-size: 1.2rem;
+        }
+        .detail-item label {
+            font-size: 0.98em;
+        }
+        .detail-value {
+            font-size: 14px;
+            padding: 10px 8px;
+        }
+        .reserve-button {
+            font-size: 14px;
+            padding: 10px 10px;
+        }
+        .home-button {
+            font-size: 12px;
+            padding: 6px 10px;
+            top: 8px;
+            left: 8px;
+        }
     }
 
     @keyframes fadeIn {

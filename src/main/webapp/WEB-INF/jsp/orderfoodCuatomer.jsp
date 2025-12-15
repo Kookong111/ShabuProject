@@ -509,12 +509,18 @@
                 </a>
      
                 
-                <form action="gotowelcomeCustomer" method="get" style="display: inline;">
-                    <button type="submit" class="back-btn">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>กลับ</span>
-                    </button>
-                </form>
+                <c:if test="${not empty sessionScope.user}">
+    <form action="gotowelcomeCustomer" method="get" style="display: inline;">
+        <input type="hidden" name="cususername" value="${sessionScope.user.cususername}" />
+        <input type="hidden" name="cusname" value="${sessionScope.user.cusname}" />
+        <input type="hidden" name="phonenumber" value="${sessionScope.user.phonenumber}" />
+        <input type="hidden" name="gmail" value="${sessionScope.user.gmail}" />
+        <button type="submit" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>กลับ</span>
+        </button>
+    </form>
+</c:if>
             </div>
         </div>
 
@@ -593,7 +599,7 @@
             </c:if>
             
             <c:if test="${empty foodTypeList or empty menuList}">
-                 <div style="text-align: center; padding: 40px; color: #7f8c8d;">
+                 <div style="text-align: center; padding: 40px; color: #7f8c8c;">
                      ไม่พบรายการอาหาร กรุณาตรวจสอบข้อมูลในฐานข้อมูล
                  </div>
             </c:if>

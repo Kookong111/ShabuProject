@@ -399,7 +399,7 @@
 <div class="container">
 
     <div class="header">
-        <h1><i class="fas fa-shopping-cart"></i> ตะกร้าอาหาร</h1>
+        <h1>ตะกร้าอาหาร</h1>
         <a href="viewmenu" class="back-btn"><i class="fas fa-arrow-left"></i> กลับไปเมนู</a>
     </div>
 

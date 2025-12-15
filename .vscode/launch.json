@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "RunHibernate",
+      "request": "launch",
+      "mainClass": "com.springmvc.model.RunHibernate",
+      "projectName": "Zproject_shabu2"
+    },
+    {
+      "type": "java",
       "name": "Attach to Tomcat (no prelaunch)",
       "request": "attach",
       "hostName": "localhost",

@@ -29,9 +29,17 @@ public class ManageCashierController {
         return "welcomeCashier"; 
     }
     
-    @RequestMapping(value = "/backToListOrder", method = RequestMethod.GET)//***********กลับหน้าhome***************
-    public String backToListOrder() {
-        return "listTableForCashier"; // เปลี่ยนเป็น redirect เพื่อโหลดรายการใหม่
+    @RequestMapping(value = "/backToListOrder", method = RequestMethod.GET)
+    public ModelAndView backToListOrder(HttpSession session) {
+        CashierManager manager = new CashierManager();
+        // ดึงข้อมูลออเดอร์ล่าสุดทุกครั้ง
+        List<Order> allOpenOrders = manager.getAllOpenOrders();
+        ModelAndView mav = new ModelAndView("listTableForCashier");
+        mav.addObject("ordersList", allOpenOrders);
+        if (allOpenOrders.isEmpty()) {
+            mav.addObject("error_message", "ไม่พบรายการOrder");
+        }
+        return mav;
     }
     @RequestMapping(value = "/LoginCashier", method = RequestMethod.POST)
     public ModelAndView loginCashier(HttpServletRequest request,HttpSession session) {
@@ -40,6 +48,29 @@ public class ManageCashierController {
         // ดึงข้อมูลจากฟอร์ม
         String username = request.getParameter("empUsername");
         String password = request.getParameter("empPassword");
+        
+        // ✅ [NEW] ตรวจสอบว่า username ขึ้นต้นด้วย "CUS" หรือไม่
+        if (username == null || !username.toUpperCase().startsWith("CUS")) {
+            ModelAndView mav = new ModelAndView("loginCashier");
+            mav.addObject("error", "ชื่อผู้ใช้ต้องขึ้นต้นด้วย CUS เท่านั้น");
+            return mav;
+        }
+        
+        // ✅ [NEW] ตรวจสอบว่า password มีตัวอักษร + ตัวเลข 8 ตัวขึ้นไป
+        if (password == null || password.length() < 8) {
+            ModelAndView mav = new ModelAndView("loginCashier");
+            mav.addObject("error", "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
+            return mav;
+        }
+        
+        boolean hasLetters = password.matches(".*[a-zA-Z].*");
+        boolean hasNumbers = password.matches(".*[0-9].*");
+        
+        if (!hasLetters || !hasNumbers) {
+            ModelAndView mav = new ModelAndView("loginCashier");
+            mav.addObject("error", "รหัสผ่านต้องมีตัวอักษรและตัวเลขรวมกัน");
+            return mav;
+        }
         
         // ตรวจสอบผู้ใช้จากฐานข้อมูล
         Employee user = rm.authenticateUserEmployee(username, password);
@@ -53,7 +84,7 @@ public class ManageCashierController {
         } else {
             // หากเข้าสู่ระบบไม่สำเร็จ กลับไปหน้า login พร้อมข้อความแสดงข้อผิดพลาด
             ModelAndView mav = new ModelAndView("loginCashier");
-            mav.addObject("error", "Email หรือรหัสผ่านไม่ถูกต้อง");
+            mav.addObject("error", "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
             return mav;
         }
     }
@@ -235,6 +266,8 @@ public ModelAndView confirmEditCashier(HttpServletRequest request) {
  
  // ▲▲▲ สิ้นสุดเมธอดใหม่ ▲▲▲
  
+ // ... (imports) ...
+ 
  @RequestMapping(value = "/processFinalPayment", method = RequestMethod.POST)
  public ModelAndView processFinalPayment(@RequestParam("orderId") String orderId, HttpSession session) {
      
@@ -262,6 +295,9 @@ public ModelAndView confirmEditCashier(HttpServletRequest request) {
              return mav;
          }
          // --- สิ้นสุดการตรวจสอบ ---
+         
+         // VVVV [NEW] 2.5 ดึงรายการ OrderDetail ทั้งหมดของ Order นี้ VVVV
+         List<OrderDetail> orderDetails = manager.getOrderDetailsByOrderId(orderId);
 
 
          // 3. สร้างและตั้งค่า Payment Object
@@ -288,12 +324,17 @@ public ModelAndView confirmEditCashier(HttpServletRequest request) {
              // 7. ไปยังหน้า "ชำระเงินสำเร็จ"
              mav = new ModelAndView("paymentSuccess"); // ไปที่ paymentSuccess.jsp
              mav.addObject("paymentInfo", payment); // ส่งข้อมูล Payment ที่เพิ่งบันทึกไปแสดงผล
+             
+             // VVVV [NEW] ส่งรายการ OrderDetail ไปด้วย VVVV
+             mav.addObject("orderDetails", orderDetails); 
+             
          } else {
              // หากบันทึก Payment ไม่สำเร็จ
              mav = new ModelAndView("paymentReceipt");
              mav.addObject("error_message", "เกิดข้อผิดพลาดในการบันทึกการชำระเงิน");
              mav.addObject("orderInfo", orderToPay);
-             mav.addObject("orderDetails", manager.getOrderDetailsByOrderId(orderId));
+             // ใช้อันที่ดึงมาแล้ว
+             mav.addObject("orderDetails", orderDetails); 
              mav.addObject("totalPrice", orderToPay.getTotalPeice());
          }
 

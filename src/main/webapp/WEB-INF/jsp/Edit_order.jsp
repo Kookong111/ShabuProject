@@ -218,6 +218,9 @@
             <c:if test="${not empty add_result}">
                 <div class="success-message">${add_result}</div>
             </c:if>
+            <c:if test="${not empty param.add_result}">
+                <div class="success-message">${param.add_result}</div>
+            </c:if>
             <c:if test="${not empty edit_result}">
                 <div class="error-message">${edit_result}</div>
             </c:if>
