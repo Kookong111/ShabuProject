@@ -27,7 +27,7 @@
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
             --quick-action-color: #FF6F61; 
-            --quick-action-shadow: rgba(255, 111, 97, 0.4); 
+            --quick-action-shadow: rgba(255, 111, 97, 0.4);
         }
 
         body {
@@ -379,11 +379,13 @@
             text-align: center;
             transition: all 0.4s ease;
             border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm); /* เพิ่ม box-shadow สำหรับ Feature Card */
         }
 
         .feature-card:hover {
             transform: translateY(-8px);
             box-shadow: var(--shadow-md);
+            border-color: rgba(0, 0, 0, 0.2); /* เพิ่ม border-color สำหรับ hover */
         }
 
         .feature-icon {
@@ -403,6 +405,48 @@
             color: var(--text-secondary);
             line-height: 1.7;
             font-size: 15px;
+        }
+        
+        /* Footer adjustments for better styling */
+        .footer-logo {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .footer-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            margin-left: 4px;
         }
 
         /* --- Quick Actions (แสดงข้อความเสมอ) --- */
@@ -431,7 +475,6 @@
             font-size: 24px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             text-decoration: none;
-            
             transition: all 0.3s ease;
             padding: 0 24px 0 18px; /* padding ทั้งซ้ายและขวา */
             white-space: nowrap;
@@ -471,41 +514,6 @@
             margin-bottom: 60px;
         }
 
-        .footer-logo {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .footer-text {
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.8;
-            margin-bottom: 24px;
-        }
-
-        .footer-section h3 {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-
-        .footer-links {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            transition: color 0.3s ease;
-            font-size: 15px;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
         .footer-bottom {
             padding-top: 40px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -538,6 +546,12 @@
         }
 
         /* Responsive */
+        @media (max-width: 1200px) {
+             .footer-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        
         @media (max-width: 968px) {
             .hero-content {
                 grid-template-columns: 1fr;
@@ -631,7 +645,7 @@
                 <li><a href="listTable">โต๊ะ</a></li>
                 <li><a href="gotoContact">ติดต่อเรา</a></li>
             </ul>
-            
+           
             <div class="user-actions">
                 <c:if test="${not empty user}">
                     <div class="user-info">
@@ -646,7 +660,7 @@
                     </a>
                 </c:if>
             </div>
-            
+   
             <button class="mobile-menu-btn">
                 <span></span>
                 <span></span>
@@ -658,11 +672,11 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-text">
-                <div class="hero-subtitle">Authentic Japanese Experience</div>
-                <h1 class="hero-title">ShaBu Buffet</h1>
+                <div class="hero-subtitle">🍲 ชาบูญี่ปุ่นแท้ 100% - Premium Hot Pot Experience</div>
+                <h1 class="hero-title">ยินดีต้อนรับสู่ ShaBu</h1>
                 <p class="hero-description">
                     เสพความอร่อยแบบญี่ปุ่นแท้ ด้วยชาบูพรีเมียม วัตถุดิบสด ๆ คุณภาพเยี่ยม 
-                    ในบรรยากาศอบอุ่นที่จะทำให้ทุกมื้อเป็นประสบการณ์พิเศษ
+                    ในบรรยากาศอบอุ่นที่จะทำให้ทุกมื้อเป็นประสบการณ์พิเศษ ที่คุณจะจำได้นาน
                 </p>
                 
                 <div class="hero-buttons">
@@ -681,9 +695,70 @@
                 <div class="hero-image-container">
                     <img src="<c:url value='https://image.makewebeasy.net/makeweb/m_1920x0/Ommd4Syoj/DefaultData/%E0%B9%80%E0%B8%A1%E0%B8%99%E0%B8%B9_%E0%B8%99%E0%B9%89%E0%B8%B3%E0%B8%8B%E0%B8%B8%E0%B8%9B%E0%B8%8A%E0%B8%B2%E0%B8%9A%E0%B8%B9_%E0%B9%92%E0%B9%91%E0%B9%90%E0%B9%95%E0%B9%91%E0%B9%91_18.jpg?v=202012190947' />" alt="ShaBu Restaurant" />
                     <div class="hero-badge">
-                        <span>⭐</span>
+                        <span>⭐⭐⭐⭐⭐</span>
                         <span>Premium Quality</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" style="font-size: 3rem;">ทำไมต้องเลือก ShaBu</h2>
+                <p class="section-description">
+                    เรามอบประสบการณ์การรับประทานอาหารที่สุดยอด พร้อมบริการที่ดีเยี่ยมและราคาที่ยุติธรรม
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🥩</div>
+                    <h3 class="feature-title">วัตถุดิบสดใหม่</h3>
+                    <p class="feature-description">
+                        เลือกวัตถุดิบสดใหม่ทุกวัน จากผู้จัดส่งที่มีความเชี่ยวชาญ เพื่อให้ได้รสชาติที่ดีที่สุด
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">👨‍🍳</div>
+                    <h3 class="feature-title">เชฟมืออาชีพ</h3>
+                    <p class="feature-description">
+                        ทีมเชฟที่มีประสบการณ์สูงจากญี่ปุ่น พร้อมให้คำแนะนำเรื่องการหุงและวิธีการรับประทาน
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🏡</div>
+                    <h3 class="feature-title">บรรยากาศอบอุ่น</h3>
+                    <p class="feature-description">
+                        ห้องพักดำรมที่ออกแบบมาเพื่อให้นั่งสบาย อบอุ่น และสวยงาม เหมาะสำหรับทุกโอกาส
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">ราคาพิเศษ</h3>
+                    <p class="feature-description">
+                        บุฟเฟต์อร่อย ราคาสมเหตุสมผล พร้อมโปรโมชั่นพิเศษและสิทธิสำหรับสมาชิกประจำ
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">ไม่มีเวลาจำกัด</h3>
+                    <p class="feature-description">
+                        บุฟเฟต์นั่งเท่านั้นที่ไม่มีเวลาจำกัด เพลิดเพลินกับการรับประทานอย่างสบายใจ
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎉</div>
+                    <h3 class="feature-title">ส่วนลดพิเศษ</h3>
+                    <p class="feature-description">
+                        ส่วนลดสำหรับการจองกลุ่ม การเฉลิมฉลองวันเกิด และโปรแกรมเพื่อน
+                    </p>
                 </div>
             </div>
         </div>
@@ -698,10 +773,65 @@
         </div>
     </c:if>
 
-    <footer>
+    <footer style="background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%); margin-top: 100px;">
         <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3 class="footer-logo">ShaBu Restaurant</h3>
+                    <p class="footer-text">
+                        ชาบูญี่ปุ่นแท้ที่ดีที่สุด ด้วยบรรยากาศและบริการที่ไม่มีใครเทียบ
+                    </p>
+                    <div style="display: flex; gap: 12px;">
+                        <a href="#" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s;"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-section-title" style="color: white;">ลิงค์ด่วน</h4>
+                    <ul class="footer-links">
+                        <li><a href="menurecomand"><i class="fas fa-clipboard-list"></i> เมนูอาหาร</a></li>
+                        <li><a href="listTable"><i class="fas fa-calendar-alt"></i> จองโต๊ะ</a></li>
+                        <li><a href="gotoContact"><i class="fas fa-phone-alt"></i> ติดต่อเรา</a></li>
+                        <li><a href="myReservess"><i class="fas fa-ticket-alt"></i> การจองของฉัน</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-section-title" style="color: white;">ติดต่อเรา</h4>
+                    <p class="footer-text" style="margin-bottom: 12px;">
+                        <i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>
+                        123 ถนนสุขุมวิท กรุงเทพฯ
+                    </p>
+                    <p class="footer-text" style="margin-bottom: 12px;">
+                        <i class="fas fa-phone" style="margin-right: 8px;"></i>
+                        02-123-4567
+                    </p>
+                    <p class="footer-text" style="margin-bottom: 12px;">
+                        <i class="fas fa-envelope" style="margin-right: 8px;"></i>
+                        contact@shabu.com
+                    </p>
+                    <p class="footer-text">
+                        <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                        เปิด: 11:00 - 22:00 น.
+                    </p>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-section-title" style="color: white;">รับข่าวสาร</h4>
+                    <p class="footer-text">
+                        สมัครรับโปรโมชั่นและข่าวสารพิเศษจาก ShaBu
+                    </p>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="email" placeholder="อีเมลของคุณ" style="flex: 1; padding: 12px; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2);" />
+                        <button class="btn btn-primary" style="padding: 12px 20px; border-radius: 8px; font-weight: 500;">ส่ง</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="footer-bottom">
-                <p>&copy; 2024 ShaBu Restaurant. All rights reserved.</p>
+                <p>&copy; 2024 ShaBu Restaurant. All rights reserved. | <a href="#" style="color: rgba(255, 255, 255, 0.5); text-decoration: none; margin-left: 10px;">Privacy Policy</a> | <a href="#" style="color: rgba(255, 255, 255, 0.5); text-decoration: none; margin-left: 10px;">Terms of Service</a></p>
             </div>
         </div>
     </footer>
