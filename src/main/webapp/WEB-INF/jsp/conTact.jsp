@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -65,8 +66,9 @@
             margin: 0 auto;
             padding: 0 32px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
         .back-link {
@@ -95,6 +97,14 @@
             font-weight: 500;
             letter-spacing: 0.5px;
             color: var(--text-primary);
+        }
+
+        .header-content h1 {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            text-align: center;
         }
 
         /* Container */
@@ -405,21 +415,97 @@
                 font-size: 1.1rem;
             }
         }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 48px;
+            align-items: center;
+            white-space: nowrap;
+            font-size: 1.35rem;
+        }
+.nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.15em;
+            padding: 10px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+.nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--text-primary);
+            transition: width 0.3s ease;
+        }
+.nav-menu a:hover::after,
+        .nav-menu a.active::after {
+            width: 100%;
+        }
+.nav-menu a:hover {
+            color: var(--accent);
+        }
+.nav-menu {
+                gap: 18px;
+                font-size: 14px;
+            }
+            .nav-menu a {
+                font-size: 14px;
+            }
+        /* User Actions (copied from welcomeCustomer.jsp) */
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: 24px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+        .user-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: nowrap;
+            gap: 0;
+        }
+        
+
     </style>
 </head>
 <body>
-    <div class="header-bar">
-        <div class="header-content">
-            <a href="gotowelcomeCustomer" class="back-link">
-                <i class="fas fa-arrow-left"></i>
-                <span>กลับหน้าหลัก</span>
-            </a>
-            <h1>ติดต่อเรา</h1>
-            <span style="width: 140px;"></span>
+  <nav>
+        <div class="nav-container" style="justify-content: center;">
+            <%@ include file="/WEB-INF/jsp/include/navbar.jsp" %>
         </div>
-    </div>
+    </nav>
 
     <div class="container">
+        <h1 style="font-size:2rem;font-weight:600;margin:48px auto 40px auto;padding:0 5vw;letter-spacing:0.5px;color:var(--text-primary);text-align:center;max-width:100%;box-sizing:border-box;">ติดต่อเรา</h1>
         <div class="contact-wrapper">
             <!-- Contact Information -->
             <div class="contact-info">
@@ -502,7 +588,6 @@
             <h2 class="section-title">แผนที่และการเดินทาง</h2>
             <div class="map-container">
                 <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3776.3928445558436!2d99.0017!3d18.8919!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30da3a9a271a8e8d%3A0x43c3528e6fe0070!2z4Lih4Lir4Liy4Lin4Li04LiX4Lii4Liy4Lil4Lix4Lii4LmB4Lih4LmI4LmC4LiI4LmJ!5e0!3m2!1sth!2sth!4v1234567890"
                     width="100%" 
                     height="100%" 
                     style="border:0; border-radius: 16px;" 

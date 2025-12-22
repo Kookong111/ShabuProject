@@ -38,28 +38,7 @@
             overflow-x: hidden;
         }
 
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 5%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        
 
         .logo {
             font-size: 28px;
@@ -71,48 +50,14 @@
             gap: 10px;
         }
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .nav-menu a {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 400;
-            font-size: 15px;
-            padding: 8px 0;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--text-primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-menu a:hover::after,
-        .nav-menu a.active::after {
-            width: 100%;
-        }
-
-        .nav-menu a:hover {
-            color: var(--accent);
-        }
+        
 
         /* User Actions */
         .user-actions {
             display: flex;
             align-items: center;
             gap: 16px;
+            flex-wrap: nowrap; /* ป้องกันแตกแถว */
         }
 
         .user-info {
@@ -152,7 +97,24 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            position: relative;
+            /* เพิ่มวงกลมรอบไอคอน */
         }
+
+        .logout-btn .fa-sign-out-alt, .logout-btn .fa-sign-in-alt {
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            color: #1a1a1a;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 4px;
+        }
+        
 
         .logout-btn:hover {
             background: rgba(0, 0, 0, 0.08);
@@ -308,22 +270,20 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: brightness(0.95) contrast(1.05);
         }
 
         .hero-badge {
             position: absolute;
-            top: 30px;
-            right: 30px;
+            bottom: 20px;
+            right: 20px;
             background: white;
-            padding: 12px 24px;
+            padding: 12px 20px;
             border-radius: 50px;
-            box-shadow: var(--shadow-md);
-            font-size: 14px;
-            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: var(--shadow-lg);
+            font-weight: 600;
         }
 
         /* Features Section */
@@ -495,6 +455,121 @@
             line-height: 1;
         }
 
+       
+
+        @media (max-width: 768px) {
+           
+            .logo {
+                font-size: 22px;
+            }
+            
+            .mobile-menu-btn {
+                display: flex;
+            }
+            .user-actions {
+                flex-direction: row;
+                gap: 8px;
+                justify-content: flex-end;
+                align-items: center;
+                width: auto;
+                flex-wrap: nowrap;
+            }
+            .user-info, .logout-btn {
+                min-width: 0;
+                white-space: nowrap;
+            }
+            .hero {
+                padding: 80px 3% 40px;
+            }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-image-container {
+                height: 260px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .feature-card {
+                padding: 32px 16px;
+            }
+            .user-actions {
+                flex-direction: row;
+                gap: 8px;
+                justify-content: flex-end;
+                align-items: center;
+                width: auto;
+                flex-wrap: nowrap !important;
+            }
+            .user-info, .logout-btn {
+                min-width: 0;
+                white-space: nowrap;
+                padding: 4px 8px;
+                font-size: 13px;
+            }
+            .footer-content {
+                padding: 0 8px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+           
+            .logo {
+                font-size: 16px;
+            }
+            
+            
+            .user-actions {
+                flex-direction: row;
+                gap: 4px;
+                justify-content: flex-end;
+                align-items: center;
+                width: auto;
+                flex-wrap: nowrap;
+            }
+            .user-info, .logout-btn {
+                min-width: 0;
+                white-space: nowrap;
+                font-size: 12px;
+                padding: 4px 6px;
+            }
+            .hero {
+                padding: 60px 2% 24px;
+            }
+
+            .hero-description {
+                font-size: 14px;
+            }
+            .hero-image-container {
+                height: 140px;
+            }
+            .feature-card {
+                padding: 18px 6px;
+            }
+            .features {
+                padding: 40px 2%;
+            }
+            .section-title {
+                font-size: 1.2rem;
+            }
+            .footer-logo {
+                font-size: 18px;
+            }
+            .footer-content {
+                padding: 0 2px;
+            }
+            .quick-action-btn {
+                font-size: 14px;
+                height: 38px;
+                padding: 0 8px 0 8px;
+            }
+        }
+
         /* Footer */
         footer {
             background: var(--text-primary);
@@ -536,6 +611,20 @@
 
         @keyframes fadeInRight {
             from {
+            .user-actions {
+                flex-direction: row;
+                gap: 4px;
+                justify-content: flex-end;
+                align-items: center;
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+            .user-info, .logout-btn {
+                min-width: 0;
+                white-space: nowrap;
+                font-size: 12px;
+                padding: 4px 6px;
+            }
                 opacity: 0;
                 transform: translateX(30px);
             }
@@ -557,7 +646,6 @@
                 grid-template-columns: 1fr;
                 gap: 60px;
             }
-
             .hero-image-container {
                 height: 400px;
             }
@@ -566,43 +654,31 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 40px;
             }
+
+
         }
-
+        
+        
         @media (max-width: 768px) {
-            .nav-menu {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: white;
-                flex-direction: column;
-                gap: 0;
-                padding: 20px;
-                box-shadow: var(--shadow-md);
-                display: none;
-            }
-
-            .nav-menu.active {
-                display: flex;
-            }
+            
 
             .mobile-menu-btn {
-                display: flex;
+                display: none !important;
             }
 
             .user-actions {
-                flex-direction: column;
-                align-items: flex-start;
-                width: 100%;
-                gap: 12px;
+                flex-direction: row;
+                gap: 4px;
+                justify-content: flex-end;
+                align-items: center;
+                width: auto;
+                flex-wrap: nowrap !important;
             }
-
-            .hero {
-                padding: 100px 5% 60px;
-            }
-
-            .hero-title {
-                font-size: 2.5rem;
+            .user-info, .logout-btn {
+                min-width: 0;
+                white-space: nowrap;
+                font-size: 12px;
+                padding: 2px 4px;
             }
 
             .features-grid {
@@ -628,60 +704,79 @@
             .quick-action-btn .btn-text {
                 font-size: 14px;
             }
+            .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 48px;
+            align-items: center;
+            white-space: nowrap;
+            font-size: 1.35rem;
+        }
+.nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.15em;
+            padding: 10px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+.nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--text-primary);
+            transition: width 0.3s ease;
+        }
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+            width: 100%;
+        }
+.nav-menu a:hover {
+            color: var(--accent);
+        }
+.nav-menu {
+                gap: 18px;
+                font-size: 14px;
+            }
+.nav-menu a {
+                font-size: 14px;
+            }
+.nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: nowrap;
+            gap: 0;
+        }
         }
     </style>
 </head>
 <body>
     <nav>
-        <div class="nav-container">
-            <a href="#" class="logo">
-                <span></span>
-                <span>ShaBu</span>
-            </a>
-            
-            <ul class="nav-menu">
-                <li><a href="gotowelcomeCustomer" class="active">หน้าแรก</a></li>
-                <li><a href="menurecomand">เมนู</a></li>
-                <li><a href="listTable">โต๊ะ</a></li>
-                <li><a href="gotoContact">ติดต่อเรา</a></li>
-            </ul>
-           
-            <div class="user-actions">
-                <c:if test="${not empty user}">
-                    <div class="user-info">
-                        <div class="user-icon">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <span>${user.cusname}</span>
-                    </div>
-                    <a href="logoutCustomer" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>ออกจากระบบ</span>
-                    </a>
-                </c:if>
-            </div>
-   
-            <button class="mobile-menu-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+        <div class="nav-container" style="justify-content: center;">
+            <%@ include file="/WEB-INF/jsp/include/navbar.jsp" %>
         </div>
     </nav>
     
     <section class="hero">
         <div class="hero-content">
             <div class="hero-text">
-                <div class="hero-subtitle">🍲 ชาบูญี่ปุ่นแท้ 100% - Premium Hot Pot Experience</div>
-                <h1 class="hero-title">ยินดีต้อนรับสู่ ShaBu</h1>
+              
+                <h1 class="hero-title">ยินดีต้อนรับสู่ ShaBu By กำนันไข่</h1>
                 <p class="hero-description">
                     เสพความอร่อยแบบญี่ปุ่นแท้ ด้วยชาบูพรีเมียม วัตถุดิบสด ๆ คุณภาพเยี่ยม 
-                    ในบรรยากาศอบอุ่นที่จะทำให้ทุกมื้อเป็นประสบการณ์พิเศษ ที่คุณจะจำได้นาน
+                    ในบรรยากาศอบอุ่นที่จะทำให้ทุกมื้อเป็นประสบการณ์พิเศษ
                 </p>
                 
                 <div class="hero-buttons">
                     <a href="viewmenu" class="btn btn-primary">
-                        <span>ดูเมนู</span>
+                        <span>สั่งอาหาร</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
                     <a href="reserve&listTable" class="btn btn-secondary">
@@ -837,27 +932,19 @@
     </footer>
 
     <script>
-        // Mobile menu toggle
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        const navMenu = document.querySelector('.nav-menu');
 
-        mobileMenuBtn?.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
+        // Mobile menu toggle removed: nav-menu always visible on mobile
 
         // Hide navigation on scroll down, show on scroll up
         let lastScrollTop = 0;
         const nav = document.querySelector('nav');
-
         window.addEventListener('scroll', () => {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
             if (scrollTop > lastScrollTop && scrollTop > 100) {
                 nav.style.transform = 'translateY(-100%)';
             } else {
                 nav.style.transform = 'translateY(0)';
             }
-            
             lastScrollTop = scrollTop;
         });
     </script>

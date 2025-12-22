@@ -6,266 +6,187 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จองโต๊ะ - Restaurant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --secondary: #64748b;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-gray: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f8f6ff 0%, #f0ebff 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Kanit', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 40px 20px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 650px;
             margin: 0 auto;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(139, 69, 255, 0.1);
-            border: 1px solid #e9ecef;
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         .header {
-            background: linear-gradient(135deg, #8b45ff, #6c35cc);
-            color: white;
-            padding: 30px;
+            padding: 40px 40px 20px;
             text-align: center;
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 300;
+        .header h1 { font-size: 1.8rem; margin-bottom: 8px; font-weight: 600; }
+        .header p { color: var(--text-light); font-weight: 300; }
+
+        .content { padding: 0 40px 40px; }
+
+        .info-card {
+            background: var(--bg-gray);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
         }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .table-info {
-            background: #faf8ff;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            text-align: center;
-            border: 1px solid #e9d5ff;
-        }
-
-        .table-info h2 {
-            color: #6c35cc;
+        .info-card h3 {
+            font-size: 1rem;
+            color: var(--primary);
             margin-bottom: 15px;
-            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .info-item span {
+            color: var(--text-light);
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .table-info { margin-bottom: 30px; }
+        .table-info h2 { font-size: 1.1rem; margin-bottom: 16px; font-weight: 500; }
 
         .table-details {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
 
         .detail-item {
+            padding: 16px;
+            background: var(--white);
+            border-radius: 16px;
+            border: 1px solid var(--border);
             text-align: center;
         }
 
-        .detail-item .label {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 5px;
-        }
+        .detail-item .label { font-size: 0.75rem; color: var(--text-light); margin-bottom: 4px; }
+        .detail-item .value { font-size: 1.1rem; font-weight: 600; }
 
-        .detail-item .value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #333;
-        }
+        .status-free { color: var(--success); }
 
-        /* Status styles */
-        .status-free { color: #059669; }
-        .status-in-use { color: #6b7280; }
-        .status-reserved { color: #d97706; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 1.1em;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group input, .form-group select {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            background: white;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
         }
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #8b45ff;
-            box-shadow: 0 0 8px rgba(139, 69, 255, 0.2);
-        }
-
-        .form-group textarea {
-            height: 100px;
-            resize: vertical;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
         }
 
         .form-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
 
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
+        .btn-group { display: flex; gap: 12px; margin-top: 30px; }
         .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
+            flex: 1;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
-            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
 
-        .btn-primary {
-            background: #8b45ff;
-            color: white;
-        }
+        .btn-primary { background: var(--primary); color: var(--white); border: none; }
+        .btn-primary:hover { background: #4338ca; transform: translateY(-2px); }
 
-        .btn-primary:hover {
-            background: #6c35cc;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 69, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #4b5563;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(75, 85, 99, 0.3);
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
+        .btn-secondary { background: var(--white); color: var(--text-dark); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-gray); }
 
         .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #fef2f2; color: var(--error); border: 1px solid #fee2e2;
+            padding: 16px; border-radius: 12px; margin-bottom: 24px; font-size: 0.9rem;
         }
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .user-info {
-            background: #faf8ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border-left: 4px solid #8b45ff;
-        }
-
-        .user-info h3 {
-            color: #6c35cc;
-            margin-bottom: 10px;
-        }
-
-        .required {
-            color: #dc3545;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
-            }
-            
-            .table-details {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .content {
-                padding: 25px;
-            }
+        @media (max-width: 600px) {
+            .form-row, .table-details { grid-template-columns: 1fr; }
+            .btn-group { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🍽️ จองโต๊ะ</h1>
-            <p>กรุณากรอกข้อมูลการจองให้ครบถ้วน</p>
+            <h1>จองโต๊ะอาหาร</h1>
+            <p>กรุณาเลือกวันและเวลาที่ท่านสะดวก</p>
         </div>
 
         <div class="content">
-            <!-- แสดงข้อความข้อผิดพลาด -->
             <c:if test="${not empty error}">
-                <div class="alert alert-error">
-                    ❌ ${error}
+                <div class="alert-error">
+                    <i class="fas fa-exclamation-circle"></i> ${error}
                 </div>
             </c:if>
 
-            <!-- ข้อมูลผู้ใช้ -->
-            <div class="user-info">
-                <h3>👤 ข้อมูลผู้จอง</h3>
-                <p><strong>ชื่อ:</strong> ${user.cusname}</p>
-                <p><strong>เบอร์โทร:</strong> ${user.phonenumber}</p>
-                <p><strong>อีเมล:</strong> ${user.gmail}</p>
+            <div class="info-card">
+                <h3><i class="fas fa-user-circle"></i> ข้อมูลผู้ติดต่อ</h3>
+                <div class="info-grid">
+                    <div class="info-item"><span>ชื่อผู้จอง</span>${user.cusname}</div>
+                    <div class="info-item"><span>เบอร์โทรศัพท์</span>${user.phonenumber}</div>
+                </div>
             </div>
 
-            <!-- ข้อมูลโต๊ะที่เลือก -->
             <div class="table-info">
-                <h2>📋 ข้อมูลโต๊ะที่เลือก</h2>
+                <h2>โต๊ะที่ท่านเลือก</h2>
                 <div class="table-details">
                     <div class="detail-item">
                         <div class="label">หมายเลขโต๊ะ</div>
@@ -273,226 +194,121 @@
                     </div>
                     <div class="detail-item">
                         <div class="label">จำนวนที่นั่ง</div>
-                        <div class="value">${selectedTable.capacity} ที่</div>
+                        <div class="value">${selectedTable.capacity} ท่าน</div>
                     </div>
                     <div class="detail-item">
                         <div class="label">สถานะ</div>
-                        <div class="value" id="tableStatus">
-                            <c:choose>
-                                <c:when test="${selectedTable.status == 'Free'}">
-                                    <span class="status-free">พร้อมให้บริการ</span>
-                                </c:when>
-                                <c:when test="${selectedTable.status == 'In use'}">
-                                    <span class="status-in-use">กำลังใช้งาน</span>
-                                </c:when>
-                                <c:when test="${selectedTable.status == 'Already reserved'}">
-                                    <span class="status-reserved">จองแล้ว</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span>${selectedTable.status}</span>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
+                        <div class="value status-free">พร้อมใช้งาน</div>
                     </div>
                 </div>
             </div>
 
-            <!-- ฟอร์มการจอง -->
-            <form action="confirmReservation" method="post" onsubmit="return validateForm()">
+            <form action="confirmReservation" method="post">
                 <input type="hidden" name="tableid" value="${selectedTable.tableid}">
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="reservationDate"> วันที่จอง <span class="required">*</span></label>
-                        <input type="date" id="reservationDate" name="reservationDate" required min="">
+                        <label for="reservationDate">วันที่จอง (จองล่วงหน้าได้ 1 วัน)</label>
+                        <input type="date" id="reservationDate" name="reservationDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="reservationTime"> เวลาจอง <span class="required">*</span></label>
+                        <label for="reservationTime">เวลาจอง</label>
                         <select id="reservationTime" name="reservationTime" required>
                             <option value="">เลือกเวลา</option>
-                            
-                            <option value="11:00">11:00 น.</option>
-                            <option value="11:30">11:30 น.</option>
-                            <option value="12:00">12:00 น.</option>
-                            <option value="12:30">12:30 น.</option>
-                            <option value="13:00">13:00 น.</option>
-                            <option value="13:30">13:30 น.</option>
-                            <option value="14:00">14:00 น.</option>
-                            <option value="17:00">17:00 น.</option>
-                            <option value="17:30">17:30 น.</option>
-                            <option value="18:00">18:00 น.</option>
-                            <option value="18:30">18:30 น.</option>
-                            <option value="19:00">19:00 น.</option>
-                            <option value="19:30">19:30 น.</option>
-                            <option value="20:00">20:00 น.</option>
-                            <option value="20:30">20:30 น.</option>
-                            <option value="21:00">21:00 น.</option>
+                            <option value="11:00">11:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="19:00">19:00</option>
+                            <option value="21:00">21:00</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="numberOfGuests"> จำนวนผู้ใช้บริการ <span class="required">*</span></label>
+                    <label for="numberOfGuests">จำนวนผู้เข้าใช้บริการ</label>
                     <select id="numberOfGuests" name="numberOfGuests" required>
-                        <option value="">เลือกจำนวนคน</option>
+                        <option value="">ระบุจำนวนคน</option>
                         <c:forEach begin="1" end="${selectedTable.capacity}" var="i">
-                            <option value="${i}">${i} คน</option>
+                            <option value="${i}">${i} ท่าน</option>
                         </c:forEach>
                     </select>
                 </div>
 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">
-                         ยืนยันการจอง
-                    </button>
-                    <a href="listTable" class="btn btn-secondary">
-                         ยกเลิก
-                    </a>
+                    <button type="submit" class="btn btn-primary">ยืนยันการจอง</button>
+                    <a href="listTable" class="btn btn-secondary">ยกเลิก</a>
                 </div>
             </form>
         </div>
     </div>
 
-   <script>
-    // แทนที่สคริปต์เดิมด้วยอันนี้ทั้งหมด
-    document.addEventListener('DOMContentLoaded', function() {
-        const dateInput = document.getElementById('reservationDate');
-        const timeSelect = document.getElementById('reservationTime');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('reservationDate');
+            const timeSelect = document.getElementById('reservationTime');
+            const now = new Date();
 
-        // ค่า server-side ที่ต้องการใช้งานใน JS
-        const maxCapacity = ${selectedTable.capacity}; // เป็นตัวเลข
-        const tableId = '${selectedTable.tableid}'; // ใช้ใน confirm message
+            // --- 1. ตั้งค่าวันที่: วันนี้ และ วันพรุ่งนี้ เท่านั้น ---
+            const todayStr = now.toISOString().split('T')[0];
+            const tomorrow = new Date();
+            tomorrow.setDate(now.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-        // ตั้งค่าวันที่ขั้นต่ำเป็นวันนี้ (อนุญาตจองวันนี้ แต่ต้องเป็นเวลาข้างหน้า)
-        const now = new Date();
-        const todayIso = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-                          .toISOString().split('T')[0];
-        dateInput.min = todayIso;
+            dateInput.min = todayStr;
+            dateInput.max = tomorrowStr;
+            dateInput.value = todayStr;
 
-        // ตั้งค่าวันที่สูงสุด (2 วันข้างหน้า)
-        const maxDate = new Date(now);
-        maxDate.setDate(maxDate.getDate() + 2);
-        dateInput.max = maxDate.toISOString().split('T')[0];
+            // --- 2. ฟังก์ชันตรวจสอบเวลา (ป้องกันการจองย้อนหลังสำหรับวันนี้) ---
+            function updateAvailableTimes() {
+                const selectedDate = dateInput.value;
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
 
-        // ฟังก์ชันช่วย: ปรับสถานะตัวเลือกเวลาเมื่อเลือกวันเป็น "วันนี้" หรือวันอื่น
-        function updateTimeOptionsDisablePast() {
-            const selectedDateStr = dateInput.value;
-            if (!selectedDateStr) {
-                // ถ้ายังไม่เลือกวัน ให้เปิดตัวเลือกทั้งหมด (ยกเลิก disabled)
-                for (let opt of timeSelect.options) opt.disabled = false;
-                return;
-            }
-
-            const selectedDate = new Date(selectedDateStr);
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-            // ถ้าเลือกวันนี้ ให้ปิดตัวเลือกเวลาที่ผ่านไปแล้ว
-            if (selectedDate.getTime() === today.getTime()) {
-                const current = new Date(); // เวลาปัจจุบันจริง
                 for (let i = 0; i < timeSelect.options.length; i++) {
-                    const opt = timeSelect.options[i];
-                    if (!opt.value) { // ตัวเลือก placeholder
-                        opt.disabled = false;
-                        continue;
-                    }
-                    // สร้าง Date object สำหรับเวลาที่เลือก (บนวันที่ที่เลือก)
-                    const [h, m] = opt.value.split(':').map(Number);
-                    const optDate = new Date(selectedDate);
-                    optDate.setHours(h, m, 0, 0);
+                    const option = timeSelect.options[i];
+                    if (!option.value) continue;
 
-                    // ถ้าเวลาในอดีตหรือเท่ากับตอนนี้ -> disabled
-                    if (optDate <= current) {
-                        opt.disabled = true;
+                    const [optHour, optMinute] = option.value.split(':').map(Number);
+                    
+                    if (selectedDate === todayStr) {
+                        // ปิดเวลาที่เท่ากับหรือน้อยกว่าเวลาปัจจุบัน
+                        if (optHour < currentHour || (optHour === currentHour && optMinute <= currentMinute)) {
+                            option.disabled = true;
+                            option.style.backgroundColor = "#f1f5f9";
+                            option.style.color = "#cbd5e1";
+                        } else {
+                            option.disabled = false;
+                            option.style.backgroundColor = "";
+                            option.style.color = "";
+                        }
                     } else {
-                        opt.disabled = false;
+                        // วันพรุ่งนี้เปิดทุกเวลา
+                        option.disabled = false;
+                        option.style.backgroundColor = "";
+                        option.style.color = "";
                     }
                 }
-            } else {
-                // ถ้าไม่ใช่วันนี้ (วันถัดไป/2 วันข้างหน้า) ให้เปิดทุกตัวเลือก
-                for (let opt of timeSelect.options) opt.disabled = false;
-            }
-        }
-
-        // เรียกครั้งแรก (กรณี dateInput มีค่า preload)
-        updateTimeOptionsDisablePast();
-
-        // อัพเดตตัวเลือกเวลาเมื่อผู้ใช้เปลี่ยนวันที่
-        dateInput.addEventListener('change', updateTimeOptionsDisablePast);
-
-        // เพิ่ม animation เมื่อโหลดหน้า
-        const container = document.querySelector('.container');
-        container.style.transform = 'translateY(20px)';
-        container.style.opacity = '0';
-
-        setTimeout(() => {
-            container.style.transition = 'all 0.5s ease';
-            container.style.transform = 'translateY(0)';
-            container.style.opacity = '1';
-        }, 100);
-
-        // ติดตั้งการ validate ก่อน submit
-        const form = document.querySelector('form[action="confirmReservation"]');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                if (!validateForm()) {
-                    e.preventDefault();
+                
+                // หากตัวเลือกที่เลือกอยู่ถูก Disable ให้รีเซ็ตค่า
+                if (timeSelect.selectedOptions[0] && timeSelect.selectedOptions[0].disabled) {
+                    timeSelect.value = "";
                 }
-            });
-        }
-
-        // ฟังก์ชัน validate เดียว ทำหน้าที่ครบถ้วน
-        function validateForm() {
-            const date = dateInput.value;
-            const time = timeSelect.value;
-            const guests = document.getElementById('numberOfGuests').value;
-
-            if (!date || !time || !guests) {
-                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
-                return false;
             }
 
-            // ตรวจสอบจำนวนไม่เกินความจุของโต๊ะ
-            if (parseInt(guests) > parseInt(maxCapacity, 10)) {
-                alert('จำนวนผู้ใช้บริการเกินความจุของโต๊ะ (สูงสุด ' + maxCapacity + ' คน)');
-                return false;
-            }
+            updateAvailableTimes();
+            dateInput.addEventListener('change', updateAvailableTimes);
 
-            // สร้าง DateTime ที่ถูกเลือก
-            const [hour, minute] = time.split(":").map(Number);
-            const selectedDate = new Date(date);
-            selectedDate.setHours(hour, minute, 0, 0);
-
-            const nowReal = new Date();
-
-            // ถ้าวันที่เป็นวันนี้หรือวันก่อน ตรวจสอบเวลาให้แน่นอน
-            if (selectedDate <= nowReal) {
-                alert('ไม่สามารถจองเวลาที่ผ่านมาแล้วได้ กรุณาเลือกเวลาในอนาคต');
-                return false;
-            }
-
-            // ยืนยันการจอง (show confirmation)
-            const confirmation = confirm(
-                'ยืนยันการจองโต๊ะ ' + tableId + '\n' +
-                'วันที่: ' + formatDate(date) + '\n' +
-                'เวลา: ' + time + '\n' +
-                'จำนวนคน: ' + guests + ' คน'
-            );
-
-            return confirmation;
-        }
-
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                weekday: 'long'
-            };
-            return date.toLocaleDateString('th-TH', options);
-        }
-    });
-</script>
-
+            // --- 3. Animation ตอนโหลด ---
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(15px)';
+            container.style.transition = 'all 0.5s ease-out';
+            setTimeout(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
 </body>
 </html>
