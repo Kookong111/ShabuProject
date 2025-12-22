@@ -29,6 +29,17 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class CustomerController {
 
+    // ตรวจสอบ session: ถ้า login แล้วไปหน้า welcomeCustomer, ถ้าไม่ login ให้ไปหน้า loginCustomer
+    @RequestMapping(value = "/gotowelcomeCustomerCheck", method = RequestMethod.GET)
+    public String gotowelcomeCustomerCheck(HttpSession session) {
+        Object user = session.getAttribute("user");
+        if (user != null) {
+            return "welcomeCustomer";
+        } else {
+            return "Homecustomer";
+        }
+    }
+
     @RequestMapping(value = "/regiscus", method = RequestMethod.GET)
     public String loadd() {
         return "registerCustomer"; 
@@ -77,16 +88,39 @@ public class CustomerController {
 
     
     @RequestMapping(value = "/loginCustomer", method = RequestMethod.POST)
-    public ModelAndView loginUser(HttpServletRequest request,HttpSession session) {
-    	CustomerRegisterManager rm = new CustomerRegisterManager();
+    public ModelAndView loginUser(HttpServletRequest request, HttpSession session) {
+        CustomerRegisterManager rm = new CustomerRegisterManager();
 
         // ดึงข้อมูลจากฟอร์ม
         String username = request.getParameter("cususername");
         String password = request.getParameter("cuspassword");
-        
+
+        // Validation 1: Username ต้องมีอย่างน้อย 6 ตัวอักษร
+        if (username == null || username.trim().length() < 6) {
+            ModelAndView mav = new ModelAndView("loginCustomer");
+            mav.addObject("error", "ชื่อผู้ใช้ต้องมีอย่างน้อย 6 ตัวอักษร");
+            return mav;
+        }
+
+        // Validation 2: Password ต้องมีอย่างน้อย 8 ตัวอักษร
+        if (password == null || password.length() < 8) {
+            ModelAndView mav = new ModelAndView("loginCustomer");
+            mav.addObject("error", "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
+            return mav;
+        }
+
+        // Validation 3: Password ต้องมีตัวอักษรและตัวเลข
+        boolean hasLetters = password.matches(".*[a-zA-Z].*");
+        boolean hasNumbers = password.matches(".*[0-9].*");
+        if (!hasLetters || !hasNumbers) {
+            ModelAndView mav = new ModelAndView("loginCustomer");
+            mav.addObject("error", "รหัสผ่านต้องมีตัวอักษรและตัวเลขรวมกัน");
+            return mav;
+        }
+
         // ตรวจสอบผู้ใช้จากฐานข้อมูล
         Customer user = rm.authenticateUsers(username, password);
-        
+
         if (user != null) {
             ModelAndView mav = new ModelAndView("welcomeCustomer");
             mav.addObject("user", user);
@@ -96,7 +130,7 @@ public class CustomerController {
         } else {
             // หากเข้าสู่ระบบไม่สำเร็จ กลับไปหน้า login พร้อมข้อความแสดงข้อผิดพลาด
             ModelAndView mav = new ModelAndView("loginCustomer");
-            mav.addObject("error", "รหัสผ่านไม่ถูกต้อง");
+            mav.addObject("error", "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
             return mav;
         }
     }
@@ -495,4 +529,9 @@ public String logoutCustomer(HttpSession session) {
     return "Homecustomer"; // หรือหน้า WelcomeCustomer ที่ไม่มี Session
 }
     
+   @RequestMapping(value = "/gotohomecustomer", method = RequestMethod.GET)
+
+    public String homecustomer() {
+        return "Homecustomer"; 
+    }
 }

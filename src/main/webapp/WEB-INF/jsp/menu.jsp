@@ -10,439 +10,273 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
-            --bg-primary: #f8f9fa;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --text-primary: #1a1a1a;
-            --text-secondary: #6c757d;
-            --accent: #1a1a1a;
-            --border: rgba(0, 0, 0, 0.08);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
+            --bg-page: #f2f3f7;
+            --primary: #1e293b;
+            --secondary: #64748b;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --accent: #4f46e5;
+            --white: #ffffff;
+            --success: #10b981;
         }
 
         body {
-            font-family: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--primary);
+            padding-bottom: 40px;
+            padding-top: 110px; 
         }
 
-        /* Subtle animated background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Header */
-        .header-bar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+        nav { 
+            background: #fff; 
+            padding: 15px 0; 
             border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
+            position: fixed;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
-            padding: 24px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
+        
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 32px;
+        /* --- Filter Section --- */
+        .filter-section {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 20px;
+            margin-bottom: 35px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-wrapper, .select-wrapper { position: relative; flex: 1; min-width: 280px; }
+        
+        .search-wrapper input, .select-wrapper select {
+            width: 100%; 
+            padding: 16px 15px 16px 50px;
+            border-radius: 14px;
+            border: 1px solid var(--border); 
+            background: var(--white); 
+            font-family: 'Kanit';
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-wrapper input:focus, .select-wrapper select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
         }
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 400;
-            font-size: 0.95rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .search-icon { 
+            position: absolute; top: 50%; left: 20px;
+            transform: translateY(-50%); 
+            color: var(--secondary); 
         }
 
-        .back-link:hover {
-            background: rgba(0, 0, 0, 0.08);
-            border-color: rgba(0, 0, 0, 0.15);
-            transform: translateX(-4px);
+        /* --- Grid & Items (จุดที่แก้ไข) --- */
+        .menu-grid { 
+            display: grid; 
+            /* ปรับขนาดคอลัมน์ให้เหมาะสมกับจอคอม */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px;
         }
-
-        .back-link i {
-            font-size: 0.85rem;
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            color: var(--text-primary);
-        }
-
-        /* Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 64px 32px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Menu Grid */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 32px;
-        }
-
-        /* Menu Card */
+        
         .menu-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .menu-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .menu-item:hover {
-            transform: translateY(-12px);
-            box-shadow: var(--shadow-lg);
-            border-color: rgba(99, 102, 241, 0.2);
-        }
-
-        .menu-item:hover::before {
-            opacity: 1;
-        }
-
-        /* Image Container */
-        .image-container {
-            width: 100%;
-            height: 280px;
-            overflow: hidden;
-            background: #ffffff;
-            position: relative;
+            background: var(--white); 
+            border-radius: var(--radius); 
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
+            flex-direction: column; 
+            padding: 15px; 
+            /* กำหนดความสูงขั้นต่ำที่เหมาะสม */
+            min-height: 420px;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
         }
 
-        .menu-item img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            object-position: center;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: brightness(0.95) contrast(1.05);
-            display: block;
+        /* แก้ไขปัญหาเรื่องรูปไม่เต็มและล้น */
+        .image-container {
+            width: 100%; 
+            /* ใช้ Aspect Ratio เพื่อให้บล็อกรูปภาพมีสัดส่วนคงที่เสมอ */
+            aspect-ratio: 4 / 3; 
+            background: #f8fafc; 
+            border-radius: 12px; 
+            overflow: hidden; /* ป้องกันรูปภาพล้นออกจากขอบ */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .menu-item img { 
+            width: 100%; 
+            height: 100%; 
+            /* object-fit: cover สำคัญมาก! ทำให้รูปขยายเต็มพื้นที่โดยไม่เสียสัดส่วน */
+            object-fit: cover; 
+            transition: transform 0.5s ease;
         }
 
         .menu-item:hover img {
             transform: scale(1.05);
-            filter: brightness(1) contrast(1.1);
         }
 
-        .no-image {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            color: var(--text-secondary);
-        }
-
-        .no-image i {
-            font-size: 2.5rem;
-            opacity: 0.3;
-        }
-
-        .no-image span {
-            font-size: 0.9rem;
-            opacity: 0.5;
-        }
-
-        /* Item Details */
-        .item-details {
-            padding: 28px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .item-details h2 {
-            font-size: 1.5rem;
+        .item-details { display: flex; flex-direction: column; flex-grow: 1; }
+        .food-type { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; }
+        
+        /* บังคับความสูงชื่ออาหารให้เท่ากัน ป้องกันการ์ดเบี้ยว */
+        .item-details h2 { 
+            font-size: 1.15rem; 
+            margin-bottom: 15px; 
+            color: var(--primary); 
+            line-height: 1.4; 
             font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-            letter-spacing: 0.3px;
+            min-height: 3.2em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .food-type {
-            display: inline-block;
-            padding: 6px 14px;
-            background: rgba(99, 102, 241, 0.08);
-            border: 1px solid rgba(99, 102, 241, 0.15);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: #6366f1;
-            margin-bottom: 20px;
-            font-weight: 400;
-        }
-
-        .price-container {
+        .price-container { 
+            margin-top: auto; /* ดันราคาไปไว้ล่างสุดเสมอ */
+            padding-top: 15px; 
+            border-top: 1px solid #f1f5f9; 
             display: flex;
             align-items: baseline;
-            gap: 6px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
         }
+        
+        .price { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .currency { font-size: 0.9rem; color: var(--secondary); margin-left: 4px; }
+        .free-buffet-label { font-size: 1.1rem; color: var(--success); font-weight: 600; }
 
-        .price {
-            font-size: 1.75rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.5px;
-        }
-
-        .currency {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            font-weight: 300;
-        }
-
-        /* Empty State */
-        .empty-message {
-            text-align: center;
-            padding: 80px 32px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            max-width: 600px;
-            margin: 60px auto;
-        }
-
-        .empty-message i {
-            font-size: 3rem;
-            color: var(--text-secondary);
-            opacity: 0.3;
-            margin-bottom: 20px;
-        }
-
-        .empty-message p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            line-height: 1.8;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 20px;
-                align-items: flex-start;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            .container {
-                padding: 40px 20px;
-            }
-
-            .menu-grid {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-
-            .image-container {
-                height: 240px;
-            }
-
-            .item-details {
-                padding: 24px;
-            }
-
-            .item-details h2 {
-                font-size: 1.3rem;
-            }
-
-            .price {
-                font-size: 1.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header-bar {
-                padding: 16px 0;
-            }
-
-            .header-content {
-                padding: 0 20px;
-            }
-
-            .back-link {
-                padding: 10px 18px;
-                font-size: 0.9rem;
-            }
-
-            h1 {
-                font-size: 1.3rem;
-            }
-        }
-
-        /* Loading animation for images */
-        @keyframes shimmer {
-            0% {
-                background-position: -1000px 0;
-            }
-            100% {
-                background-position: 1000px 0;
-            }
-        }
-
-        .menu-item img[src=""] {
-            background: linear-gradient(
-                90deg,
-                #1a1a1a 0%,
-                #2a2a2a 50%,
-                #1a1a1a 100%
-            );
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite;
+        /* --- Mobile Responsive --- */
+        @media (max-width: 600px) {
+            body { padding-top: 100px; } 
+            .filter-section { gap: 12px; }
+            .search-wrapper, .select-wrapper { min-width: 100%; }
+            .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .menu-item { min-height: 320px; padding: 10px; }
+            .image-container { aspect-ratio: 1 / 1; } /* มือถือใช้ทรงจัตุรัสเพื่อประหยัดพื้นที่ */
+            .item-details h2 { font-size: 1rem; min-height: 2.8em; }
+            .price { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="header-bar">
-        <div class="header-content">
-            <a href="gotowelcomeCustomer" class="back-link">
-                <i class="fas fa-arrow-left"></i>
-                <span>กลับหน้าหลัก</span>
-            </a>
-            <h1>THE SIGNATURE MENU</h1>
-            <span style="width: 140px;"></span>
+    <nav>
+        <div class="nav-container">
+            <%@ include file="/WEB-INF/jsp/include/navbar.jsp" %>
         </div>
-    </div>
+    </nav>
 
     <div class="container">
-        <div class="menu-grid">
-            <c:forEach items="${menuItems}" var="item">
-                <div class="menu-item">
-                    <div class="image-container">
-                        <c:choose>
-                            <c:when test="${not empty item.foodImage}">
-                                <img src="${item.foodImage}" alt="${item.foodname}" loading="lazy">
-                            </c:when>
-                            <c:otherwise>
-                                <div class="no-image">
-                                    <i class="fas fa-utensils"></i>
-                                    <span>No Image Available</span>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                    
-                    <div class="item-details">
-                        <h2>${item.foodname}</h2>
-                        <div class="food-type">${item.foodtype.foodtypeName}</div>
-                        <div class="price-container">
-                            <span class="price">
-                                <fmt:formatNumber value="${item.price}" pattern="#,##0.00" />
-                            </span>
-                            <span class="currency">บาท</span>
-                        </div>
-                    </div>
-                </div>
-            </c:forEach>
+        <div class="filter-section">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="ค้นหาเมนูอาหาร..." onkeyup="filterMenu()">
+            </div>
+            
+            <div class="select-wrapper">
+                <i class="fas fa-filter search-icon"></i> 
+                <select id="categorySelect" onchange="filterMenu()">
+                    <option value="all">ประเภทอาหารทั้งหมด</option>
+                    <c:set var="addedTypes" value="" />
+                    <c:forEach items="${menuItems}" var="item">
+                        <c:if test="${!addedTypes.contains(item.foodtype.foodtypeName) && !item.foodtype.foodtypeName.contains('ต่อคน')}">
+                            <option value="${item.foodtype.foodtypeName}">${item.foodtype.foodtypeName}</option>
+                            <c:set var="addedTypes" value="${addedTypes},${item.foodtype.foodtypeName}" />
+                        </c:if>
+                    </c:forEach>
+                </select>
+            </div>
         </div>
         
-        <c:if test="${empty menuItems}">
-            <div class="empty-message">
-                <i class="fas fa-inbox"></i>
-                <p>ขณะนี้ยังไม่มีรายการอาหารในเมนู<br>กรุณาตรวจสอบอีกครั้งในภายหลัง</p>
-            </div>
-        </c:if>
+        <div class="menu-grid" id="mainGrid">
+            <c:forEach items="${menuItems}" var="item">
+                <c:if test="${!item.foodname.contains('บุฟเฟต์') && !item.foodname.contains('ต่อคน')}">
+                    <div class="menu-item" data-name="${item.foodname.toLowerCase()}" data-category="${item.foodtype.foodtypeName}">
+                        <div class="image-container">
+                            <c:choose>
+                                <c:when test="${not empty item.foodImage}">
+                                    <img src="${item.foodImage}" alt="${item.foodname}" loading="lazy">
+                                </c:when>
+                                <c:otherwise>
+                                    <i class="fas fa-image" style="font-size: 2.5rem; color: #e2e8f0;"></i>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                        <div class="item-details">
+                            <span class="food-type">${item.foodtype.foodtypeName}</span>
+                            <h2>${item.foodname}</h2>
+                            <div class="price-container">
+                                <c:choose>
+                                    <c:when test="${item.price == 0 || empty item.price}">
+                                        <span class="free-buffet-label">รวมในบุฟเฟต์</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="price"><fmt:formatNumber value="${item.price}" pattern="#,##0" /></span>
+                                        <span class="currency">บาท</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+            </c:forEach>
+        </div>
+
+        <div id="noDataMessage" style="display:none; text-align:center; padding: 120px 20px; color: var(--secondary);">
+            <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.2;"></i>
+            <p style="font-size: 1.2rem; font-weight: 300;">ขออภัย ไม่พบเมนูที่คุณกำลังมองหา</p>
+        </div>
     </div>
 
     <script>
-        // ซ่อนเมนูที่มีชื่อว่า "บุฟเฟต์"
-        document.addEventListener('DOMContentLoaded', function() {
+        function filterMenu() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
+            const categorySelect = document.getElementById('categorySelect').value;
             const menuItems = document.querySelectorAll('.menu-item');
+            const noDataMessage = document.getElementById('noDataMessage');
+            const mainGrid = document.getElementById('mainGrid');
             
-            menuItems.forEach(function(item) {
-                const foodName = item.querySelector('.item-details h2');
-                if (foodName && foodName.textContent.includes('บุฟเฟต์')) {
+            let visibleCount = 0;
+
+            menuItems.forEach(item => {
+                const name = item.getAttribute('data-name');
+                const category = item.getAttribute('data-category');
+                
+                const matchesSearch = name.includes(searchInput);
+                const matchesCategory = (categorySelect === 'all' || category === categorySelect);
+
+                if (matchesSearch && matchesCategory) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
                     item.style.display = 'none';
                 }
             });
 
-            // ตรวจสอบว่ามีเมนูที่แสดงอยู่หรือไม่
-            const visibleItems = document.querySelectorAll('.menu-item:not([style*="display: none"])');
-            const emptyMessage = document.querySelector('.empty-message');
-            
-            if (visibleItems.length === 0 && !emptyMessage) {
-                // ถ้าไม่มีเมนูเลย ให้แสดงข้อความ
-                const container = document.querySelector('.container');
-                const emptyDiv = document.createElement('div');
-                emptyDiv.className = 'empty-message';
-                emptyDiv.innerHTML = '<i class="fas fa-inbox"></i><p>ขณะนี้ยังไม่มีรายการอาหารในเมนู<br>กรุณาตรวจสอบอีกครั้งในภายหลัง</p>';
-                container.appendChild(emptyDiv);
-                
-                // ซ่อน grid
-                const menuGrid = document.querySelector('.menu-grid');
-                if (menuGrid) {
-                    menuGrid.style.display = 'none';
-                }
+            if (visibleCount === 0) {
+                mainGrid.style.display = 'none';
+                noDataMessage.style.display = 'block';
+            } else {
+                mainGrid.style.display = 'grid';
+                noDataMessage.style.display = 'none';
             }
-        });
+        }
+        window.onload = filterMenu;
     </script>
 </body>
 </html>

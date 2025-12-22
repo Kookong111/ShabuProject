@@ -43,7 +43,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #fff;
             padding: 50px 40px;
             text-align: center;
             position: relative;
@@ -51,14 +51,7 @@
         }
 
         .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
+            display: none;
         }
 
         @keyframes rotate {
@@ -72,12 +65,13 @@
             width: 100px;
             height: 100px;
             margin: 0 auto 20px;
-            background: rgba(255, 255, 255, 0.2);
+            background: #22c55e;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+            box-shadow: 0 2px 12px rgba(34,197,94,0.10);
         }
 
         @keyframes scaleIn {
@@ -87,14 +81,14 @@
 
         .success-icon i {
             font-size: 50px;
-            color: white;
+            color: #fff;
         }
 
         .header h1 {
             position: relative;
             z-index: 1;
             font-size: 2.2em;
-            color: white;
+            color: #222;
             margin-bottom: 12px;
             font-weight: 600;
             letter-spacing: -0.5px;
@@ -104,7 +98,7 @@
             position: relative;
             z-index: 1;
             font-size: 1.05em;
-            color: rgba(255, 255, 255, 0.9);
+            color: #222;
             font-weight: 300;
         }
 
@@ -113,14 +107,15 @@
         }
 
         .reservation-id-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8f9fa;
             border-radius: 16px;
+            border: 1px solid #e9ecef;
             padding: 24px;
             text-align: center;
             margin-bottom: 35px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
 
         .reservation-id-card::before {
@@ -141,7 +136,7 @@
 
         .reservation-id-card .label {
             font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.8);
+            color: #6c757d;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -150,7 +145,7 @@
 
         .reservation-id-card .id-number {
             font-size: 2em;
-            color: white;
+            color: #222;
             font-weight: 700;
             letter-spacing: 2px;
         }
@@ -275,19 +270,22 @@
             align-items: center;
             gap: 10px;
             padding: 16px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #f8f9fa;
+            color: #222;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
             font-size: 1.05em;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e0e0e0;
         }
 
         .btn-home:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+            background: #ececec;
+            color: #111;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         }
 
         .divider {
@@ -374,7 +372,10 @@
                     <span class="detail-label">สถานะ</span>
                     <span class="status-badge">
                         <i class="fas fa-check-circle"></i>
-                        ${reservation.status}
+                        <c:choose>
+                            <c:when test="${reservation.status eq 'Reserved'}">จองแล้ว</c:when>
+                            <c:otherwise>${reservation.status}</c:otherwise>
+                        </c:choose>
                     </span>
                 </div>
             </div>

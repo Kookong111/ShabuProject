@@ -58,10 +58,13 @@
         .nav-container {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             max-width: 1400px;
             margin: 0 auto;
+            flex-wrap: nowrap;
+            gap: 0;
         }
+
 
         .logo {
             font-size: 28px;
@@ -73,42 +76,7 @@
             gap: 10px;
         }
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .nav-menu a {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 400;
-            font-size: 15px;
-            padding: 8px 0;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--text-primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-menu a:hover::after,
-        .nav-menu a.active::after {
-            width: 100%;
-        }
-
-        .nav-menu a:hover {
-            color: var(--accent);
-        }
+        
 
         .back-link {
             display: inline-flex;
@@ -160,12 +128,9 @@
         }
 
         .back-button {
-            position: absolute;
-            left: 5%;
-            top: 40px;
             padding: 12px 24px;
-            background: linear-gradient(135deg, var(--accent-light), #7c3aed);
-            color: white;
+            background: #222831;
+            color: #fff;
             border: none;
             border-radius: 12px;
             font-weight: 600;
@@ -175,17 +140,26 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 4px 15px rgba(34, 40, 49, 0.12);
             font-family: inherit;
         }
 
         .back-button:hover {
-            transform: translateX(-4px);
-            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+            background: #393e46;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 40, 49, 0.18);
         }
 
         .back-button:active {
-            transform: translateX(-2px) scale(0.98);
+            background: #222831;
+            transform: scale(0.98);
+        }
+
+        .nav-back-btn {
+            position: absolute;
+            right: 5%;
+            top: 40px;
         }
 
         .page-title {
@@ -576,11 +550,13 @@
             nav {
                 padding: 16px 20px;
             }
-
-            .back-button {
+        }
+            .nav-back-btn {
                 position: static;
                 margin-bottom: 20px;
                 width: auto;
+                right: auto;
+                top: auto;
             }
 
             .page-title {
@@ -608,40 +584,121 @@
             .mobile-menu-btn {
                 display: flex;
             }
+
+            .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 48px;
+            align-items: center;
+            white-space: nowrap;
+            font-size: 1.35rem;
+        }
+.nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.15em;
+            padding: 10px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+.nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--text-primary);
+            transition: width 0.3s ease;
+        }
+.nav-menu a:hover::after,
+        .nav-menu a.active::after {
+            width: 100%;
+        }
+.nav-menu a:hover {
+            color: var(--accent);
+        }
+.nav-menu {
+                gap: 18px;
+                font-size: 14px;
+            }
+            .nav-menu a {
+                font-size: 14px;
+            }
+.header-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 24px 0;
+        }
+.header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+.header-content h1 {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            text-align: center;
+        }
+@media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+        }
+        .header-content {
+                padding: 0 20px;
+            }
+
+            .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: 24px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+        .user-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <a href="#" class="logo">
-                <span>🍲</span>
-                <span>ShaBu</span>
-            </a>
-            
-            <ul class="nav-menu">
-                <li><a href="gotowelcomeCustomer">หน้าแรก</a></li>
-                <li><a href="menurecomand">เมนู</a></li>
-                <li><a href="listTable" class="active">จองโต๊ะ</a></li>
-                <li><a href="gotoContact">ติดต่อเรา</a></li>
-            </ul>
-            
-            <button class="mobile-menu-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+  <nav>
+        <div class="nav-container" style="justify-content: center;">
+            <%@ include file="/WEB-INF/jsp/include/navbar.jsp" %>
         </div>
     </nav>
 
     <!-- Header Section -->
     <section class="header-section">
         <div class="container">
-            <button class="back-button" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i>
-                ย้อนกลับ
-            </button>
+            
             <h1 class="page-title">จองโต๊ะ</h1>
             <p class="page-subtitle">
                 เลือกโต๊ะที่คุณต้องการจองและทำการจองหรือดูรายละเอียดเพิ่มเติม
@@ -719,15 +776,15 @@
             <div class="legend-items">
                 <div class="legend-item">
                     <div class="legend-color legend-free"></div>
-                    <span>✅ ว่าง - พร้อมจอง</span>
+                    <span>ว่าง - พร้อมจอง</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color legend-in-use"></div>
-                    <span>🔴 ใช้งาน - มีผู้ใช้งาน</span>
+                    <span>ใช้งาน - มีผู้ใช้งาน</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color legend-reserved"></div>
-                    <span>⏳ จองแล้ว - ถูกจองโดยลูกค้าคนอื่น</span>
+                    <span>จองแล้ว - ถูกจองโดยลูกค้าคนอื่น</span>
                 </div>
             </div>
         </div>

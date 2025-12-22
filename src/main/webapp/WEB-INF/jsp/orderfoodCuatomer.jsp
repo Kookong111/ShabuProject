@@ -525,36 +525,46 @@
         </div>
 
         <div class="menu-container">
+        <!-- Filter Controls -->
+        <div style="margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; align-items: center;">
+            <div style="flex: 1; min-width: 200px; max-width: 320px;">
+                <input type="text" id="foodSearchInput" placeholder="ค้นหาเมนูอาหาร..." style="width: 100%; padding: 7px 16px; border-radius: 8px; border: 1px solid #4a4f56; font-family: 'Kanit';">
+            </div>
+            <div>
+                <label for="foodTypeFilter" style="font-weight: 500; margin-right: 8px;"></label>
+                <select id="foodTypeFilter" style="padding: 7px 16px; border-radius: 8px; border: 1px solid #4f555c; font-family: 'Kanit';">
+                    <option value="all">ทั้งหมด</option>
+                    <c:forEach var="foodType" items="${foodTypeList}">
+                        <c:if test="${foodType.foodtypeName != 'ต่อคน'}">
+                            <option value="${foodType.foodtypeId}">${foodType.foodtypeName}</option>
+                        </c:if>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
             <c:set var="totalItems" value="${sessionScope.totalCartItems}" />
             
             <c:if test="${not empty foodTypeList and not empty menuList}">
                 <c:forEach var="foodType" items="${foodTypeList}">
                     <c:if test="${foodType.foodtypeName != 'ต่อคน'}">
-                        <div class="foodtype-section">
+                        <div class="foodtype-section" data-foodtype="${foodType.foodtypeId}">
                             <div class="foodtype-name">
                                 ${foodType.foodtypeName}
                             </div>
-                            
                             <c:forEach var="menu" items="${menuList}">
-                            
                                 <c:if test="${menu.foodtype.foodtypeId == foodType.foodtypeId}">
-                                    
                                     <c:set var="currentQty" value="${sessionScope.cartObject.items[menu.foodId].quantity}" />
                                     <c:set var="currentQty" value="${currentQty == null ? 0 : currentQty}" />
-                                    
                                     <div class="menu-item ${currentQty > 0 ? 'has-items' : ''}">
                                         <div class="menu-content">
                                             <img src="${menu.foodImage}" alt="${menu.foodname}" class="menu-image">
-                                    
                                             <div class="menu-details">
                                                 <div class="menu-name">${menu.foodname}</div>
-                                                
                                                 <div class="menu-price">
                                                     ฿<fmt:formatNumber value="${menu.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
                                                 </div>
                                             </div>
                                         </div>
-                                  
                                         <div class="item-actions">
                                             <c:if test="${currentQty > 0}">
                                                 <div class="qty-control">
@@ -565,11 +575,9 @@
                                                             <i class="fas fa-minus"></i>
                                                         </button>
                                                     </form>
-                                                    
                                                     <div class="qty-number">
                                                         <c:out value="${currentQty}" />
                                                     </div>
-                                                    
                                                     <form action="addToCart" method="post" style="display:inline;" class="add-to-cart-form">
                                                         <input type="hidden" name="foodId" value="${menu.foodId}" />
                                                         <input type="hidden" name="quantity" value="1" />
@@ -579,7 +587,6 @@
                                                     </form>
                                                 </div>
                                             </c:if>
-
                                             <c:if test="${currentQty == 0}">
                                                 <form action="addToCart" method="post" style="display:inline;" class="add-to-cart-form">
                                                     <input type="hidden" name="foodId" value="${menu.foodId}" />
@@ -626,6 +633,40 @@
     </c:if>
 
     <script>
+        // Food type and search filter
+        document.addEventListener('DOMContentLoaded', function() {
+            var foodTypeFilter = document.getElementById('foodTypeFilter');
+            var foodSearchInput = document.getElementById('foodSearchInput');
+            function filterMenu() {
+                var selectedType = foodTypeFilter ? foodTypeFilter.value : 'all';
+                var searchText = foodSearchInput ? foodSearchInput.value.trim().toLowerCase() : '';
+                document.querySelectorAll('.foodtype-section').forEach(function(section) {
+                    var showSection = false;
+                    if (selectedType === 'all' || section.getAttribute('data-foodtype') === selectedType) {
+                        // Check if any menu-item in this section matches search
+                        var items = section.querySelectorAll('.menu-item');
+                        items.forEach(function(item) {
+                            var name = item.querySelector('.menu-name')?.textContent?.toLowerCase() || '';
+                            if (name.includes(searchText)) {
+                                item.style.display = '';
+                                showSection = true;
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                    } else {
+                        // Hide all items if section is hidden by type
+                        section.querySelectorAll('.menu-item').forEach(function(item) {
+                            item.style.display = 'none';
+                        });
+                    }
+                    section.style.display = showSection ? '' : 'none';
+                });
+            }
+            if (foodTypeFilter) foodTypeFilter.addEventListener('change', filterMenu);
+            if (foodSearchInput) foodSearchInput.addEventListener('input', filterMenu);
+            filterMenu();
+        });
         // Loading effect
         
         document.querySelectorAll('.container form').forEach(form => {

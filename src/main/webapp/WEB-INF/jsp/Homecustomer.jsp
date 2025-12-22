@@ -36,27 +36,7 @@
         }
 
         /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 5%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        
 
         .logo {
             font-size: 28px;
@@ -68,42 +48,7 @@
             gap: 10px;
         }
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .nav-menu a {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 400;
-            font-size: 15px;
-            padding: 8px 0;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .nav-menu a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--text-primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-menu a:hover::after,
-        .nav-menu a.active::after {
-            width: 100%;
-        }
-
-        .nav-menu a:hover {
-            color: var(--accent);
-        }
+        
 
         /* Auth Buttons */
         .auth-buttons {
@@ -436,22 +381,9 @@
         }
 
         @media (max-width: 768px) {
-            .nav-menu {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: white;
-                flex-direction: column;
-                gap: 0;
-                padding: 20px;
-                box-shadow: var(--shadow-md);
-                display: none;
-            }
+            
 
-            .nav-menu.active {
-                display: flex;
-            }
+            
 
             .mobile-menu-btn {
                 display: flex;
@@ -484,40 +416,63 @@
                 grid-template-columns: 1fr;
                 gap: 40px;
             }
+            .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 48px;
+            align-items: center;
+            white-space: nowrap;
+            font-size: 1.35rem;
+        }
+.nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.15em;
+            padding: 10px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+.nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--text-primary);
+            transition: width 0.3s ease;
+        }
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+            width: 100%;
+        }
+.nav-menu a:hover {
+            color: var(--accent);
+        }
+.nav-menu {
+                gap: 18px;
+                font-size: 14px;
+            }
+.nav-menu a {
+                font-size: 14px;
+            }
+.nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: nowrap;
+            gap: 0;
+        }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="nav-container">
-            <a href="#" class="logo">
-                <span>🍲</span>
-                <span>ShaBu</span>
-            </a>
-            
-            <ul class="nav-menu">
-                <li><a href="gotohomecustomer" class="active">หน้าแรก</a></li>
-                <li><a href="menurecomand">เมนู</a></li>
-                <li><a href="reservetable">จองโต๊ะ</a></li>
-                <li><a href="conTact">ติดต่อเรา</a></li>
-            </ul>
-            
-            <div class="auth-buttons">
-                <a href="gotologin">
-                    <i class="fas fa-sign-in-alt"></i>
-                    เข้าสู่ระบบ
-                </a>
-                <a href="gotoregister">
-                    <i class="fas fa-user-plus"></i>
-                    สมัครสมาชิก
-                </a>
-            </div>
-            
-            <button class="mobile-menu-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+      <nav>
+        <div class="nav-container" style="justify-content: center;">
+            <%@ include file="/WEB-INF/jsp/include/navbar.jsp" %>
         </div>
     </nav>
     
