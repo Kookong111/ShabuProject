@@ -17,7 +17,7 @@
             --primary: #1e293b;
             --secondary: #64748b;
             --border: #e2e8f0;
-            --radius: 16px;
+            --radius: 20px;
             --accent: #4f46e5;
             --white: #ffffff;
             --success: #10b981;
@@ -48,7 +48,7 @@
         .filter-section {
             display: flex;
             gap: 20px;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
             margin-top: 10px;
             flex-wrap: wrap;
         }
@@ -78,12 +78,11 @@
             color: var(--secondary); 
         }
 
-        /* --- Grid & Items (จุดที่แก้ไข) --- */
+        /* --- Grid & Items (ปรับแต่งการแสดงผลในคอม) --- */
         .menu-grid { 
             display: grid; 
-            /* ปรับขนาดคอลัมน์ให้เหมาะสมกับจอคอม */
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 30px;
         }
         
         .menu-item {
@@ -91,86 +90,90 @@
             border-radius: var(--radius); 
             display: flex;
             flex-direction: column; 
-            padding: 15px; 
-            /* กำหนดความสูงขั้นต่ำที่เหมาะสม */
-            min-height: 420px;
+            padding: 20px; 
+            min-height: 520px; /* ปรับความสูงให้พอดีกับรูปและการชิดของข้อความ */
             height: 100%;
-            transition: transform 0.3s ease, box-shadow 0.3s ease; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border);
         }
         
         .menu-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* แก้ไขปัญหาเรื่องรูปไม่เต็มและล้น */
         .image-container {
             width: 100%; 
-            /* ใช้ Aspect Ratio เพื่อให้บล็อกรูปภาพมีสัดส่วนคงที่เสมอ */
-            aspect-ratio: 4 / 3; 
+            height: 320px; /* ความสูงบล็อกรูปภาพในจอคอม */
             background: #f8fafc; 
-            border-radius: 12px; 
-            overflow: hidden; /* ป้องกันรูปภาพล้นออกจากขอบ */
+            border-radius: 15px; 
+            overflow: hidden; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             position: relative;
         }
         
         .menu-item img { 
             width: 100%; 
             height: 100%; 
-            /* object-fit: cover สำคัญมาก! ทำให้รูปขยายเต็มพื้นที่โดยไม่เสียสัดส่วน */
             object-fit: cover; 
-            transition: transform 0.5s ease;
+            transition: transform 0.6s ease;
         }
 
-        .menu-item:hover img {
-            transform: scale(1.05);
+        .menu-item:hover img { transform: scale(1.1); }
+
+        .item-details { 
+            display: flex; 
+            flex-direction: column; 
+            flex-grow: 1; 
         }
 
-        .item-details { display: flex; flex-direction: column; flex-grow: 1; }
-        .food-type { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; }
+        .food-type { 
+            font-size: 0.85rem; 
+            color: var(--accent); 
+            font-weight: 600; 
+            margin-bottom: 5px; 
+        }
         
-        /* บังคับความสูงชื่ออาหารให้เท่ากัน ป้องกันการ์ดเบี้ยว */
+        /* แก้ไขให้ชื่ออาหารชิดราคามากขึ้น */
         .item-details h2 { 
-            font-size: 1.15rem; 
-            margin-bottom: 15px; 
+            font-size: 1.25rem; 
+            margin-bottom: 5px; /* ลด margin-bottom ให้เหลือ 5px */
             color: var(--primary); 
-            line-height: 1.4; 
+            line-height: 1.3; 
             font-weight: 500;
-            min-height: 3.2em;
+            min-height: 2.6em; /* ปรับขนาดพื้นที่ชื่อให้เล็กลงเล็กน้อย */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
+        /* แก้ไขให้ส่วนราคาขยับขึ้นมาชิดชื่อ */
         .price-container { 
-            margin-top: auto; /* ดันราคาไปไว้ล่างสุดเสมอ */
-            padding-top: 15px; 
+            margin-top: 5px; /* ลด margin-top ให้เหลือ 5px */
+            padding-top: 10px; 
             border-top: 1px solid #f1f5f9; 
             display: flex;
             align-items: baseline;
         }
         
-        .price { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-        .currency { font-size: 0.9rem; color: var(--secondary); margin-left: 4px; }
-        .free-buffet-label { font-size: 1.1rem; color: var(--success); font-weight: 600; }
+        .price { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+        .currency { font-size: 1rem; color: var(--secondary); margin-left: 5px; }
+        .free-buffet-label { font-size: 1.2rem; color: var(--success); font-weight: 600; }
 
         /* --- Mobile Responsive --- */
         @media (max-width: 600px) {
             body { padding-top: 100px; } 
-            .filter-section { gap: 12px; }
-            .search-wrapper, .select-wrapper { min-width: 100%; }
             .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .menu-item { min-height: 320px; padding: 10px; }
-            .image-container { aspect-ratio: 1 / 1; } /* มือถือใช้ทรงจัตุรัสเพื่อประหยัดพื้นที่ */
-            .item-details h2 { font-size: 1rem; min-height: 2.8em; }
+            .menu-item { min-height: 360px; padding: 12px; }
+            .image-container { height: 180px; margin-bottom: 12px; }
+            .item-details h2 { font-size: 1rem; min-height: 2.6em; margin-bottom: 5px; }
             .price { font-size: 1.2rem; }
+            .free-buffet-label { font-size: 1rem; }
         }
     </style>
 </head>
@@ -213,7 +216,10 @@
                                     <img src="${item.foodImage}" alt="${item.foodname}" loading="lazy">
                                 </c:when>
                                 <c:otherwise>
-                                    <i class="fas fa-image" style="font-size: 2.5rem; color: #e2e8f0;"></i>
+                                    <div style="display: flex; flex-direction: column; align-items: center; color: #cbd5e1;">
+                                        <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                                        <span style="font-size: 0.8rem;">ไม่มีรูปภาพ</span>
+                                    </div>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -240,6 +246,7 @@
         <div id="noDataMessage" style="display:none; text-align:center; padding: 120px 20px; color: var(--secondary);">
             <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.2;"></i>
             <p style="font-size: 1.2rem; font-weight: 300;">ขออภัย ไม่พบเมนูที่คุณกำลังมองหา</p>
+            <button onclick="resetFilters()" style="margin-top: 15px; background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 8px; cursor: pointer;">ล้างการค้นหา</button>
         </div>
     </div>
 
@@ -276,6 +283,13 @@
                 noDataMessage.style.display = 'none';
             }
         }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categorySelect').value = 'all';
+            filterMenu();
+        }
+
         window.onload = filterMenu;
     </script>
 </body>
