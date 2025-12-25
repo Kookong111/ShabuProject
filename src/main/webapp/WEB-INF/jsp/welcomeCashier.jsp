@@ -162,6 +162,14 @@
                 </button>
             </form>
 
+            <%-- ปุ่มดูบิลย้อนหลัง --%>
+            <form action="viewPastBills" method="POST">
+                <button type="submit" class="action-card">
+                    <div class="action-icon"><i class="fas fa-history"></i></div>
+                    <div class="action-title">ดูบิลย้อนหลัง</div>
+                </button>
+            </form>
+
         </div>
 
         <div class="logout-container">

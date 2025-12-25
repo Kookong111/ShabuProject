@@ -312,7 +312,7 @@
     function validatePassword(password) {
       if (password.length < 8) return false;
       const hasLetters = /[a-zA-Z]/.test(password);
-      const hasNumbers = /[0-9]/.test(password);
+      const hasNumbers = /[0-7]/.test(password);
       return hasLetters && hasNumbers;
     }
 

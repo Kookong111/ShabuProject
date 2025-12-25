@@ -1,28 +1,31 @@
 package com.springmvc.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import com.springmvc.model.Manager; 
+import com.springmvc.model.Manager;
 import com.springmvc.model.LoginManager;
+import com.springmvc.model.CashierManager;
+import com.springmvc.model.Payment;
+import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class ManagerController {
 
     @RequestMapping(value = "/LoginManager", method = RequestMethod.POST)
-    public ModelAndView loginUser(HttpServletRequest request,HttpSession session) {
-    	LoginManager rm = new LoginManager();
+    public ModelAndView loginUser(HttpServletRequest request, HttpSession session) {
+        LoginManager rm = new LoginManager();
 
         // ดึงข้อมูลจากฟอร์ม
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        
+
         // ตรวจสอบผู้ใช้จากฐานข้อมูล
         Manager user = rm.authenticateUser(username, password);
-        
+
         if (user != null) {
             ModelAndView mav = new ModelAndView("welcomemanager");
             mav.addObject("user", user);
@@ -36,59 +39,81 @@ public class ManagerController {
             return mav;
         }
     }
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String rolelogin() {
-        return "loginManager"; 
+        return "loginManager";
     }
-    
+
     @RequestMapping(value = "/RoleManager", method = RequestMethod.POST)
     public String loginManager() {
-        return "loginManager"; 
+        return "loginManager";
     }
-    
+
     @RequestMapping(value = "/RoleCustomer", method = RequestMethod.POST)
     public String loginCustomer() {
-        return "Homecustomer"; 
+        return "Homecustomer";
     }
-    
+
     @RequestMapping(value = "/RoleCashier", method = RequestMethod.POST)
     public String loginCashier() {
-        return "loginCashier"; 
+        return "loginCashier";
     }
-    
+
     @RequestMapping(value = "/RoleWaiter", method = RequestMethod.POST)
     public String loginWaiter() {
-        return "loginWaiter"; 
+        return "loginWaiter";
     }
 
     @RequestMapping(value = "/ManagerEmployee", method = RequestMethod.GET)
     public String manageremp() {
-        return "EmployeeInformation"; 
+        return "EmployeeInformation";
     }
-    
-    
-    
-    @RequestMapping(value = "/logoutmanager", method = RequestMethod.GET) //**********ออกจากระบบ************
+
+    @RequestMapping(value = "/logoutmanager", method = RequestMethod.GET) // **********ออกจากระบบ************
     public String logoutmanager() {
-        return "loginManager"; 
+        return "loginManager";
     }
-    
-    @RequestMapping(value = "/backmain", method = RequestMethod.GET)//************กลับสู่หน้าจัดการพนักงาน************
+
+    @RequestMapping(value = "/backmain", method = RequestMethod.GET) // ************กลับสู่หน้าจัดการพนักงาน************
     public String back() {
-        return "EmployeeInformation"; 
+        return "EmployeeInformation";
     }
-    
-    @RequestMapping(value = "/home", method = RequestMethod.GET)//***********กลับหน้าhome***************
+
+    @RequestMapping(value = "/home", method = RequestMethod.GET) // ***********กลับหน้าhome***************
     public String homemanager() {
-        return "welcomemanager"; 
+        return "welcomemanager";
     }
-    
-    
 
+    /**
+     * เมธอดสำหรับดูรายการบิลย้อนหลังสำหรับ Manager
+     */
+    @RequestMapping(value = "/viewPastBillsManager", method = { RequestMethod.GET, RequestMethod.POST })
+    public ModelAndView viewPastBillsManager(HttpSession session) {
+        CashierManager manager = new CashierManager();
+        List<Payment> pastBills = manager.getAllSuccessfulPayments();
+        ModelAndView mav = new ModelAndView("pastBillsManager");
+        mav.addObject("pastBills", pastBills);
+        if (pastBills.isEmpty()) {
+            mav.addObject("error_message", "ไม่พบรายการบิลย้อนหลัง");
+        }
+        return mav;
+    }
 
+    /**
+     * Method สำหรับกลับไปหน้ารายการบิลสำหรับ Manager
+     */
+    @RequestMapping(value = "/backToPastBillsManager", method = RequestMethod.GET)
+    public String backToPastBillsManager() {
+        return "redirect:/viewPastBillsManager";
+    }
 
-
-
-
+    /**
+     * Method สำหรับกลับไปหน้าแรกของ Manager
+     */
+    @RequestMapping(value = "/backToHomeManager", method = RequestMethod.GET)
+    public String backToHomeManager() {
+        return "redirect:/home";
+    }
 
 }

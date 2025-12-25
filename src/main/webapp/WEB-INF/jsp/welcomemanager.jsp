@@ -209,18 +209,14 @@
                     <p>จัดการข้อมูลโต๊ะ</p>
                 </div>
             </a>
-            <a href="listuser" class="text-decoration-none">
-                <div class="action-btn" tabindex="0">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                    <p>ดูรายการบิล</p>
-                </div>
-            </a>
-            <a href="Addcoursepage" class="text-decoration-none">
-                <div class="action-btn" tabindex="0">
-                    <i class="fas fa-clipboard-check"></i>
-                    <p>จัดการข้อมูลการสั่งอาหาร</p>
-                </div>
-            </a>
+            
+            <form action="viewPastBillsManager" method="POST" class="d-inline">
+                <button type="submit" class="action-btn text-decoration-none border-0 bg-transparent" style="width: 100%; height: 100%;">
+                    <i class="fas fa-history"></i>
+                    <p>ดูบิลย้อนหลัง</p>
+                </button>
+            </form>
+            
             <a href="logoutmanager" class="text-decoration-none">
                 <div class="action-btn" tabindex="0">
                     <i class="fas fa-sign-out-alt"></i>

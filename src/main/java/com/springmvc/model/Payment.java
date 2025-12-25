@@ -21,27 +21,26 @@ public class Payment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-    private int PaymentId;
-	
-	
+	private int PaymentId;
+
 	@Column(nullable = false, length = 255)
 	private String paymentStatus;
-	
-    @Column(nullable = false)
-	@Temporal(TemporalType.DATE)
-    private Date paymentDate;
-    
-    @Column(nullable = false, length = 255)
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date paymentDate;
+
+	@Column(nullable = false, length = 255)
 	private Double totalPrice;
-	
+
 	@ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "empUsername", nullable = false)
+	@JoinColumn(name = "empUsername", nullable = false)
 	private Employee employees;
-	
+
 	@OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "oderId", nullable = false)
+	@JoinColumn(name = "oderId", nullable = false)
 	private Order orders;
-	
+
 	public Payment() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -106,14 +105,4 @@ public class Payment {
 		this.orders = orders;
 	}
 
-	
-
-	
-
-
-	
-	
-	
-	
-	
 }
