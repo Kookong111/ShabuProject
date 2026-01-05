@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ใบเสร็จชำระเงิน - ShaBu Restaurant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
         * {
@@ -18,76 +18,161 @@
         }
 
         :root {
-            --primary-color: #5d00a8;
-            --secondary-color: #f7f3ff;
-            --accent-color: #22c55e;
-            --text-color: #333;
-            --white: #ffffff;
-            --shadow: 0 10px 30px rgba(93, 0, 168, 0.2);
+            --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-600: #4b5563;
+            --gray-900: #111827;
         }
 
         body {
-            background: linear-gradient(135deg, var(--secondary-color) 0%, #e0e7ff 100%);
+            background: var(--gray-50);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            color: var(--text-color);
         }
 
         .receipt-container {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 550px;
-            padding: 2.5rem;
-            position: relative;
+            max-width: 480px;
             overflow: hidden;
         }
 
-        .receipt-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-        }
-
         .receipt-header {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            padding: 2rem 1.5rem;
             text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid var(--secondary-color);
-            position: relative;
         }
 
-        .receipt-header::after {
-            content: '🍜';
-            font-size: 2rem;
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--white);
-            padding: 0 10px;
+        .receipt-header i {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
         }
 
         .receipt-header h1 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin: 0;
-            line-height: 1.4;
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .receipt-header .order-id {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 300;
         }
 
         .order-date {
-            font-size: 0.95rem;
-            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             margin-top: 1rem;
+            font-size: 0.875rem;
+            opacity: 0.95;
+        }
+
+        .receipt-body {
+            padding: 1.5rem;
+        }
+
+        .items-table {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .items-table thead {
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .items-table th {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .items-table th:last-child,
+        .items-table td:last-child {
+            text-align: right;
+        }
+
+        .items-table th:nth-child(2),
+        .items-table td:nth-child(2) {
+            text-align: center;
+            width: 60px;
+        }
+
+        .items-table tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .items-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .items-table td {
+            padding: 1rem 0.5rem;
+            font-size: 0.95rem;
+            color: var(--gray-900);
+        }
+
+        .item-name {
+            font-weight: 500;
+        }
+
+        .item-qty {
+            color: var(--gray-600);
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .total-section {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .total-amount {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .paid-badge {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1.5rem;
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -95,225 +180,100 @@
             gap: 0.5rem;
         }
 
-        .order-date i {
-            color: var(--primary-color);
+        .paid-badge i {
+            font-size: 1.25rem;
         }
 
-        .receipt-details {
-            margin: 2rem 0;
-            background: var(--secondary-color);
-            border-radius: 12px;
-            padding: 1.5rem;
+        .actions {
+            display: flex;
+            gap: 0.75rem;
         }
 
-        .receipt-details table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .receipt-details thead th {
-            padding: 1rem 0.5rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--primary-color);
-            font-size: 0.95rem;
-            border-bottom: 2px solid var(--primary-color);
-        }
-
-        .receipt-details thead th.col-qty,
-        .receipt-details thead th.col-total {
-            text-align: right;
-        }
-
-        .receipt-details tbody td {
-            padding: 1rem 0.5rem;
-            color: var(--text-color);
+        .btn {
+            flex: 1;
+            padding: 0.875rem;
+            border-radius: 10px;
             font-size: 1rem;
             font-weight: 500;
-            border-bottom: 1px solid rgba(93, 0, 168, 0.1);
-        }
-
-        .receipt-details tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .receipt-details tbody tr:hover {
-            background: rgba(93, 0, 168, 0.05);
-            border-radius: 8px;
-        }
-
-        .col-name {
-            width: 50%;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .col-qty {
-            width: 20%;
-            text-align: right;
-            color: var(--primary-color);
-        }
-
-        .col-total {
-            width: 30%;
-            text-align: right;
-            font-weight: 700;
-            color: var(--accent-color);
-        }
-
-        .receipt-total {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, var(--primary-color), #7b00e0);
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--white);
-            box-shadow: 0 4px 15px rgba(93, 0, 168, 0.3);
-        }
-
-        .receipt-total .label {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .receipt-total .amount {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-
-        .receipt-actions {
-            margin-top: 2.5rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .action-btn {
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-            min-width: 120px;
-            border-radius: 50px;
+            text-align: center;
             text-decoration: none;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 2px solid;
+            border: none;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s;
         }
 
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
 
-        .action-btn:hover::before {
-            left: 100%;
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
         }
 
-        .btn-confirm {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: var(--white);
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        .btn-success {
+            background: var(--success);
+            color: white;
         }
 
-        .btn-confirm:hover {
-            background: #16a34a;
-            border-color: #16a34a;
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
-            transform: translateY(-2px);
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
         }
 
-        .btn-cancel {
-            background: transparent;
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            box-shadow: 0 4px 15px rgba(93, 0, 168, 0.2);
+        .btn-outline {
+            background: white;
+            color: var(--danger);
+            border: 1.5px solid var(--danger);
         }
 
-        .btn-cancel:hover {
-            background: var(--primary-color);
-            color: var(--white);
-            box-shadow: 0 6px 20px rgba(93, 0, 168, 0.4);
-            transform: translateY(-2px);
+        .btn-outline:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-1px);
         }
 
-        .paid-status {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--accent-color), #16a34a);
-            color: var(--white);
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
-        }
-
-        .paid-status i {
-            margin-right: 0.5rem;
-        }
-        
-        
-        .btn-cancel:hover { 
-            background: #dc2626;
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-            transform: translateY(-2px);
-        }
-        
         .empty-state {
             text-align: center;
             padding: 3rem 2rem;
-            color: #666;
         }
 
         .empty-state i {
-            font-size: 3rem;
-            color: var(--primary-color);
+            font-size: 3.5rem;
+            color: var(--gray-600);
             margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
         .empty-state h3 {
-            color: var(--text-color);
-            font-weight: 600;
-            margin-bottom: 1rem;
+            color: var(--gray-900);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .empty-state p {
+            color: var(--gray-600);
+            margin-bottom: 2rem;
         }
 
         @media (max-width: 480px) {
             .receipt-container {
-                padding: 2rem 1.5rem;
-                max-width: 420px;
-                margin: 10px;
+                max-width: 100%;
             }
 
-            .receipt-header h1 {
-                font-size: 1.2rem;
+            .receipt-header {
+                padding: 1.5rem 1rem;
             }
 
-            .action-btn {
-                padding: 0.8rem 1.5rem;
-                font-size: 0.95rem;
-                min-width: 100px;
-            }
-
-            .receipt-total {
+            .receipt-body {
                 padding: 1rem;
-                flex-direction: column;
-                gap: 0.5rem;
-                text-align: center;
             }
 
-            .receipt-total .amount {
+            .total-amount {
                 font-size: 1.5rem;
             }
         }
@@ -327,77 +287,79 @@
             <c:when test="${not empty orderInfo and not empty orderDetails}">
                 
                 <div class="receipt-header">
-                    
-                    <h1>
-                        <i class="fas fa-receipt"></i><br>
-                        เช็คบิลโต๊ะ: TA${orderInfo.table.tableid}<br>
-                        <small>เลขที่ใบเสร็จ O${orderInfo.oderId}</small>
-                    </h1>
-                    
+                    <i class="fas fa-receipt"></i>
+                    <h1>โต๊ะ TA${orderInfo.table.tableid}</h1>
+                    <div class="order-id">เลขที่ใบเสร็จ O${orderInfo.oderId}</div>
                     <div class="order-date">
                         <i class="fas fa-calendar-alt"></i>
-                        วันที่: <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy" />
+                        <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy" />
                     </div>
                 </div>
         
-                <div class="receipt-details">
-                    <table>
+                <div class="receipt-body">
+                    
+                    <c:if test="${isPaid}">
+                        <div class="paid-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>ชำระเงินเรียบร้อยแล้ว</span>
+                        </div>
+                    </c:if>
+
+                    <table class="items-table">
                         <thead>
                             <tr>
-                                <th class="col-name">Name</th>
-                                <th class="col-qty">Qty</th>
-                                <th class="col-total">Total</th>
+                                <th>รายการ</th>
+                                <th>จำนวน</th>
+                                <th>ราคา</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach items="${orderDetails}" var="item">
                                 <c:if test="${item.priceAtTimeOfOrder > 1.0}">
                                     <tr>
-                                        <td class="col-name">${item.menufood.foodname}</td> 
-                                        <td class="col-qty">${item.quantity}</td>
-                                        <td class="col-total">
-                                            <fmt:formatNumber value="${item.priceAtTimeOfOrder * item.quantity}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                        <td class="item-name">${item.menufood.foodname}</td> 
+                                        <td class="item-qty">${item.quantity}</td>
+                                        <td class="item-price">
+                                            ฿<fmt:formatNumber value="${item.priceAtTimeOfOrder * item.quantity}" type="number" minFractionDigits="2" maxFractionDigits="2" />
                                         </td>
                                     </tr>
                                 </c:if>
                             </c:forEach>
                         </tbody>
                     </table>
-                </div>
         
-                <div class="receipt-total">
-                    <span class="label">รวมทั้งสิ้น</span>
-                    <span class="amount">
-                        <fmt:formatNumber value="${totalPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
-                    </span>
-                </div>
-        
-                <div class="receipt-actions">
-                    <c:if test="${isPaid}">
-                        <div class="paid-status">
-                            <i class="fas fa-check-circle"></i> ชำระเงินเรียบร้อยแล้ว
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span class="total-label">รวมทั้งสิ้น</span>
+                            <span class="total-amount">
+                                ฿<fmt:formatNumber value="${totalPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                            </span>
                         </div>
-                        <a href="backToPastBills" class="action-btn btn-confirm">กลับไปหน้ารายการบิล</a>
-                    </c:if>
-                    <c:if test="${!isPaid}">
-                        <form action="processFinalPayment" method="POST" style="display: contents;">
-                            <input type="hidden" name="orderId" value="${orderInfo.oderId}">
-                            <button type="submit" class="action-btn btn-confirm">เช็คบิล</button>
-                        </form>
-                        <a href="backToListOrder" class="action-btn btn-cancel">ยกเลิก</a>
-                    </c:if>
+                    </div>
+        
+                    <div class="actions">
+                        <c:if test="${isPaid}">
+                            <a href="backToPastBills" class="btn btn-primary">กลับไปหน้ารายการบิล</a>
+                        </c:if>
+                        <c:if test="${!isPaid}">
+                            <form action="processFinalPayment" method="POST" style="flex: 1;">
+                                <input type="hidden" name="orderId" value="${orderInfo.oderId}">
+                                <button type="submit" class="btn btn-success" style="width: 100%;">ยืนยันชำระเงิน</button>
+                            </form>
+                            <a href="backToListOrder" class="btn btn-outline">ยกเลิก</a>
+                        </c:if>
+                    </div>
+
                 </div>
 
             </c:when>
             
             <c:otherwise>
                 <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-circle"></i>
                     <h3>ไม่พบข้อมูลออเดอร์</h3>
                     <p>กรุณาตรวจสอบเลขที่ออเดอร์อีกครั้ง</p>
-                    <div class="receipt-actions">
-                        <a href="welcomeCashier.jsp" class="action-btn btn-cancel">กลับหน้าหลัก</a>
-                    </div>
+                    <a href="welcomeCashier.jsp" class="btn btn-primary" style="max-width: 200px; margin: 0 auto;">กลับหน้าหลัก</a>
                 </div>
             </c:otherwise>
         </c:choose>
