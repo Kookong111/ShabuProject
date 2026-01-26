@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ใบเสร็จชำระเงิน - ShaBu Restaurant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <style>
         * {
@@ -17,18 +17,8 @@
             font-family: 'Kanit', sans-serif;
         }
 
-        :root {
-            --primary: #6366f1;
-            --success: #10b981;
-            --danger: #ef4444;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-600: #4b5563;
-            --gray-900: #111827;
-        }
-
         body {
-            background: var(--gray-50);
+            background: #f5f5f5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -37,95 +27,131 @@
         }
 
         .receipt-container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
             width: 100%;
-            max-width: 480px;
-            overflow: hidden;
+            max-width: 420px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .receipt-header {
-            background: linear-gradient(135deg, var(--primary), #8b5cf6);
-            color: white;
-            padding: 2rem 1.5rem;
+            background: #ffffff;
+            padding: 2rem 1.5rem 1rem;
             text-align: center;
+            border-bottom: 2px dashed #e0e0e0;
         }
 
-        .receipt-header i {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
+        .restaurant-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.5px;
         }
 
-        .receipt-header h1 {
-            font-size: 1.25rem;
-            font-weight: 500;
+        .restaurant-subtitle {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .receipt-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            margin-top: 1rem;
+        }
+
+        .receipt-info-item {
+            text-align: left;
+        }
+
+        .receipt-info-item:last-child {
+            text-align: right;
+        }
+
+        .receipt-info-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 0.25rem;
         }
 
-        .receipt-header .order-id {
-            font-size: 0.875rem;
-            opacity: 0.9;
-            font-weight: 300;
+        .receipt-info-value {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            font-weight: 600;
         }
 
-        .order-date {
+        .receipt-body {
+            padding: 1.5rem 1.5rem 2rem;
+        }
+
+        .paid-status {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 0.875rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            margin-top: 1rem;
-            font-size: 0.875rem;
-            opacity: 0.95;
         }
 
-        .receipt-body {
-            padding: 1.5rem;
+        .paid-status i {
+            color: #16a34a;
+            font-size: 1.125rem;
+        }
+
+        .paid-status span {
+            color: #16a34a;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .items-section {
+            margin-bottom: 1.5rem;
         }
 
         .items-table {
             width: 100%;
-            margin-bottom: 1.5rem;
+            border-collapse: collapse;
         }
 
-        .items-table thead {
-            border-bottom: 2px solid var(--gray-100);
-        }
-
-        .items-table th {
-            padding: 0.75rem 0.5rem;
+        .items-table thead th {
+            padding: 0.625rem 0.5rem;
             text-align: left;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-600);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #888;
             text-transform: uppercase;
-            letter-spacing: 0.025em;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e0e0e0;
         }
 
-        .items-table th:last-child,
-        .items-table td:last-child {
+        .items-table thead th:nth-child(2) {
+            text-align: center;
+            width: 50px;
+        }
+
+        .items-table thead th:last-child {
             text-align: right;
         }
 
-        .items-table th:nth-child(2),
-        .items-table td:nth-child(2) {
-            text-align: center;
-            width: 60px;
-        }
-
-        .items-table tbody tr {
-            border-bottom: 1px solid var(--gray-100);
-        }
-
-        .items-table tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        .items-table td {
-            padding: 1rem 0.5rem;
+        .items-table tbody td {
+            padding: 0.875rem 0.5rem;
             font-size: 0.95rem;
-            color: var(--gray-900);
+            color: #1a1a1a;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .items-table tbody tr:last-child td {
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .item-name {
@@ -133,68 +159,89 @@
         }
 
         .item-qty {
-            color: var(--gray-600);
+            text-align: center;
+            color: #666;
+            font-weight: 400;
         }
 
         .item-price {
+            text-align: right;
             font-weight: 600;
-            color: var(--gray-900);
+            color: #1a1a1a;
         }
 
-        .total-section {
-            background: var(--gray-50);
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
+        .summary-section {
+            padding: 1rem 0;
+            border-bottom: 2px dashed #e0e0e0;
         }
 
-        .total-row {
+        .summary-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .summary-label {
+            font-size: 0.95rem;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .summary-value {
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .total-row {
+            padding-top: 1rem;
+            margin-top: 0.5rem;
         }
 
         .total-label {
             font-size: 1.125rem;
-            font-weight: 500;
-            color: var(--gray-900);
+            color: #1a1a1a;
+            font-weight: 700;
         }
 
         .total-amount {
             font-size: 1.75rem;
-            font-weight: 600;
-            color: var(--primary);
+            color: #1a1a1a;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        .paid-badge {
-            background: linear-gradient(135deg, var(--success), #059669);
-            color: white;
-            padding: 1rem;
-            border-radius: 12px;
+        .payment-info {
+            padding: 1.5rem 0 0;
             text-align: center;
-            margin-bottom: 1.5rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
         }
 
-        .paid-badge i {
-            font-size: 1.25rem;
+        .payment-info-text {
+            font-size: 0.875rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+
+        .thank-you {
+            font-size: 1rem;
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-top: 1rem;
         }
 
         .actions {
             display: flex;
             gap: 0.75rem;
+            margin-top: 2rem;
         }
 
         .btn {
             flex: 1;
             padding: 0.875rem;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 500;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
             text-align: center;
             text-decoration: none;
             border: none;
@@ -203,37 +250,36 @@
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: #1a1a1a;
             color: white;
+            border: 2px solid #1a1a1a;
         }
 
         .btn-primary:hover {
-            background: #4f46e5;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            background: #333;
+            border-color: #333;
         }
 
         .btn-success {
-            background: var(--success);
+            background: #16a34a;
             color: white;
+            border: 2px solid #16a34a;
         }
 
         .btn-success:hover {
-            background: #059669;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            background: #15803d;
+            border-color: #15803d;
         }
 
         .btn-outline {
             background: white;
-            color: var(--danger);
-            border: 1.5px solid var(--danger);
+            color: #dc2626;
+            border: 2px solid #dc2626;
         }
 
         .btn-outline:hover {
-            background: var(--danger);
+            background: #dc2626;
             color: white;
-            transform: translateY(-1px);
         }
 
         .empty-state {
@@ -242,22 +288,38 @@
         }
 
         .empty-state i {
-            font-size: 3.5rem;
-            color: var(--gray-600);
+            font-size: 3rem;
+            color: #ccc;
             margin-bottom: 1rem;
-            opacity: 0.5;
         }
 
         .empty-state h3 {
-            color: var(--gray-900);
-            font-weight: 500;
+            color: #1a1a1a;
+            font-weight: 600;
             margin-bottom: 0.5rem;
             font-size: 1.25rem;
         }
 
         .empty-state p {
-            color: var(--gray-600);
+            color: #666;
             margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .receipt-container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            .actions {
+                display: none;
+            }
         }
 
         @media (max-width: 480px) {
@@ -266,11 +328,11 @@
             }
 
             .receipt-header {
-                padding: 1.5rem 1rem;
+                padding: 1.5rem 1rem 0.75rem;
             }
 
             .receipt-body {
-                padding: 1rem;
+                padding: 1.25rem 1rem 1.5rem;
             }
 
             .total-amount {
@@ -287,55 +349,76 @@
             <c:when test="${not empty orderInfo and not empty orderDetails}">
                 
                 <div class="receipt-header">
-                    <i class="fas fa-receipt"></i>
-                    <h1>โต๊ะ TA${orderInfo.table.tableid}</h1>
-                    <div class="order-id">เลขที่ใบเสร็จ O${orderInfo.oderId}</div>
-                    <div class="order-date">
-                        <i class="fas fa-calendar-alt"></i>
-                        <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy" />
+                    <div class="restaurant-name">SHABU RESTAURANT</div>
+                    <div class="restaurant-subtitle">ใบเสร็จรับเงิน / Receipt</div>
+                    
+                    <div class="receipt-info">
+                        <div class="receipt-info-item">
+                            <div class="receipt-info-label">โต๊ะ / Table</div>
+                            <div class="receipt-info-value">TA${orderInfo.table.tableid}</div>
+                        </div>
+                        <div class="receipt-info-item">
+                            <div class="receipt-info-label">เลขที่ / No.</div>
+                            <div class="receipt-info-value">O${orderInfo.oderId}</div>
+                        </div>
+                        <div class="receipt-info-item">
+                            <div class="receipt-info-label">วันที่ / Date</div>
+                            <div class="receipt-info-value">
+                                <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy" />
+                            </div>
+                        </div>
                     </div>
                 </div>
         
                 <div class="receipt-body">
                     
                     <c:if test="${isPaid}">
-                        <div class="paid-badge">
+                        <div class="paid-status">
                             <i class="fas fa-check-circle"></i>
                             <span>ชำระเงินเรียบร้อยแล้ว</span>
                         </div>
                     </c:if>
 
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th>รายการ</th>
-                                <th>จำนวน</th>
-                                <th>ราคา</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${orderDetails}" var="item">
-                                <c:if test="${item.priceAtTimeOfOrder > 1.0}">
-                                    <tr>
-                                        <td class="item-name">${item.menufood.foodname}</td> 
-                                        <td class="item-qty">${item.quantity}</td>
-                                        <td class="item-price">
-                                            ฿<fmt:formatNumber value="${item.priceAtTimeOfOrder * item.quantity}" type="number" minFractionDigits="2" maxFractionDigits="2" />
-                                        </td>
-                                    </tr>
-                                </c:if>
-                            </c:forEach>
-                        </tbody>
-                    </table>
+                    <div class="items-section">
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>รายการ</th>
+                                    <th>จำนวน</th>
+                                    <th>ราคา</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${orderDetails}" var="item">
+                                    <c:if test="${item.priceAtTimeOfOrder > 1.0}">
+                                        <tr>
+                                            <td class="item-name">${item.menufood.foodname}</td> 
+                                            <td class="item-qty">${item.quantity}</td>
+                                            <td class="item-price">
+                                                ฿<fmt:formatNumber value="${item.priceAtTimeOfOrder * item.quantity}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
         
-                    <div class="total-section">
-                        <div class="total-row">
-                            <span class="total-label">รวมทั้งสิ้น</span>
+                    <div class="summary-section">
+                        <div class="summary-row total-row">
+                            <span class="total-label">ยอดรวมทั้งสิ้น</span>
                             <span class="total-amount">
                                 ฿<fmt:formatNumber value="${totalPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
                             </span>
                         </div>
                     </div>
+
+                    <c:if test="${isPaid}">
+                        <div class="payment-info">
+                            <div class="payment-info-text">ชำระเงินเรียบร้อยแล้ว</div>
+                            <div class="thank-you">ขอบคุณที่ใช้บริการ</div>
+                        </div>
+                    </c:if>
         
                     <div class="actions">
                         <c:if test="${isPaid}">
