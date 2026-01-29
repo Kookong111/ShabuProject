@@ -152,7 +152,7 @@
                             <td><fmt:formatNumber value="${bill.totalPrice}" pattern="#,##0.00"/> บาท</td>
                             <td>${bill.employees.empname}</td>
                             <td>ออเดอร์ #${bill.orders.oderId} (โต๊ะ ${bill.orders.table.tableid})</td>
-                            <td><a href="checkbill-page?orderId=${bill.orders.oderId}" class="view-slip-btn">ดูสลิป</a></td>
+                            <td><a href="checkbill-page?orderId=${bill.orders.oderId}&amp;from=manager" class="view-slip-btn">ดูสลิป</a></td>
                         </tr>
                     </c:forEach>
                 </tbody>

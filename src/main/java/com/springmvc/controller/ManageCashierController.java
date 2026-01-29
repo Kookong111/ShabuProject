@@ -232,7 +232,8 @@ public class ManageCashierController {
      * 3. ส่งข้อมูลทั้งสองส่วน (และราคารวม) ไปยังหน้า paymentReceipt.jsp
      */
     @RequestMapping(value = "/checkbill-page", method = RequestMethod.GET)
-    public ModelAndView showPaymentReceipt(@RequestParam("orderId") String orderId) {
+    public ModelAndView showPaymentReceipt(@RequestParam("orderId") String orderId,
+            @RequestParam(value = "from", required = false) String from) {
 
         ModelAndView mav = new ModelAndView("paymentReceipt"); // 1. กำหนดหน้าปลายทางคือ paymentReceipt.jsp
         CashierManager manager = new CashierManager();
@@ -262,6 +263,13 @@ public class ManageCashierController {
                 mav.addObject("orderDetails", new ArrayList<OrderDetail>());
                 mav.addObject("totalPrice", 0.0);
             }
+
+            // กำหนดปลายทางสำหรับปุ่ม "กลับไปหน้ารายการบิล"
+            String returnTo = "backToPastBills"; // default for cashier
+            if ("manager".equalsIgnoreCase(from)) {
+                returnTo = "backToPastBillsManager";
+            }
+            mav.addObject("returnTo", returnTo);
 
         } catch (Exception e) {
             e.printStackTrace();

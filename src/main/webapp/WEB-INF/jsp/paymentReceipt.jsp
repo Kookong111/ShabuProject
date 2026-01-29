@@ -422,7 +422,14 @@
         
                     <div class="actions">
                         <c:if test="${isPaid}">
-                            <a href="backToPastBills" class="btn btn-primary">กลับไปหน้ารายการบิล</a>
+                            <c:choose>
+                                <c:when test="${not empty returnTo}">
+                                    <a href="${returnTo}" class="btn btn-primary">กลับไปหน้ารายการบิล</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="backToPastBills" class="btn btn-primary">กลับไปหน้ารายการบิล</a>
+                                </c:otherwise>
+                            </c:choose>
                         </c:if>
                         <c:if test="${!isPaid}">
                             <form action="processFinalPayment" method="POST" style="flex: 1;">
