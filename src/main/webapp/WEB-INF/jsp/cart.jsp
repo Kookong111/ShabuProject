@@ -484,6 +484,21 @@
 
 </div>
 
+<script>
+// ===== Scroll Position Save/Restore =====
+// Save scroll position before unload
+window.addEventListener('beforeunload', function() {
+    sessionStorage.setItem('cart_scrollY', window.scrollY);
+});
+// Restore scroll position after load
+window.addEventListener('load', function() {
+    const y = sessionStorage.getItem('cart_scrollY');
+    if (y !== null) {
+        window.scrollTo(0, parseInt(y, 10));
+    }
+});
+</script>
+
 </body>
 
 </html>

@@ -304,25 +304,20 @@ public ModelAndView viewmenu(HttpSession session,
     @RequestMapping(value = "/updateQuantity", method = RequestMethod.POST)
     public ModelAndView updateQuantity(HttpSession session, 
                                        @RequestParam("foodId") int foodId, 
-                                       @RequestParam("action") String action) {
-        
+                                       @RequestParam("action") String action,
+                                       @RequestParam(value = "from", required = false) String from) {
         String sessionTableId = (String) session.getAttribute("tableId");
         Integer sessionOrderId = (Integer) session.getAttribute("orderId");
-        
         if (sessionTableId == null || sessionOrderId == null) {
             return new ModelAndView("redirect:/viewmenu", "error", "⚠️ กรุณาสแกน QR Code โต๊ะเพื่อเริ่มสั่งอาหาร");
         }
-        
         Cart cart = getCartFromSession(session);
         Map<Integer, CartItem> items = cart.getItems();
-        
         CartItem item = items.get(foodId);
         if (item == null) {
             return new ModelAndView("redirect:/viewCart", "error", "ไม่พบรายการอาหารในตะกร้า"); 
         }
-
         int currentQty = item.getQuantity();
-
         if ("increase".equals(action)) {
             item.setQuantity(currentQty + 1);
         } else if ("decrease".equals(action)) {
@@ -333,9 +328,11 @@ public ModelAndView viewmenu(HttpSession session,
                 item.setQuantity(currentQty);
             }
         }
-        
         updateCartTotalItems(session, cart);
-
+        // Redirect logic: ถ้ามี from=orderfoodCuatomer ให้กลับไปหน้า orderfoodCuatomer.jsp
+        if (from != null && from.equals("orderfoodCuatomer")) {
+            return new ModelAndView("redirect:/viewmenu");
+        }
         return new ModelAndView("redirect:/viewCart");
     }
     

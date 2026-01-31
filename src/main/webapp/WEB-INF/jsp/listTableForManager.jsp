@@ -546,26 +546,28 @@
                 deleteBtn.style.pointerEvents = 'none';
                 
                 fetch('deleteTable', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/x-www-form-urlencoded' 
-                    },
-                    body: 'empusername=' + encodeURIComponent(tableid)
-                })
-                .then(response => response.text())
-                .then(() => {
-                    // Add fade out animation before reload
-                    const card = deleteBtn.closest('.table-card');
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(-20px)';
-                    setTimeout(() => location.reload(), 300);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    deleteBtn.innerHTML = originalContent;
-                    deleteBtn.style.pointerEvents = 'auto';
-                    alert('เกิดข้อผิดพลาดในการลบโต๊ะ กรุณาลองใหม่อีกครั้ง');
-                });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'empusername=' + encodeURIComponent(tableid)
+})
+.then(response => response.text())
+.then(data => {
+    if (data.trim() === "success") {
+        // ถ้า Backend ส่ง success กลับมา ค่อยทำ Animation และ Reload
+        const card = deleteBtn.closest('.table-card');
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(-20px)';
+        setTimeout(() => location.reload(), 300);
+    } else {
+        throw new Error("Delete failed on server");
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+    deleteBtn.innerHTML = originalContent;
+    deleteBtn.style.pointerEvents = 'auto';
+    alert('เกิดข้อผิดพลาดในการลบโต๊ะ หรือระบบไม่ตอบสนอง');
+});
             }
         }
 

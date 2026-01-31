@@ -1,3 +1,4 @@
+
 package com.springmvc.model;
 
 import java.util.ArrayList;
@@ -28,21 +29,23 @@ public class FoodITemManager {
         return list;
     }
 	public FoodType findFoodTypeById(String id) {
-        Session session = null;
-        FoodType foodType = null;
-        try {
-            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-            session = sessionFactory.openSession();
-            foodType = session.get(FoodType.class, id);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close(); 
-            }
+    Session session = null;
+    FoodType foodType = null;
+    try {
+        // แปลงจาก String เป็น int เพื่อให้ตรงกับ Primary Key ใน DB
+        int foodtypeIdInt = Integer.parseInt(id); 
+        SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+        session = sessionFactory.openSession();
+        foodType = session.get(FoodType.class, foodtypeIdInt);
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    } finally {
+        if (session != null) {
+            session.close(); 
         }
-        return foodType;
     }
+    return foodType;
+}
 	public FoodType getFoodTypeByName(String foodtypeName) {
 	    Session session = null;
 	    try {
@@ -163,6 +166,34 @@ public class FoodITemManager {
         return false;  // ถ้าบันทึกไม่สำเร็จ return false
 }
     
-    
-
+    public boolean insertFoodType(FoodType type) {
+    Session session = null;
+    try {
+        SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+        
+        // บันทึกประเภทอาหารใหม่
+        session.save(type);
+        
+        session.getTransaction().commit();
+        return true;
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        return false;
+    } finally {
+        if (session != null) session.close();
+    }
+}
+    public boolean deleteFoodType(FoodType type) {
+        try (Session session = HibernateConnection.doHibernateConnection().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.delete(type);
+            tx.commit();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
 }

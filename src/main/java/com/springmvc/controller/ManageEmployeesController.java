@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.springmvc.model.Employee;
 import com.springmvc.model.LoginManager;
@@ -78,27 +79,18 @@ public class ManageEmployeesController {
     
     
     
-    @RequestMapping(value = "/deleteEmployeeWaiter", method = RequestMethod.POST)  //*************ลบพนักงานเสริฟ*************
-    public ModelAndView delUserWaiter(@RequestParam("empusername") String username) {
-        LoginManager rm = new LoginManager();
-        Employee reg = rm.getEmployeeByUsername(username);
+    @RequestMapping(value = "/deleteEmployeeWaiter", method = RequestMethod.POST)
+@ResponseBody // เพิ่มเพื่อให้ส่ง text กลับไปหา JavaScript ตรงๆ
+public String delUserWaiter(@RequestParam("empusername") String username) {
+    LoginManager rm = new LoginManager();
+    Employee reg = rm.getEmployeeByUsername(username);
 
-        if (reg != null) {
-            rm.deleteEmployee(reg);
-        }
-
-        List<Employee> list = rm.getAllWaiter();
-        
-        ModelAndView mav = new ModelAndView("listWaiter");
-        
-        mav.addObject("deleted","ลบสำเร็จ" );
-
-        if (list.isEmpty()) {
-            mav.addObject("error_msg", "ยังไม่มีคนลงทะเบียน");
-        }
-
-        return mav;
+    if (reg != null) {
+        rm.deleteEmployee(reg);
+        return "success"; // ส่งข้อความยืนยัน
     }
+    return "fail";
+}
     
     @RequestMapping(value = "/geteditWaiter", method = RequestMethod.GET)//**************ดึงข้อมูลพนักงานเสริฟเพื่อแก้ไข*****************
     public ModelAndView getedit(HttpServletRequest request) {

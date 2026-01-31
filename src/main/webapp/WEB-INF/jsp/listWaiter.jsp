@@ -334,16 +334,23 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function deleteEmployeeCashier(empUsername) {
-            if (confirm('คุณต้องการลบพนักงานคนนี้หรือไม่?')) {
-                fetch('deleteEmployeeCashier', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'empusername=' + encodeURIComponent(empUsername)
-                }).then(response => response.text())
-                  .then(() => location.reload());
+       // เปลี่ยนชื่อ function ให้ตรงกับที่ปุ่มเรียก (deleteEmployeeWaiter)
+function deleteEmployeeWaiter(empUsername) { 
+    if (confirm('คุณต้องการลบพนักงานเสริฟคนนี้หรือไม่?')) {
+        fetch('deleteEmployeeWaiter', { // ตรวจสอบ URL Mapping ให้ถูกต้อง
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            // ต้องส่งเป็น empusername (ตัวพิมพ์เล็กหมด) ตามที่ @RequestParam ใน Java กำหนด
+            body: 'empusername=' + encodeURIComponent(empUsername) 
+        }).then(response => {
+            if(response.ok) {
+                location.reload();
+            } else {
+                alert('ไม่สามารถลบข้อมูลได้');
             }
-        }
+        });
+    }
+}
     </script>
 
 </body>

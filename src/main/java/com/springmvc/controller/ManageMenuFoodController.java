@@ -1,3 +1,4 @@
+
 package com.springmvc.controller;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ManageMenuFoodController {
     public ModelAndView ListAllMenuFood(HttpSession session) {
         FoodITemManager manager = new FoodITemManager();
         List<MenuFood> menufood = manager.getAllFoodItem();
+        List<FoodType> foodTypes = manager.getAllFoodTypes();
         ModelAndView mav = new ModelAndView("listMenuFood");
 
         session.setAttribute("listmenuFood", menufood);
@@ -31,6 +33,7 @@ public class ManageMenuFoodController {
             mav.addObject("error_message", "รายการว่างเปล่า");
         }
         mav.addObject("add_result2", "ทำรายการสำเร็จ");
+        mav.addObject("foodTypes", foodTypes); // ส่งประเภทอาหารไป JSP
         return mav;
     }
 
@@ -195,4 +198,35 @@ public class ManageMenuFoodController {
 
     }
 
+    @RequestMapping(value = "/addFoodType", method = RequestMethod.POST)
+public ModelAndView addFoodType(@RequestParam("foodtypeName") String name, 
+                               @RequestParam("description") String desc) {
+    
+    FoodITemManager manager = new FoodITemManager();
+    FoodType newType = new FoodType();
+    newType.setFoodtypeName(name);
+    newType.setDescription(desc);
+
+    // บันทึกลงฐานข้อมูล
+    boolean result = manager.insertFoodType(newType); 
+
+    // เมื่อเสร็จแล้วให้กลับไปหน้า ListAllMenuFood
+    ModelAndView mav = new ModelAndView("redirect:/ListAllMenuFood");
+    
+    if (result) {
+        mav.addObject("add_result2", "เพิ่มประเภทอาหารสำเร็จ");
+    } else {
+        mav.addObject("error_message", "ไม่สามารถเพิ่มประเภทอาหารได้");
+    }
+    return mav;
+}
+    @RequestMapping(value = "/deleteFoodType", method = RequestMethod.POST)
+    public ModelAndView deleteFoodType(@RequestParam("foodtypeId") String foodtypeId) {
+        FoodITemManager manager = new FoodITemManager();
+        FoodType type = manager.findFoodTypeById(foodtypeId);
+        if (type != null) {
+            manager.deleteFoodType(type);
+        }
+        return new ModelAndView("redirect:/ListAllMenuFood");
+    }
 }

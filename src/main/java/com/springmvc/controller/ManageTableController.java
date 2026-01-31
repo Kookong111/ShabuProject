@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -127,26 +128,19 @@ public class ManageTableController {
         return mav;
     }
     
-    @RequestMapping(value = "/deleteTable", method = RequestMethod.POST)  //*************ลบพนักงานเสริฟ*************
-    public ModelAndView deleteTable(@RequestParam("empusername") String tables) {
-    	TableManager rm = new TableManager();
-        Tables reg = rm.getTableById(tables);
+    @RequestMapping(value = "/deleteTable", method = RequestMethod.POST)
+    @ResponseBody // เพิ่ม @ResponseBody เพื่อส่งข้อความกลับไปตรงๆ ไม่ผ่านหน้า JSP
+    public String deleteTable(@RequestParam("empusername") String tables) {
+    TableManager rm = new TableManager();
+    Tables reg = rm.getTableById(tables);
 
-        if (reg != null) {
-            rm.deleteTable(reg);
+    if (reg != null) {
+        boolean isDeleted = rm.deleteTable(reg);
+        if (isDeleted) {
+            return "success"; // ส่งข้อความยืนยันกลับไป
         }
-
-        List<Tables> list = rm.getAllTable();
-        
-        ModelAndView mav = new ModelAndView("listTable");
-        
-        mav.addObject("deleted","ลบสำเร็จ" );
-
-        if (list.isEmpty()) {
-            mav.addObject("error_msg", "ยังไม่มีคนลงทะเบียน");
-        }
-
-        return mav;
+    }
+    return "fail";
     }
     
     @RequestMapping(value = "/generateQrForTable", method = RequestMethod.GET)

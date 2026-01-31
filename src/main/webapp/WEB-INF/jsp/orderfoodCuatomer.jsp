@@ -571,6 +571,7 @@
                                                     <form action="updateQuantity" method="post" style="display:inline;">
                                                         <input type="hidden" name="foodId" value="${menu.foodId}" />
                                                         <input type="hidden" name="action" value="decrease" />
+                                                        <input type="hidden" name="from" value="orderfoodCuatomer" />
                                                         <button type="submit" class="qty-btn">
                                                             <i class="fas fa-minus"></i>
                                                         </button>
@@ -687,6 +688,19 @@
                 setTimeout(() => successMessage.remove(), 500);
             }, 3000);
         }
+
+        // ===== Scroll Position Save/Restore =====
+        // Save scroll position before unload
+        window.addEventListener('beforeunload', function() {
+            sessionStorage.setItem('orderfood_scrollY', window.scrollY);
+        });
+        // Restore scroll position after load
+        window.addEventListener('load', function() {
+            const y = sessionStorage.getItem('orderfood_scrollY');
+            if (y !== null) {
+                window.scrollTo(0, parseInt(y, 10));
+            }
+        });
     </script>
 </body>
 </html>

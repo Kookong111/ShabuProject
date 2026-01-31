@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class MenuFood {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int foodId;
 	
 	@Column(nullable = false, length = 255)
