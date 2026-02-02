@@ -668,10 +668,11 @@
             if (foodSearchInput) foodSearchInput.addEventListener('input', filterMenu);
             filterMenu();
         });
-        // Loading effect
-        
+        // Loading effect + Save scroll position
         document.querySelectorAll('.container form').forEach(form => {
             form.addEventListener('submit', function(e) {
+                // เก็บ scroll position ก่อน submit
+                sessionStorage.setItem('orderfood_scrollY', window.scrollY);
                 document.querySelector('.container').classList.add('loading');
             });
         });
