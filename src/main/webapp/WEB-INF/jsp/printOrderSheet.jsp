@@ -52,28 +52,32 @@
             <p><strong>วันที่:</strong> <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy" /></p>
             <div class="info-block"></div>
         <c:if test="${not empty orderDetails}">
-            <h3>รายการอาหารเริ่มต้น:</h3>
+            <h3>รายการอาหารที่สั่ง:</h3>
             <table class="order-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th style="text-align: center;">Qty</th>
-                        <th class="text-right">Total</th>
+                        <th>ชื่อเมนู</th>
+                        <th style="text-align: center;">จำนวน</th>
+                        <th class="text-right">ราคา/หน่วย</th>
+                        <th class="text-right">รวม</th>
                     </tr>
                 </thead>
                 <tbody>
                     <c:set var="subtotal" value="0" />
                     <c:forEach var="detail" items="${orderDetails}">
-                        <c:set var="itemTotal" value="${detail.quantity * detail.priceAtTimeOfOrder}" />
-                        <c:set var="subtotal" value="${subtotal + itemTotal}" />
-                        <tr>
-                            <td>${detail.menufood.foodname}</td>
-                            <td style="text-align: center;">${detail.quantity}</td>
-                            <td class="text-right">฿<fmt:formatNumber value="${itemTotal}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
-                        </tr>
+                        <c:if test="${detail.priceAtTimeOfOrder > 0}">
+                            <c:set var="itemTotal" value="${detail.quantity * detail.priceAtTimeOfOrder}" />
+                            <c:set var="subtotal" value="${subtotal + itemTotal}" />
+                            <tr>
+                                <td>${detail.menufood.foodname}</td>
+                                <td style="text-align: center;">${detail.quantity}</td>
+                                <td class="text-right">฿<fmt:formatNumber value="${detail.priceAtTimeOfOrder}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
+                                <td class="text-right">฿<fmt:formatNumber value="${itemTotal}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
+                            </tr>
+                        </c:if>
                     </c:forEach>
                     <tr class="total-row">
-                        <td colspan="2" style="text-align: right;">ยอดสุทธิ:</td>
+                        <td colspan="3" style="text-align: right;">ยอดรวม:</td>
                         <td class="text-right">฿<fmt:formatNumber value="${subtotal}" type="number" minFractionDigits="2" maxFractionDigits="2" /></td>
                     </tr>
                 </tbody>
