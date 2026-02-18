@@ -274,6 +274,13 @@
 <body>
 
     <div class="table-container">
+
+        <c:if test="${not empty error_message}">
+            <div class="error-message" style="color: #ef4444; text-align: center; margin-bottom: 20px; font-weight: 600;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error_message}
+            </div>
+        </c:if>
+
         <div class="header-section">
             <div class="title-section">
                 <h2><i class="bi bi-cash-stack me-3"></i>รายชื่อพนักงานแคชเชียร์</h2>
@@ -319,11 +326,12 @@
                     </c:forEach>
                 </tbody>
             </table>
+            <c:if test="${not empty error_message}">
+                <div class="error-message" style="color: #ef4444; text-align: center; margin-top: 20px; font-weight: 600;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error_message}
+                </div>
+            </c:if>
         </div>
-
-        <c:if test="${not empty error_message}">
-            <div class="error-message">${error_message}</div>
-        </c:if>
 
         <div class="back-link-container">
             <a href="backmain" class="back-link">
@@ -334,18 +342,26 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function deleteEmployeeCashier(empUsername) {
-            if (confirm('คุณต้องการลบพนักงานคนนี้หรือไม่?')) {
-                fetch('deleteEmployeeCashier', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'empusername=' + encodeURIComponent(empUsername)
-                }).then(response => response.text())
-                  .then(() => location.reload());
-            }
-        }
+      function deleteEmployeeCashier(empUsername) {
+    if (confirm('คุณต้องการลบพนักงานคนนี้หรือไม่?')) {
+        // สร้างฟอร์มจำลองเพื่อส่งค่า POST ไปหา Controller
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'deleteEmployeeCashier';
+
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'empusername';
+        input.value = empUsername;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit(); // สั่งรีเฟรชหน้าและส่งค่าไปลบ
+    }
+}
     </script>
 
 </body>
 
 </html>
+

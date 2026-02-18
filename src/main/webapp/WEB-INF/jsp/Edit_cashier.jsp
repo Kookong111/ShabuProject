@@ -170,6 +170,13 @@
                 margin-bottom: 10px;
             }
         }
+        input[readonly] {
+        background-color: #e9ecef !important;
+        color: #000000 !important; /* ไอดีดำสนิทชัดเจน [cite: 179] */
+        font-weight: 700 !important; /* ตัวหนา [cite: 180] */
+        border: 2px solid var(--primary-purple) !important; /* เน้นขอบ [cite: 176] */
+        cursor: not-allowed;
+    }
     </style>
 </head>
 <body>
@@ -183,39 +190,47 @@
                 <div class="error-message">${error_result}</div>
             </c:if>
         </div>
-        <form name="frm1" action="confirmEditCashier" method="post">
-            <div class="mb-3">
-                <label for="empUsername" class="form-label"><i class="fas fa-user"></i>ชื่อผู้ใช้งาน</label>
-                <input type="text" class="form-control" id="empUsername" name="empUsername" value="${cashier.empUsername}" readonly>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label"><i class="fas fa-lock"></i>รหัสผ่าน</label>
-                <input type="text" class="form-control" id="password" name="password" value="${cashier.empPassword}">
-            </div>
-            <div class="mb-3">
-                <label for="empname" class="form-label"><i class="fas fa-id-card"></i>ชื่อ - นามสกุล</label>
-                <input type="text" class="form-control" id="empname" name="empname" value="${cashier.empname}">
-            </div>
-            <div class="mb-3">
-                <label for="age" class="form-label"><i class="fas fa-calendar"></i>อายุ</label>
-                <input type="number" class="form-control" id="age" name="age" value="${cashier.age}">
-            </div>
-            <div class="mb-3">
-                <label for="position" class="form-label"><i class="fas fa-briefcase"></i>ตำแหน่ง</label>
-                <select class="form-control form-control-select" id="position" name="position">
-                    <option <c:if test="${cashier.position == 'แคชเชียร์'}">selected</c:if>>แคชเชียร์</option>
-                    <option <c:if test="${cashier.position == 'พนักงานเสริฟ์'}">selected</c:if>>พนักงานเสริฟ์</option>
-                </select>
-            </div>
-            <div class="d-flex justify-content-between gap-2">  
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> บันทึก
-                </button>
-                <button type="reset" class="btn btn-secondary">
-                    <i class="fas fa-undo"></i> รีเซ็ต
-                </button>
-            </div>
-        </form>
+        <form name="frm1" action="confirmEditCashier" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="empUsername" class="form-label"><i class="fas fa-user"></i>ชื่อผู้ใช้งาน (ไอดีพนักงาน)</label>
+        <input type="text" class="form-control" id="empUsername" name="empUsername" value="${cashier.empUsername}" readonly>
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label"><i class="fas fa-lock"></i>รหัสผ่าน</label>
+        <input type="password" class="form-control" id="password" name="password" value="${cashier.empPassword}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="empname" class="form-label"><i class="fas fa-id-card"></i>ชื่อ - นามสกุล</label>
+        <input type="text" class="form-control" id="empname" name="empname" value="${cashier.empname}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="age" class="form-label"><i class="fas fa-calendar"></i>วันเกิด</label>
+        <input type="date" class="form-control" id="age" name="age" value="${cashier.age}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label"><i class="fas fa-briefcase"></i>ตำแหน่ง</label>
+        <div class="form-control-plaintext" style="background: #f8fafc; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border); font-weight: 600;">
+            แคชเชียร์
+        </div>
+        <input type="hidden" name="position" value="แคชเชียร์">
+    </div>
+
+    <div class="mb-3">
+        <label for="url" class="form-label"><i class="fas fa-image"></i>เปลี่ยนรูปภาพพนักงาน</label>
+        <input type="file" class="form-control" id="url" name="url" accept="image/*">
+        <small class="text-muted">* หากไม่ต้องการเปลี่ยนรูปภาพ ให้เว้นว่างไว้</small>
+        <input type="hidden" name="oldImageUrl" value="${cashier.image}">
+    </div>
+
+    <div class="d-flex justify-content-between gap-2">  
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> บันทึก</button>
+        <button type="reset" class="btn btn-secondary"><i class="fas fa-undo"></i> รีเซ็ต</button>
+    </div>
+</form>
         <hr>
         <div class="form-links">
             <a href="listcashier"><i class="fas fa-arrow-left"></i> กลับหน้าหลัก</a>

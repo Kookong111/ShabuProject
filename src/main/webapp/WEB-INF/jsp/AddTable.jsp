@@ -159,12 +159,19 @@
 </head>
 <body>
     <div class="form-container">
-        <h2><i class="fas fa-table"></i> เพิ่มโต๊ะ</h2>
-        <c:if test="${not empty add_result2}">
-            <div class="result-message">
-                <div class="success-message">${add_result2}</div>
-            </div>
-        </c:if>
+       <h2><i class="fas fa-table"></i> เพิ่มโต๊ะ</h2>
+    
+    <c:if test="${not empty add_result2}">
+        <div class="alert alert-success text-center">
+            <strong><i class="fas fa-check-circle"></i> ${add_result2}</strong>
+        </div>
+    </c:if>
+
+    <c:if test="${not empty error_message}">
+        <div class="alert alert-danger text-center">
+            <strong><i class="fas fa-exclamation-triangle"></i> ${error_message}</strong>
+        </div>
+    </c:if>
         <form action="Add_Table" method="post">
             <div class="mb-3">
                 <label for="tablenumber" class="form-label"><i class="fas fa-hashtag"></i>หมายเลขโต๊ะ</label>
@@ -172,7 +179,7 @@
             </div>
             <div class="mb-3">
                 <label for="capacity" class="form-label"><i class="fas fa-users"></i>ความจุ</label>
-                <input type="number" class="form-control" id="capacity" name="capacity" required>
+                <input type="number" class="form-control" id="capacity" name="capacity" max="10" required>
             </div>
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-check-circle"></i>สถานะโต๊ะ</label>

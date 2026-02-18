@@ -207,7 +207,13 @@ height: 50%; border-radius: 8px;" />
         </div>
     </c:if>
 </div>
-
+<div class="mb-3">
+    <label for="status" class="form-label">สถานะอาหาร</label>
+    <select class="form-control form-control-select" id="status" name="status">
+        <option value="พร้อมเสิร์ฟ" <c:if test="${menu.status == 'พร้อมเสิร์ฟ'}">selected</c:if>>พร้อมเสิร์ฟ</option>
+        <option value="หมด" <c:if test="${menu.status == 'หมด'}">selected</c:if>>หมด</option>
+    </select>
+</div>
 
 			 <div class="mb-3">
                 <label for="type" class="form-label">ประเภท</label>

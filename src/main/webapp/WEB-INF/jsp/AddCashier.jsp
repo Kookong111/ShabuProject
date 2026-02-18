@@ -152,11 +152,17 @@
     <div class="form-container">
         <h2><i class="fas fa-user-plus"></i> เพิ่มพนักงานแคชเชียร์</h2>
         <c:if test="${not empty add_result2}">
-            <div class="result-message">
-                <div class="success-message">${add_result2}</div>
-            </div>
-        </c:if>
-        <form action="Add_Cashier" method="post">
+        <div class="result-message">
+            <div class="success-message">${add_result2}</div>
+        </div>
+    </c:if>
+
+    <c:if test="${not empty error}">
+        <div class="result-message">
+            <div class="error-message">${error}</div> 
+        </div>
+    </c:if>
+        <form action="Add_Cashier" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="empusername" class="form-label"><i class="fas fa-user"></i>ชื่อผู้ใช้งาน</label>
                 <input type="text" class="form-control" id="empusername" name="empusername" required>
@@ -170,19 +176,16 @@
                 <input type="text" class="form-control" id="empname" name="empname" required>
             </div>
             <div class="mb-3">
-                <label for="age" class="form-label"><i class="fas fa-calendar"></i>อายุ</label>
-                <input type="number" class="form-control" id="age" name="age" required>
+                <label for="age" class="form-label"><i class="fas fa-calendar"></i>วันเกิด</label>
+                <input type="date" class="form-control" id="age" name="age" required>
             </div>
             <div class="mb-3">
                 <label for="position" class="form-label"><i class="fas fa-briefcase"></i>ตำแหน่ง</label>
-                <select class="form-control form-control-select" id="position" name="position">
-                    <option>แคชเชียร์</option>
-                    <option>พนักงานเสริฟ์</option>
-                </select>
+                <input type="text" class="form-control" id="position" name="position" value="แคชเชียร์" readonly required>
             </div>
             <div class="mb-3">
-                <label for="url" class="form-label"><i class="fas fa-image"></i>URL รูปภาพ</label>
-                <input type="url" class="form-control" id="url" name="url" required>
+                <label for="url" class="form-label"><i class="fas fa-image"></i>เลือกรูปภาพ</label>
+                <input type="file" class="form-control" id="url" name="url" accept="image/*" required>
             </div>
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-plus-circle"></i> เพิ่มพนักงาน

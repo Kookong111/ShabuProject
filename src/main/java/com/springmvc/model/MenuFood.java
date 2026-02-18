@@ -3,8 +3,7 @@ package com.springmvc.model;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -15,7 +14,6 @@ import javax.persistence.Table;
 public class MenuFood {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int foodId;
 	
 	@Column(nullable = false, length = 255)
@@ -28,8 +26,11 @@ public class MenuFood {
 	private String foodImage;
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "foodtypeId", nullable = false)
+	@JoinColumn(name = "foodtypeId", nullable = false)
 	private FoodType foodtype;
+
+	@Column(nullable = false, length = 50)
+	private String status; // สถานะอาหาร เช่น "พร้อมเสิร์ฟ", "หมด"
 	
 	public MenuFood() {
 		super();
@@ -43,6 +44,17 @@ public class MenuFood {
 		this.price = price;
 		this.foodImage = foodImage;
 		this.foodtype = foodtype;
+		this.status = "พร้อมเสิร์ฟ"; // default
+	}
+
+	public MenuFood(int foodId, String foodname, double price, String foodImage, FoodType foodtype, String status) {
+		super();
+		this.foodId = foodId;
+		this.foodname = foodname;
+		this.price = price;
+		this.foodImage = foodImage;
+		this.foodtype = foodtype;
+		this.status = status;
 	}
 
 	public int getFoodId() {
@@ -83,6 +95,14 @@ public class MenuFood {
 
 	public void setFoodtype(FoodType foodtype) {
 		this.foodtype = foodtype;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	
