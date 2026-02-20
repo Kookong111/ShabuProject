@@ -48,46 +48,69 @@ public class ManageMenuFoodController {
     }
 
     @RequestMapping(value = "/Add_MenuFood", method = RequestMethod.POST)
-    public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        FoodITemManager foodManager = new FoodITemManager();
-        FoodITemManager rm = new FoodITemManager();
+public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    
+    FoodITemManager foodManager = new FoodITemManager();
 
-        // รับค่าจาก form
-        String url = request.getParameter("url");
-        String foodname = request.getParameter("foodname");
-        String prices = request.getParameter("price");
-        String type = request.getParameter("type"); // ชื่อประเภท เช่น "อาหาร", "เครื่องดื่ม" เป็นต้น
+   
+    String url = request.getParameter("url");
+    String foodname = request.getParameter("foodname");
+    String prices = request.getParameter("price");
+    String type = request.getParameter("type");
+    String status = request.getParameter("status"); 
 
-        // ค้นหา FoodType จากชื่อ
-        FoodType foodType = foodManager.getFoodTypeByName(type);
-        if (foodType == null) {
-            ModelAndView mav = new ModelAndView("AddMenuFood");
-            mav.addObject("error", "ไม่พบประเภทอาหารที่เลือก");
-            return mav;
-        }
+   
+    FoodType foodType = foodManager.getFoodTypeByName(type);
+    
+    
+    ModelAndView mav = new ModelAndView("AddMenuFood");
 
-        // สร้าง MenuFood
+    // ตรวจสอบว่าพบประเภทอาหารหรือไม่
+    if (foodType == null) {
+        mav.addObject("error", "ไม่พบประเภทอาหารที่เลือกในระบบ");
+       
+        mav.addObject("foodTypes", foodManager.getAllFoodTypes()); 
+        return mav;
+    }
+
+    try {
+      
         MenuFood menus = new MenuFood();
         menus.setFoodImage(url);
         menus.setFoodname(foodname);
         menus.setPrice(Double.parseDouble(prices));
-        menus.setFoodtype(foodType); // เชื่อม FoodType ที่ดึงมา
-
-        // บันทึก
-        boolean result = rm.insertMenuFood(menus);
-
-        ModelAndView mav = new ModelAndView("AddMenuFood");
-        if (result) {
-            mav.addObject("add_result", "ทำรายการสำเร็จ");
+        menus.setFoodtype(foodType); 
+        
+        // กำหนดสถานะอาหารที่รับมาจากหน้าจอ
+        if (status != null && !status.isEmpty()) {
+            menus.setStatus(status);
         } else {
-            mav.addObject("error", "ไม่สามารถบันทึกข้อมูลได้");
+            menus.setStatus("พร้อมเสิร์ฟ"); // ค่า Default กรณีไม่ได้ส่งค่ามา
         }
 
-        List<FoodType> foodTypes = foodManager.getAllFoodTypes(); // ดึงจาก DB
-        mav.addObject("foodTypes", foodTypes); // ส่งให้ JSP
+      
+        boolean result = foodManager.insertMenuFood(menus);
 
-        return mav;
+        if (result) {
+            mav.addObject("add_result", "เพิ่มเมนูอาหารเรียบร้อยแล้ว");
+        } else {
+            mav.addObject("error", "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+        }
+        
+    } catch (NumberFormatException e) {
+        mav.addObject("error", "กรุณาระบุราคาเป็นตัวเลขที่ถูกต้อง");
+        e.printStackTrace();
+    } catch (Exception e) {
+        mav.addObject("error", "เกิดข้อผิดพลาด: " + e.getMessage());
+        e.printStackTrace();
     }
+
+   
+    List<FoodType> foodTypes = foodManager.getAllFoodTypes();
+    mav.addObject("foodTypes", foodTypes);
+
+    return mav;
+}
 
     @RequestMapping(value = "/geteditMenufood", method = RequestMethod.GET)
     public ModelAndView geteditTable(HttpServletRequest request) {
@@ -111,69 +134,69 @@ public class ManageMenuFoodController {
         return mav;
     }
 
-    @RequestMapping(value = "/confirmEditMenuFood", method = RequestMethod.POST)
-    public ModelAndView confirmEditMenuFood(HttpServletRequest request) {
-        FoodITemManager rm = new FoodITemManager();
-        List<FoodType> foodTypes = rm.getAllFoodTypes(); // 👈 ดึงรายการประเภทอาหารทั้งหมดล่วงหน้า
+   @RequestMapping(value = "/confirmEditMenuFood", method = RequestMethod.POST)
+public ModelAndView confirmEditMenuFood(HttpServletRequest request) {
+    FoodITemManager rm = new FoodITemManager();
+    List<FoodType> foodTypes = rm.getAllFoodTypes(); 
 
-        String foodIdStr = request.getParameter("foodId");
-        String url = request.getParameter("foodImage");
-        String foodname = request.getParameter("foodname");
-        String prices = request.getParameter("price");
-        String type = request.getParameter("type");
+    // 1. รับค่าพารามิเตอร์ (รวม Status ที่เพิ่มเข้ามา)
+    String foodIdStr = request.getParameter("foodId");
+    String url = request.getParameter("foodImage");
+    String foodname = request.getParameter("foodname");
+    String prices = request.getParameter("price");
+    String type = request.getParameter("type");
+    String status = request.getParameter("status"); // 👈 รับค่า Status จากฟอร์มแก้ไข
 
-        ModelAndView mav = new ModelAndView("Edit_MenuFood");
-        mav.addObject("foodTypes", foodTypes); // 👈 ส่งรายการประเภทอาหารไปที่ ModelAndView ทันที
+    ModelAndView mav = new ModelAndView("Edit_MenuFood");
+    mav.addObject("foodTypes", foodTypes); 
 
-        MenuFood menuToDisplay = null; // Object ที่จะถูกส่งกลับไปให้ JSP
+    MenuFood menuToDisplay = null; 
 
-        try {
-            int foodId = Integer.parseInt(foodIdStr);
-            double price = Double.parseDouble(prices);
+    try {
+        int foodId = Integer.parseInt(foodIdStr);
+        double price = Double.parseDouble(prices);
 
-            // หา foodType จากชื่อ
-            FoodType foodType = rm.getFoodTypeByName(type);
-            if (foodType == null) {
-                // หากหาประเภทอาหารไม่พบ ให้โหลดข้อมูลเดิมกลับมาแสดง
-                menuToDisplay = rm.getMenuFoodeById(foodIdStr);
-                mav.addObject("menu", menuToDisplay != null ? menuToDisplay : new MenuFood());
-                mav.addObject("error_result", "ประเภทอาหารไม่ถูกต้อง");
-                return mav;
-            }
-
-            // สร้างวัตถุใหม่เพื่อทำการ update
-            MenuFood rest = new MenuFood();
-            rest.setFoodId(foodId);
-            rest.setFoodImage(url);
-            rest.setFoodname(foodname);
-            rest.setPrice(price);
-            rest.setFoodtype(foodType);
-            
-            menuToDisplay = rest; // ใช้ Object ที่กำลังจะถูกบันทึก/อัปเดต
-
-            boolean result = rm.updateMenuFood(rest);
-            
-            if (result) {
-                mav.addObject("add_result", "บันทึกสำเร็จ");
-            } else {
-                mav.addObject("error_result", "ไม่สามารถบันทึกได้");
-            }
-        } catch (Exception e) {
-            mav.addObject("error_result", "เกิดข้อผิดพลาด: " + e.getMessage());
-            e.printStackTrace();
-            // หากเกิด Exception ให้โหลดข้อมูลเดิมกลับมาแสดง
-            if (menuToDisplay == null) {
-                 menuToDisplay = rm.getMenuFoodeById(foodIdStr);
-            }
+        // หา foodType จากชื่อ
+        FoodType foodType = rm.getFoodTypeByName(type);
+        if (foodType == null) {
+            menuToDisplay = rm.getMenuFoodeById(foodIdStr);
+            mav.addObject("menu", menuToDisplay != null ? menuToDisplay : new MenuFood());
+            mav.addObject("error_result", "ประเภทอาหารไม่ถูกต้อง");
+            return mav;
         }
+
+        // 2. สร้างวัตถุใหม่เพื่อทำการ update และกำหนดค่า Status
+        MenuFood rest = new MenuFood();
+        rest.setFoodId(foodId);
+        rest.setFoodImage(url);
+        rest.setFoodname(foodname);
+        rest.setPrice(price);
+        rest.setFoodtype(foodType);
+        rest.setStatus(status); // 👈 นำ Status ที่รับมาใส่ใน Object
         
-        // ***************************************************************
-        // ส่วนสำคัญ: ต้องส่ง MenuFood object กลับไปเสมอ
-        // ***************************************************************
-        mav.addObject("menu", menuToDisplay != null ? menuToDisplay : new MenuFood());
+        menuToDisplay = rest; 
+
+        // 3. ทำการ Update ลงฐานข้อมูล
+        boolean result = rm.updateMenuFood(rest);
         
-        return mav;
+        if (result) {
+            mav.addObject("add_result", "บันทึกสำเร็จ");
+        } else {
+            mav.addObject("error_result", "ไม่สามารถบันทึกได้");
+        }
+    } catch (Exception e) {
+        mav.addObject("error_result", "เกิดข้อผิดพลาด: " + e.getMessage());
+        e.printStackTrace();
+        if (menuToDisplay == null) {
+             menuToDisplay = rm.getMenuFoodeById(foodIdStr);
+        }
     }
+    
+    // ส่ง MenuFood object กลับไปเสมอ เพื่อให้หน้า JSP แสดงข้อมูลล่าสุดที่แก้ไข
+    mav.addObject("menu", menuToDisplay != null ? menuToDisplay : new MenuFood());
+    
+    return mav;
+}
 
     @RequestMapping(value = "/deleteMenuFood", method = RequestMethod.POST)
     public ModelAndView deleteMenuFood(@RequestParam("deleteMenuFood") String menu) {
@@ -199,13 +222,12 @@ public class ManageMenuFoodController {
     }
 
     @RequestMapping(value = "/addFoodType", method = RequestMethod.POST)
-public ModelAndView addFoodType(@RequestParam("foodtypeName") String name, 
-                               @RequestParam("description") String desc) {
+    public ModelAndView addFoodType(@RequestParam("foodtypeName") String name) {
     
     FoodITemManager manager = new FoodITemManager();
     FoodType newType = new FoodType();
     newType.setFoodtypeName(name);
-    newType.setDescription(desc);
+    
 
     // บันทึกลงฐานข้อมูล
     boolean result = manager.insertFoodType(newType); 

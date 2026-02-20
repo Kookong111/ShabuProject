@@ -9,14 +9,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import java.io.ByteArrayOutputStream;
+
+
 import java.io.IOException;
 
-import com.springmvc.model.LoginManager;
 import com.springmvc.model.QrCodeGenerator;
 import com.springmvc.model.TableManager;
 import com.springmvc.model.Tables;
@@ -54,41 +50,43 @@ public class ManageTableController {
     }
     
     
-    @RequestMapping(value = "/Add_Table", method = RequestMethod.POST)  //***********AddTableร์************
-    public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	TableManager rm = new TableManager();
+    @RequestMapping(value = "/Add_Table", method = RequestMethod.POST)
+public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    TableManager rm = new TableManager();
 
-        // ดึงข้อมูลจากฟอร์ม
-        String tablenumber = request.getParameter("tablenumber");
-        String capacity = request.getParameter("capacity");
-        String status = request.getParameter("status");
+    // ดึงข้อมูลจากฟอร์ม
+    String tablenumber = request.getParameter("tablenumber");
+    String capacity = request.getParameter("capacity");
+    String status = request.getParameter("status");
 
-       
+    ModelAndView mav = new ModelAndView("AddTable");
 
-        // สร้าง  Object
-        Tables tables = new Tables();
-        tables.setTableid(tablenumber);
-        tables.setCapacity(capacity);
-        tables.setStatus(status);
-
-
-        // บันทึกผู้ใช้ในฐานข้อมูล
-        boolean result = rm.insertTable(tables);
-
-        if (result) {
-     
-            ModelAndView mav = new ModelAndView("AddTable");
-            mav.addObject("add_result2", "ทำรายการสำเร็จ");
-            return mav;
-            
-        } else {
-            // หากบันทึกไม่สำเร็จ, แสดงข้อความข้อผิดพลาด
-            ModelAndView mav = new ModelAndView("AddTable");
-            mav.addObject("error", "ไม่สามารถบันทึกข้อมูลได้");
-            return mav;
-        }
-        
+    // --- ส่วนที่เพิ่ม: ตรวจสอบหมายเลขโต๊ะซ้ำ ---
+    Tables existingTable = rm.getTableById(tablenumber); 
+    if (existingTable != null) {
+        // หากพบว่ามีหมายเลขโต๊ะนี้อยู่แล้ว ให้แจ้งเตือนทันที
+        mav.addObject("error_message", "เพิ่มข้อมูลล้มเหลว: หมายเลขโต๊ะ " + tablenumber + " มีอยู่ในระบบแล้ว");
+        return mav;
     }
+    // ---------------------------------------
+
+    // สร้าง Object
+    Tables tables = new Tables();
+    tables.setTableid(tablenumber);
+    tables.setCapacity(capacity);
+    tables.setStatus(status);
+
+    // บันทึกในฐานข้อมูล
+    boolean result = rm.insertTable(tables);
+
+    if (result) {
+        mav.addObject("add_result2", "ทำรายการสำเร็จ");
+    } else {
+        mav.addObject("error_message", "ไม่สามารถบันทึกข้อมูลได้");
+    }
+    
+    return mav;
+}
     
     @RequestMapping(value = "/geteditTable", method = RequestMethod.GET)//************ดึงข้อมูลโต๊ะพื่อไปยังหน้าedit************
     public ModelAndView geteditTable(HttpServletRequest request) {

@@ -173,6 +173,12 @@
                 margin-bottom: 10px;
             }
         }
+        input[readonly] {
+        background-color: #e9ecef !important;
+        color: #212529 !important; /* เพิ่มความเข้มของตัวหนังสือ */
+        font-weight: 700 !important; /* เพิ่มความหนา */
+        cursor: not-allowed;
+    }
     </style>
 </head>
 
@@ -190,44 +196,51 @@
             </c:if>
         </div>
 
-        <form name="frm1" action="confirmWaiter" method="post">
-            <div class="mb-3">
-                <label for="empUsername" class="form-label"><i class="fas fa-user"></i>ชื่อผู้ใช้งาน</label>
-                <input type="text" class="form-control" id="empUsername" name="empUsername" value="${waiter.empUsername}" readonly>
-            </div>
+        <form name="frm1" action="confirmWaiter" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="empUsername" class="form-label"><i class="fas fa-user"></i>ชื่อผู้ใช้งาน (ไอดีพนักงาน)</label>
+        <input type="text" class="form-control" id="empUsername" name="empUsername" 
+               value="${waiter.empUsername}" 
+               style="background-color: #e9ecef !important; color: #000 !important; font-weight: 700 !important;" readonly>
+    </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label"><i class="fas fa-lock"></i>รหัสผ่าน</label>
-                <input type="text" class="form-control" id="password" name="password" value="${waiter.empPassword}">
-            </div>
+    <div class="mb-3">
+        <label for="password" class="form-label"><i class="fas fa-lock"></i>รหัสผ่าน</label>
+        <input type="password" class="form-control" id="password" name="password" 
+               value="${waiter.empPassword}" required>
+    </div>
 
-            <div class="mb-3">
-                <label for="empname" class="form-label"><i class="fas fa-id-card"></i>ชื่อ - นามสกุล</label>
-                <input type="text" class="form-control" id="empname" name="empname" value="${waiter.empname}">
-            </div>
+    <div class="mb-3">
+        <label for="empname" class="form-label"><i class="fas fa-id-card"></i>ชื่อ - นามสกุล</label>
+        <input type="text" class="form-control" id="empname" name="empname" 
+               value="${waiter.empname}" required>
+    </div>
 
-            <div class="mb-3">
-                <label for="age" class="form-label"><i class="fas fa-calendar"></i>อายุ</label>
-                <input type="number" class="form-control" id="age" name="age" value="${waiter.age}">
-            </div>
+    <div class="mb-3">
+        <label for="age" class="form-label"><i class="fas fa-calendar"></i>วันเกิด</label>
+        <input type="date" class="form-control" id="age" name="age" 
+               value="${waiter.age}" required>
+    </div>
 
-            <div class="mb-3">
-                <label for="position" class="form-label"><i class="fas fa-briefcase"></i>ตำแหน่ง</label>
-                <select class="form-control form-control-select" id="position" name="position">
-                    <option <c:if test="${waiter.position == 'พนักงานเสริฟ์'}">selected</c:if>>พนักงานเสริฟ์</option>
-                    <option <c:if test="${waiter.position == 'แคชเชียร์'}">selected</c:if>>แคชเชียร์</option>
-                </select>
-            </div>
+    <div class="mb-3">
+        <label class="form-label"><i class="fas fa-briefcase"></i>ตำแหน่ง</label>
+        <div class="form-control-plaintext" style="background: #f8fafc; padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; font-weight: 600;">
+            พนักงานเสิร์ฟ
+        </div>
+        <input type="hidden" name="position" value="พนักงานเสิร์ฟ">
+    </div>
 
-            <div class="d-flex justify-content-between gap-2">  
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> บันทึก
-                </button>
-                <button type="reset" class="btn btn-secondary">
-                    <i class="fas fa-undo"></i> รีเซ็ต
-                </button>
-            </div>
-        </form>
+    <div class="mb-3">
+        <label for="url" class="form-label"><i class="fas fa-image"></i>เปลี่ยนรูปภาพพนักงาน</label>
+        <input type="file" class="form-control" id="url" name="url" accept="image/*">
+        <input type="hidden" name="oldImageUrl" value="${waiter.image}">
+    </div>
+
+    <div class="d-flex justify-content-between gap-2">  
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> บันทึกการแก้ไข</button>
+        <button type="reset" class="btn btn-secondary"><i class="fas fa-undo"></i> รีเซ็ต</button>
+    </div>
+</form>
 
         <hr>
 

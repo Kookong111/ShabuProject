@@ -192,13 +192,13 @@
 
         <form name="frm1" action="confirmEditTable" method="post">
             <div class="mb-3">
-                <label for="tableid" class="form-label"><i class="fas fa-hashtag"></i>หมายเลขโต๊ะ</label>
-                <input type="text" class="form-control" id="tableid" name="tableid" value="${table.tableid}">
+                <label for="tableid" class="form-label"><i class="fas fa-hashtag"></i>หมายเลขโต๊ะ <span style="color:#ef4444;font-weight:bold;">(ไม่สามารถแก้ไขได้)</span></label>
+                <input type="text" class="form-control bg-light border border-danger" id="tableid" name="tableid" value="${table.tableid}" readonly style="font-weight:bold;color:#ef4444;">
             </div>
 
             <div class="mb-3">
-                <label for="capacity" class="form-label"><i class="fas fa-users"></i>ความจุ</label>
-                <input type="number" class="form-control" id="capacity" name="capacity" value="${table.capacity}">
+                <label for="capacity" class="form-label"><i class="fas fa-users"></i>ความจุ <span style="color:#10b981;font-weight:bold;">(สูงสุด 10)</span></label>
+                <input type="number" class="form-control border border-success" id="capacity" name="capacity" value="${table.capacity}" min="1" max="10" style="font-weight:bold;color:#10b981;">
             </div>
             
             <div class="mb-3">

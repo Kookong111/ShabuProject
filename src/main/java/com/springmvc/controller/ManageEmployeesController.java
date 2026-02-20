@@ -6,34 +6,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.springmvc.model.Employee;
 import com.springmvc.model.LoginManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import java.io.File;
 @Controller
 public class ManageEmployeesController {
 	@RequestMapping(value = "/deleteEmployeeCashier", method = RequestMethod.POST) //************ลบแคชเชียร์***************
-    public ModelAndView delUserCashier(@RequestParam("empusername") String username) {
-        LoginManager rm = new LoginManager();
-        Employee reg = rm.getEmployeeByUsername(username);
-
-        if (reg != null) {
+public ModelAndView delUserCashier(@RequestParam("empusername") String username) {
+    LoginManager rm = new LoginManager();
+    Employee reg = rm.getEmployeeByUsername(username);
+    ModelAndView mav = new ModelAndView("listCashier");
+    String errorMsg = null;
+    if (reg != null) {
+        try {
             rm.deleteEmployee(reg);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            errorMsg = "ไม่สามารถลบได้ เนื่องจากข้อมูลพนักงานคนนี้ถูกใช้งานอยู่ในส่วนอื่นของระบบ";
         }
-
-        List<Employee> list = rm.getAllCashier();
-        ModelAndView mav = new ModelAndView("listCashier");
-        mav.addObject("list", list);
-
-        if (list.isEmpty()) {
-            mav.addObject("error_msg", "ยังไม่มีคนลงทะเบียน");
-        }
-
-        return mav;
+    } else {
+        errorMsg = "ไม่พบข้อมูลพนักงานที่ต้องการลบ";
     }
+    List<Employee> list = rm.getAllCashier();
+    mav.addObject("listl2", list);
+    if (errorMsg != null) {
+        mav.addObject("error_message", errorMsg);
+    } else if (list.isEmpty()) {
+        mav.addObject("error_message", "ยังไม่มีคนลงทะเบียน");
+    }
+    return mav;
+}
     
     @RequestMapping(value = "/geteditcashier", method = RequestMethod.GET)//************ดึงข้อมูลแคชเชียร์เพื่อไปยังหน้าedit************
     public ModelAndView geteditCashier(HttpServletRequest request) {
@@ -52,29 +59,46 @@ public class ManageEmployeesController {
         return mav;
     }
     
-    @RequestMapping(value="/confirmEditCashier", method=RequestMethod.POST)//*********ยืนยันการแก้ไขแคชเชียร์***************
-    public ModelAndView confirmEditCashier(HttpServletRequest request) {
-        LoginManager rm= new LoginManager();
-        String empUsername = request.getParameter("empUsername");
-        String password = request.getParameter("password");
-        String empname = request.getParameter("empname");
-        String age = request.getParameter("age");
-        String position = request.getParameter("position");
-        String imgurl = request.getParameter("position");
+    @RequestMapping(value="/confirmEditCashier", method=RequestMethod.POST)
+public ModelAndView confirmEditCashier(
+        @RequestParam("empUsername") String empUsername,
+        @RequestParam("password") String password,
+        @RequestParam("empname") String empname,
+        @RequestParam("age") String age,
+        @RequestParam("position") String position,
+        @RequestParam("url") MultipartFile file, // รับไฟล์จาก input type="file"
+        @RequestParam("oldImageUrl") String oldImageUrl, // รับชื่อรูปเดิม
+        HttpServletRequest request) {
+    
+    LoginManager rm = new LoginManager();
+    String fileName = oldImageUrl; // ใช้ชื่อเดิมไว้ก่อน
 
-        Employee rest = new Employee(empUsername, password, empname, age,position,imgurl);
-        boolean result = rm.updateEmployee(rest);
-
-        ModelAndView mav = new ModelAndView("Edit_cashier"); // View ยังคงเป็น Edit_cashier
-        mav.addObject("cashier", rest); // **ส่ง Employee object กลับไปในชื่อ "cashier" เสมอ**
-
-        if(result) {
-            mav.addObject("add_result","บันทึกสำเร็จ"); 
-        }else {
-            mav.addObject("edit_result","ไม่สามารถบันทึกได้"); 
+    // ถ้ามีการเลือกไฟล์ใหม่มาให้ทำการอัปโหลด
+    if (file != null && !file.isEmpty()) {
+        try {
+            fileName = file.getOriginalFilename();
+            String uploadPath = request.getServletContext().getRealPath("/") + "resources" + File.separator + "images" + File.separator;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
+            file.transferTo(new File(uploadPath + fileName));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return mav;
     }
+
+    Employee rest = new Employee(empUsername, password, empname, age, position, fileName);
+    boolean result = rm.updateEmployee(rest);
+
+    ModelAndView mav = new ModelAndView("Edit_cashier");
+    mav.addObject("cashier", rest);
+
+    if(result) {
+        mav.addObject("add_result", "บันทึกสำเร็จ");
+    } else {
+        mav.addObject("error_result", "ไม่สามารถบันทึกได้");
+    }
+    return mav;
+}
 
     
     
@@ -109,29 +133,46 @@ public String delUserWaiter(@RequestParam("empusername") String username) {
         return mav;
     }
     
-    @RequestMapping(value="/confirmWaiter", method=RequestMethod.POST)//***************ยืนยันการแก้ไขพนักงานเสริฟ*************
-    public ModelAndView confirmEdit(HttpServletRequest request) {
-        LoginManager rm= new LoginManager();
-        String empUsername = request.getParameter("empUsername");
-        String password = request.getParameter("password");
-        String empname = request.getParameter("empname");
-        String age = request.getParameter("age");
-        String position = request.getParameter("position");
-        String imgurl = request.getParameter("position");
+    @RequestMapping(value="/confirmWaiter", method=RequestMethod.POST)
+public ModelAndView confirmEdit(
+        @RequestParam("empUsername") String empUsername,
+        @RequestParam("password") String password,
+        @RequestParam("empname") String empname,
+        @RequestParam("age") String age,
+        @RequestParam("position") String position,
+        @RequestParam("url") MultipartFile file,
+        @RequestParam("oldImageUrl") String oldImageUrl,
+        HttpServletRequest request) {
+    
+    LoginManager rm = new LoginManager();
+    String fileName = oldImageUrl; // ใช้ชื่อไฟล์เดิมเป็นค่าเริ่มต้น
 
-        Employee rest = new Employee(empUsername, password, empname, age,position,imgurl);
-        boolean result = rm.updateEmployee(rest);
-
-        ModelAndView mav = new ModelAndView("Edit_waiter"); // View ยังคงเป็น Edit_cashier
-        mav.addObject("waiter", rest); // **ส่ง Employee object กลับไปในชื่อ "cashier" เสมอ**
-
-        if(result) {
-            mav.addObject("add_result","บันทึกสำเร็จ"); // ข้อความสำเร็จ
-        }else {
-            mav.addObject("error_result","ไม่สามารถบันทึกได้"); // ข้อความล้มเหลว
+    // จัดการไฟล์รูปภาพใหม่หากมีการอัปโหลด
+    if (file != null && !file.isEmpty()) {
+        try {
+            fileName = file.getOriginalFilename();
+            String uploadPath = request.getServletContext().getRealPath("/") + "resources" + File.separator + "images" + File.separator;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
+            file.transferTo(new File(uploadPath + fileName));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return mav;
     }
+
+    Employee rest = new Employee(empUsername, password, empname, age, position, fileName);
+    boolean result = rm.updateEmployee(rest);
+
+    ModelAndView mav = new ModelAndView("Edit_waiter");
+    mav.addObject("waiter", rest);
+
+    if(result) {
+        mav.addObject("add_result", "บันทึกสำเร็จ");
+    } else {
+        mav.addObject("error_result", "ไม่สามารถบันทึกได้");
+    }
+    return mav;
+}
     
     @RequestMapping(value = "/listwaiter", method = RequestMethod.GET)//************ข้อมูลพนักงานเสริฟ**************
     public ModelAndView listwaiter(HttpSession session) {
@@ -174,86 +215,95 @@ public String delUserWaiter(@RequestParam("empusername") String username) {
     }
 
  // จัดการการสมัครสมาชิก
-    @RequestMapping(value = "/Add_Cashier", method = RequestMethod.POST)  //***********เพิ่มแคชเชียร์************
-    public ModelAndView registerUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	LoginManager rm = new LoginManager();
+   @RequestMapping(value = "/Add_Cashier", method = RequestMethod.POST)
+public ModelAndView registerUser(
+        @RequestParam("empusername") String username,
+        @RequestParam("password") String password,
+        @RequestParam("empname") String fullname,
+        @RequestParam("age") String age,
+        @RequestParam("position") String position,
+        @RequestParam("url") MultipartFile file, // รับไฟล์รูปภาพ
+        HttpServletRequest request) {
 
-        // ดึงข้อมูลจากฟอร์ม
-        String username = request.getParameter("empusername");
-        String password = request.getParameter("password");
-        String fullname = request.getParameter("empname");
-        String age = request.getParameter("age");
-        String position = request.getParameter("position");
-        String url = request.getParameter("url");
+    LoginManager rm = new LoginManager();
 
-
-        // สร้าง Register Object
-        Employee user = new Employee();
-        user.setEmpUsername(username);
-        user.setEmpPassword(password);
-        user.setEmpname(fullname);
-        user.setAge(age);
-        user.setPosition(position);
-        user.setImage(url);
-
-
-        // บันทึกผู้ใช้ในฐานข้อมูล
-        boolean result = rm.insertEmployee(user);
-
-        if (result) {
-     
-            ModelAndView mav = new ModelAndView("AddCashier");
-            mav.addObject("add_result2", "ทำรายการสำเร็จ");
-            return mav;
-            
-        } else {
-            // หากบันทึกไม่สำเร็จ, แสดงข้อความข้อผิดพลาด
-            ModelAndView mav = new ModelAndView("AddCashier");
-            mav.addObject("error", "ไม่สามารถบันทึกข้อมูลได้");
-            return mav;
-        }
-        
+    // 1. เช็ค ID ซ้ำ
+    Employee exist = rm.getEmployeeByUsername(username);
+    if (exist != null) {
+        ModelAndView mav = new ModelAndView("AddCashier");
+        mav.addObject("error", "เพิ่มข้อมูลไม่ได้ เนื่องจากมีข้อมูลของพนักงานคนนี้อยู่แล้ว"); // แจ้งเตือนตามที่ต้องการ
+        return mav;
     }
+
+    // 2. จัดการบันทึกไฟล์รูปภาพ
+    String fileName = file.getOriginalFilename();
+    try {
+        if (!file.isEmpty()) {
+            String uploadPath = request.getServletContext().getRealPath("/") + "resources" + File.separator + "images" + File.separator;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs(); // สร้าง folder resources/images
+            file.transferTo(new File(uploadPath + fileName));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    // 3. บันทึกลงฐานข้อมูล
+    Employee user = new Employee(username, password, fullname, age, position, fileName);
+    boolean result = rm.insertEmployee(user);
+
+    ModelAndView mav = new ModelAndView("AddCashier");
+    if (result) {
+        mav.addObject("add_result2", "ทำรายการสำเร็จ");
+    } else {
+        mav.addObject("error", "ไม่สามารถบันทึกข้อมูลได้");
+    }
+    return mav;
+}
     
-    @RequestMapping(value = "/Add_Waiter", method = RequestMethod.POST)  //*********เพิ่มพนักงานเสริฟ**********
-    public ModelAndView registerUsers(HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	LoginManager rm = new LoginManager();
+    @RequestMapping(value = "/Add_Waiter", method = RequestMethod.POST)
+public ModelAndView registerUsers(
+        @RequestParam("empusername") String username,
+        @RequestParam("password") String password,
+        @RequestParam("empname") String fullname,
+        @RequestParam("age") String age,
+        @RequestParam("position") String position,
+        @RequestParam("url") MultipartFile file, // เปลี่ยนเป็นรับไฟล์รูปภาพ
+        HttpServletRequest request) {
 
-        // ดึงข้อมูลจากฟอร์ม
-        String username = request.getParameter("empusername");
-        String password = request.getParameter("password");
-        String fullname = request.getParameter("empname");
-        String age = request.getParameter("age");
-        String position = request.getParameter("position");
-        String url = request.getParameter("url");
+    LoginManager rm = new LoginManager();
 
-
-        // สร้าง Register Object
-        Employee user = new Employee();
-        user.setEmpUsername(username);
-        user.setEmpPassword(password);
-        user.setEmpname(fullname);
-        user.setAge(age);
-        user.setPosition(position);
-        user.setImage(url);
-
-
-        // บันทึกผู้ใช้ในฐานข้อมูล
-        boolean result = rm.insertEmployee(user);
-
-        if (result) {
-            // หากบันทึกสำเร็จ, ส่งไปยัง login.jsp
-           //response.sendRedirect("login");//
-            ModelAndView mav = new ModelAndView("AddWaiter");
-            mav.addObject("add_result", "ทำรายการสำเร็จ");
-            return mav;
-            
-        } else {
-            // หากบันทึกไม่สำเร็จ, แสดงข้อความข้อผิดพลาด
-            ModelAndView mav = new ModelAndView("AddWaiter");
-            mav.addObject("error", "ไม่สามารถบันทึกข้อมูลได้");
-            return mav;
-        }
-        
+    // 1. เช็ค ID พนักงานซ้ำ
+    Employee exist = rm.getEmployeeByUsername(username);
+    if (exist != null) {
+        ModelAndView mav = new ModelAndView("AddWaiter");
+        mav.addObject("error", "เพิ่มข้อมูลไม่ได้ เนื่องจากมีข้อมูลของพนักงานคนนี้อยู่แล้ว");
+        return mav;
     }
+
+    // 2. จัดการบันทึกไฟล์รูปภาพลง Folder resources/images
+    String fileName = file.getOriginalFilename();
+    try {
+        if (!file.isEmpty()) {
+            String uploadPath = request.getServletContext().getRealPath("/") + "resources" + File.separator + "images" + File.separator;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdirs();
+            file.transferTo(new File(uploadPath + fileName));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    // 3. บันทึกลงฐานข้อมูล
+    Employee user = new Employee(username, password, fullname, age, position, fileName);
+    boolean result = rm.insertEmployee(user);
+
+    ModelAndView mav = new ModelAndView("AddWaiter");
+    if (result) {
+        mav.addObject("add_result", "ทำรายการสำเร็จ");
+    } else {
+        mav.addObject("error", "ไม่สามารถบันทึกข้อมูลได้");
+    }
+    return mav;
+}
 }

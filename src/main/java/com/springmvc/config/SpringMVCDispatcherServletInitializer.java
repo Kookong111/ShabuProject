@@ -3,6 +3,8 @@ package com.springmvc.config;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import jakarta.servlet.Filter;
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletRegistration;
 
 public class SpringMVCDispatcherServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 	@Override
@@ -27,4 +29,11 @@ public class SpringMVCDispatcherServletInitializer extends AbstractAnnotationCon
 		characterEncodingFilter.setForceEncoding(true);
 		return new Filter[] { characterEncodingFilter };
 	}
+	@Override
+    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+        // ตั้งค่าขนาดไฟล์ (ตัวอย่าง: 5MB)
+        MultipartConfigElement multipartConfigElement = new MultipartConfigElement(
+                "", 5242880, 10485760, 0);
+        registration.setMultipartConfig(multipartConfigElement);
+    }
 }

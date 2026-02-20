@@ -170,6 +170,13 @@
                 <input type="url" class="form-control" id="url" name="url" required>
             </div>
             <div class="mb-3">
+    <label for="status" class="form-label"><i class="fas fa-info-circle"></i>สถานะอาหาร</label>
+    <select class="form-control form-control-select" id="status" name="status">
+        <option value="พร้อมเสิร์ฟ">พร้อมเสิร์ฟ</option>
+        <option value="หมด">หมด</option>
+    </select>
+</div>
+            <div class="mb-3">
                 <label for="type" class="form-label"><i class="fas fa-tags"></i>ประเภทอาหาร</label>
                 <select class="form-control form-control-select" id="type" name="type">
                     <c:forEach var="ft" items="${foodTypes}">
