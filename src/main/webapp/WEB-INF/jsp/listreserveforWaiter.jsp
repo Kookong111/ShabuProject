@@ -111,7 +111,7 @@
                                 <td>${res.tables.tableid}</td>
         
                                  <td>${res.numberOfGuests}</td>
-                                <td><fmt:formatDate value="${res.reservedate}" pattern="d MMM" /></td>
+                                <td><fmt:formatDate value="${res.reservedate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
                                 <td>${res.reservetime}</td>
         
                                  

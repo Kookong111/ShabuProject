@@ -284,81 +284,67 @@ public class ManageCashierController {
     // ... (imports) ...
 
     @RequestMapping(value = "/processFinalPayment", method = RequestMethod.POST)
-    public ModelAndView processFinalPayment(@RequestParam("orderId") String orderId, HttpSession session) {
-
+    public ModelAndView processFinalPayment(@RequestParam("orderId") String orderId,
+            HttpServletRequest request,
+            HttpSession session) {
         CashierManager manager = new CashierManager();
-        ModelAndView mav;
 
         try {
-            // 1. ดึง Cashier (Employee) ที่ล็อกอินอยู่
+            // 1. ดึงข้อมูลพนักงานจาก Session
             Employee cashier = (Employee) session.getAttribute("user");
 
-            // 2. ดึง Order ที่กำลังจะจ่ายเงิน
+            // 2. ดึงข้อมูล Order และรายการอาหารเดิมมาวนลูป
             Order orderToPay = manager.getOrderById(orderId);
-
-            // --- ตรวจสอบข้อมูลก่อน ---
-            if (cashier == null) {
-                // ถ้าหลุดล็อกอิน ให้กลับไปหน้า Login
-                mav = new ModelAndView("loginCashier");
-                mav.addObject("error", "เซสชั่นหมดอายุ, กรุณาเข้าสู่ระบบใหม่");
-                return mav;
-            }
-            if (orderToPay == null) {
-                // ถ้าไม่พบ Order
-                mav = new ModelAndView("paymentReceipt");
-                mav.addObject("error_message", "ไม่พบข้อมูลออเดอร์");
-                return mav;
-            }
-            // --- สิ้นสุดการตรวจสอบ ---
-
-            // VVVV [NEW] 2.5 ดึงรายการ OrderDetail ทั้งหมดของ Order นี้ VVVV
             List<OrderDetail> orderDetails = manager.getOrderDetailsByOrderId(orderId);
+            double finalPrice = 0.0;
 
-            // 3. สร้างและตั้งค่า Payment Object
+            for (OrderDetail detail : orderDetails) {
+                // ดึงค่าจำนวน (Quantity) ที่ส่งมาจากฟอร์ม
+                String qtyStr = request.getParameter("quantity_" + detail.getOdermenuId());
+                if (qtyStr != null) {
+                    int newQty = Integer.parseInt(qtyStr);
+
+                    if (newQty > 0) {
+                        detail.setQuantity(newQty);
+                        manager.updateOrderDetail(detail); // อัปเดตจำนวนใหม่ลง DB
+                        finalPrice += (newQty * detail.getPriceAtTimeOfOrder());
+                    } else {
+                        // ถ้าถูกลบ (Quantity = 0) ให้เซตสถานะยกเลิก
+                        detail.setQuantity(0);
+                        detail.setStatus("cancelled");
+                        manager.updateOrderDetail(detail);
+                    }
+                }
+            }
+
+            // 3. อัปเดตยอดเงินรวมสุดท้ายใน Order
+            orderToPay.setTotalPeice(finalPrice);
+            orderToPay.setStatus("เสร็จสิ้น");
+            manager.updateOrder(orderToPay);
+
+            // 4. บันทึกข้อมูลการชำระเงิน
             Payment payment = new Payment();
             payment.setPaymentStatus("succeed");
-            payment.setPaymentDate(new Date()); // ใช้วันที่และเวลาปัจจุบันที่กด
-            payment.setTotalPrice(orderToPay.getTotalPeice()); // ดึงราคารวมจาก Order
-            payment.setEmployees(cashier); // อ้างอิงถึงพนักงานที่กด
-            payment.setOrders(orderToPay); // อ้างอิงถึง Order ที่จ่าย
+            payment.setPaymentDate(new java.util.Date());
+            payment.setTotalPrice(finalPrice);
+            payment.setEmployees(cashier);
+            payment.setOrders(orderToPay);
 
-            // 4. บันทึก Payment ลงฐานข้อมูล
-            boolean paymentSaved = manager.savePayment(payment);
-
-            if (paymentSaved) {
-                // 5. อัปเดตสถานะ Order เป็น "เสร็จสิ้น"
-                orderToPay.setStatus("เสร็จสิ้น");
-                manager.updateOrder(orderToPay);
-
-                // 6. อัปเดตสถานะโต๊ะให้เป็น "ว่าง"
+            if (manager.savePayment(payment)) {
+                // 5. คืนสถานะโต๊ะให้เป็นว่าง
                 Tables table = orderToPay.getTable();
                 table.setStatus("Free");
                 manager.updateTable(table);
 
-                // 7. ไปยังหน้า "ชำระเงินสำเร็จ"
-                mav = new ModelAndView("paymentSuccess"); // ไปที่ paymentSuccess.jsp
-                mav.addObject("paymentInfo", payment); // ส่งข้อมูล Payment ที่เพิ่งบันทึกไปแสดงผล
-
-                // VVVV [NEW] ส่งรายการ OrderDetail ไปด้วย VVVV
+                ModelAndView mav = new ModelAndView("paymentSuccess");
+                mav.addObject("paymentInfo", payment);
                 mav.addObject("orderDetails", orderDetails);
-
-            } else {
-                // หากบันทึก Payment ไม่สำเร็จ
-                mav = new ModelAndView("paymentReceipt");
-                mav.addObject("error_message", "เกิดข้อผิดพลาดในการบันทึกการชำระเงิน");
-                mav.addObject("orderInfo", orderToPay);
-                // ใช้อันที่ดึงมาแล้ว
-                mav.addObject("orderDetails", orderDetails);
-                mav.addObject("totalPrice", orderToPay.getTotalPeice());
+                return mav;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            mav = new ModelAndView("paymentReceipt");
-            mav.addObject("error_message", "เกิดข้อผิดพลาดร้ายแรงในระบบ: " + e.getMessage());
         }
-
-        return mav;
+        return new ModelAndView("redirect:/backToListOrder");
     }
 
     /**

@@ -49,7 +49,7 @@
         </div>
         <p><strong>Order ID:</strong> #${orderInfo.oderId}</p>
             <p><strong>โต๊ะ:</strong> ${table.tableid} (รองรับ ${table.capacity} ที่นั่ง)</p>
-            <p><strong>วันที่:</strong> <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy" /></p>
+            <p><strong>วันที่:</strong> <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy HH:mm:ss" /></p>
             <div class="info-block"></div>
         <c:if test="${not empty orderDetails}">
             <h3>รายการอาหารที่สั่ง:</h3>

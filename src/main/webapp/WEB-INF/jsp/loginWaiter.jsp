@@ -826,7 +826,7 @@
     });
 
     // Add smooth focus transitions
-    const inputs = document.querySelectorAll('.form-control');
+    const inputs  = document.querySelectorAll('.form-control');
     inputs.forEach(input => {
       input.addEventListener('focus', function() {
         this.parentElement.style.transform = 'scale(1.01)';

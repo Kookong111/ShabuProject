@@ -307,16 +307,16 @@
                                         <tr data-table="${order.table.tableid}">
                                             <td>#${order.oderId}</td>
                                             <td>${order.table.tableid}</td>
-                                            <td>${order.orderDate}</td>
+                                            <td>${order.orderDate}                                          
+                                                <fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm:ss" timeZone="Asia/Bangkok" /> น.
+                                            </td>
                                             
-                                            <td><span style="font-weight:700; color:var(--primary);">฿<c:out value="${order.totalPeice}" default="0.00"/></span></td>
                                             <td>
-                                                <a href="checkbill-page?orderId=${order.oderId}" class="btn-primary-action">
-                                                    <i class="fas fa-money-check-alt"></i> ชำระเงิน
-                                                </a>
-                                                <a href="geteditOrderStatus?oderId=${order.oderId}" class="btn-secondary-action">
-                                                    <i class="fas fa-edit"></i> แก้ไข
-                                                </a>
+                                                <span style="font-weight:700; color:var(--primary);">฿<c:out value="${order.totalPeice}" default="0.00"/></span></td>
+                                            <td>
+                                            <a href="checkbill-page?orderId=${order.oderId}" class="btn-primary-action">
+                                                <i class="fas fa-edit"></i> เช็คบิล & แก้ไข
+                                            </a>
                                             </td>
                                         </tr>
                                     </c:forEach>

@@ -1,6 +1,9 @@
 package com.springmvc.model;
 
 import java.sql.SQLException;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID; // *** NEW IMPORT: สำหรับการสร้าง QR Token ***
@@ -8,10 +11,10 @@ import java.util.UUID; // *** NEW IMPORT: สำหรับการสร้�
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query; 
+import org.hibernate.query.Query;
 
 public class TableManager {
-	public List<Tables> getAllTable() {
+    public List<Tables> getAllTable() {
         List<Tables> lists = new ArrayList<>();
         Session session = null;
         try {
@@ -19,18 +22,18 @@ public class TableManager {
             session = sessionFactory.openSession();
 
             // ค้นหาเฉพาะพนักงานที่มี empUsername ขึ้นต้นด้วย "CUS"
-            lists = session.createQuery("FROM Tables", Tables.class).list(); 
+            lists = session.createQuery("FROM Tables", Tables.class).list();
 
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             if (session != null) {
-                session.close(); 
+                session.close();
             }
         }
         return lists;
     }
-    
+
     public boolean insertTable(Tables tables) {
         Session session = null;
         try {
@@ -45,7 +48,7 @@ public class TableManager {
             // บันทึกผู้ใช้ลงในฐานข้อมูล
             session.saveOrUpdate(tables);
             session.getTransaction().commit();
-            return true;  // ถ้าบันทึกสำเร็จ return true
+            return true; // ถ้าบันทึกสำเร็จ return true
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -53,20 +56,20 @@ public class TableManager {
                 session.close();
             }
         }
-        return false;  // ถ้าบันทึกไม่สำเร็จ return false
-}
-    
+        return false; // ถ้าบันทึกไม่สำเร็จ return false
+    }
+
     public Tables getTableById(String tables) {
         List<Tables> list = new ArrayList<>();
         try {
             SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
             Session session = sessionFactory.openSession();
             session.beginTransaction();
-            
+
             // ใช้ Parameterized Query เพื่อป้องกัน SQL Injection
             list = session.createQuery("FROM Tables WHERE tableid = :table", Tables.class)
-                          .setParameter("table", tables)
-                          .list();
+                    .setParameter("table", tables)
+                    .list();
             session.getTransaction().commit();
             session.close();
         } catch (Exception ex) {
@@ -76,27 +79,27 @@ public class TableManager {
         // เช็คก่อนว่า list มีข้อมูลหรือไม่
         return list.isEmpty() ? null : list.get(0);
     }
-    
+
     public boolean updateTable(Tables r) {
-    	try {
+        try {
             // *** NEW LOGIC: ตรวจสอบและสร้าง qrToken หากยังไม่มี ***
             if (r.getQrToken() == null || r.getQrToken().isEmpty()) {
                 r.setQrToken(UUID.randomUUID().toString());
             }
             // ****************************************************
-    		SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
-    		Session session = sessionFactory.openSession();
-    		session.beginTransaction();
-    		session.update(r);
-    		session.getTransaction().commit();
-    		session.close();
-    		return true;
-    		}catch(Exception ex) {
-    			ex.printStackTrace();
-    		}
-    	return false;
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            session.update(r);
+            session.getTransaction().commit();
+            session.close();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
-    
+
     public boolean deleteTable(Tables r) {
         try (Session session = HibernateConnection.doHibernateConnection().openSession()) {
             Transaction tx = session.beginTransaction();
@@ -108,7 +111,7 @@ public class TableManager {
             return false;
         }
     }
-    
+
     public boolean updateStatusToReserved(String tableId) {
         SessionFactory sessionFactory = null;
         Session session = null;
@@ -116,7 +119,7 @@ public class TableManager {
             sessionFactory = HibernateConnection.doHibernateConnection();
             session = sessionFactory.openSession();
             session.beginTransaction();
-            
+
             // ดึงข้อมูลโต๊ะที่ต้องการอัปเดต
             Tables table = (Tables) session.get(Tables.class, tableId);
             if (table != null) {
@@ -126,7 +129,7 @@ public class TableManager {
                 }
                 // ****************************************************
                 table.setStatus("Already reserved"); // เปลี่ยนสถานะโต๊ะ
-                session.update(table);       // อัปเดตลงฐานข้อมูล
+                session.update(table); // อัปเดตลงฐานข้อมูล
                 session.getTransaction().commit();
                 return true;
             } else {
@@ -145,11 +148,12 @@ public class TableManager {
             }
         }
     }
+
     public boolean updateStatusToFree(String tableid) {
         Session session = null;
         try {
             // ดึง SessionFactory ตามวิธีที่คุณใช้ในคลาส TableManager
-            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection(); 
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
             session = sessionFactory.openSession();
             session.beginTransaction();
 
@@ -172,39 +176,39 @@ public class TableManager {
         }
         return false;
     }
-    
-    public boolean updateTableStatus(String tableid, String newStatus) {
- 		Session session = null;
- 		try {
- 			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();	
- 			session = sessionFactory.openSession();
- 			session.beginTransaction();
 
- 			Tables table = (Tables) session.get(Tables.class, tableid);
- 			if (table != null) {
+    public boolean updateTableStatus(String tableid, String newStatus) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            Tables table = (Tables) session.get(Tables.class, tableid);
+            if (table != null) {
                 // *** NEW LOGIC: ตรวจสอบและสร้าง qrToken หากยังไม่มี ***
                 if (table.getQrToken() == null || table.getQrToken().isEmpty()) {
                     table.setQrToken(UUID.randomUUID().toString());
                 }
                 // ****************************************************
- 				table.setStatus(newStatus); // ตั้งสถานะตามที่ส่งมา
- 				session.update(table);
- 				session.getTransaction().commit();
- 				return true;
- 			}
- 		} catch (Exception ex) {
- 			if (session != null && session.getTransaction() != null) {
- 				session.getTransaction().rollback();
- 			}
- 			ex.printStackTrace();
- 		} finally {
- 			if (session != null) {
- 				session.close();
- 			}
- 		}
- 		return false;
- 	}
-    
+                table.setStatus(newStatus); // ตั้งสถานะตามที่ส่งมา
+                session.update(table);
+                session.getTransaction().commit();
+                return true;
+            }
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;
+    }
+
     // *** NEW METHOD: ค้นหาโต๊ะจาก QR Token ***
     /**
      * ดึงข้อมูล Tables จาก qrToken ที่ลูกค้าสแกนมา
@@ -217,9 +221,9 @@ public class TableManager {
             session = sessionFactory.openSession();
             // ใช้ HQL ค้นหา Tables โดย qrToken
             Query<Tables> query = session.createQuery(
-                "FROM Tables WHERE qrToken = :qrToken", Tables.class);
+                    "FROM Tables WHERE qrToken = :qrToken", Tables.class);
             query.setParameter("qrToken", qrToken);
-            table = query.uniqueResult(); 
+            table = query.uniqueResult();
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -230,4 +234,44 @@ public class TableManager {
         return table;
     }
 
+    public String getTableStatusWithTimeCheck(String tableId) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+
+            // 1. ถ้าโต๊ะมีลูกค้าเดินเข้าไปนั่งแล้ว (Occupied) ให้เป็นสีแดงทันที
+            Tables table = session.get(Tables.class, tableId);
+            if ("Occupied".equals(table.getStatus()))
+                return "Occupied";
+
+            // 2. เช็คการจอง: ถ้ามีการจองวันนี้ และ "เวลาปัจจุบัน" อยู่ก่อนเวลาจองไม่เกิน 60
+            // นาที
+            // ให้แสดงเป็นสถานะ "Reserved" (สีเหลือง)
+            LocalTime now = LocalTime.now(ZoneId.of("Asia/Bangkok"));
+            String currentTime = now.format(DateTimeFormatter.ofPattern("HH:mm"));
+            String bufferTime = now.plusMinutes(60).format(DateTimeFormatter.ofPattern("HH:mm"));
+
+            String hql = "FROM Reserve WHERE tables.tableid = :tableId " +
+                    "AND reservedate = CURRENT_DATE " +
+                    "AND reservetime BETWEEN :now AND :buffer " +
+                    "AND status = 'Reserved'";
+
+            List<Reserve> list = session.createQuery(hql, Reserve.class)
+                    .setParameter("tableId", tableId)
+                    .setParameter("now", currentTime)
+                    .setParameter("buffer", bufferTime)
+                    .list();
+
+            if (!list.isEmpty())
+                return "Reserved"; // พบการจองในอีก 1 ชม. ข้างหน้า
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return "Free"; // ถ้าไม่มีเงื่อนไขข้างบน ให้เป็นสีเขียว
+    }
 }
