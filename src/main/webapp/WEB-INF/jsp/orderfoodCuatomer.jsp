@@ -563,6 +563,16 @@
                                                 <div class="menu-price">
                                                     ฿<fmt:formatNumber value="${menu.price}" type="number" minFractionDigits="0" maxFractionDigits="2" />
                                                 </div>
+                                                <div class="menu-status" style="margin-top:4px; font-size:13px; font-weight:500;">
+                                                    <c:choose>
+                                                        <c:when test="${menu.status == 'หมด'}">
+                                                            <span style="color:#dc2626;">สถานะ: หมด</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span style="color:#16a34a;">สถานะ: พร้อมเสิร์ฟ</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="item-actions">
@@ -582,7 +592,8 @@
                                                     <form action="addToCart" method="post" style="display:inline;" class="add-to-cart-form">
                                                         <input type="hidden" name="foodId" value="${menu.foodId}" />
                                                         <input type="hidden" name="quantity" value="1" />
-                                                        <button type="submit" class="qty-btn">
+                                                        <button type="submit" class="qty-btn" 
+                                                            <c:if test="${menu.status == 'หมด'}">disabled style="opacity:0.5;cursor:not-allowed;"</c:if>>
                                                             <i class="fas fa-plus"></i>
                                                         </button>
                                                     </form>
@@ -592,7 +603,8 @@
                                                 <form action="addToCart" method="post" style="display:inline;" class="add-to-cart-form">
                                                     <input type="hidden" name="foodId" value="${menu.foodId}" />
                                                     <input type="hidden" name="quantity" value="1" />
-                                                    <button type="submit">
+                                                    <button type="submit" 
+                                                        <c:if test="${menu.status == 'หมด'}">disabled style="opacity:0.5;cursor:not-allowed;"</c:if>>
                                                         <i class="fas fa-plus"></i> เพิ่ม
                                                     </button>
                                                 </form>
