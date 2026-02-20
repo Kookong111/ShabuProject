@@ -343,59 +343,83 @@
 </head>
 <body>
 
-    <div class="receipt-container">
-
-        <c:choose>
-            <c:when test="${not empty orderInfo and not empty orderDetails}">
+<div class="receipt-container">
+    <c:choose>
+        <c:when test="${not empty orderInfo and not empty orderDetails}">
+            <div class="receipt-header">
+                <div class="restaurant-name">SHABU RESTAURANT</div>
+                <div class="restaurant-subtitle">ใบเสร็จรับเงิน / Receipt</div>
                 
-                <div class="receipt-header">
-                    <div class="restaurant-name">SHABU RESTAURANT</div>
-                    <div class="restaurant-subtitle">ใบเสร็จรับเงิน / Receipt</div>
-                    
-                    <div class="receipt-info">
-                        <div class="receipt-info-item">
-                            <div class="receipt-info-label">โต๊ะ / Table</div>
-                            <div class="receipt-info-value">TA${orderInfo.table.tableid}</div>
-                        </div>
-                        <div class="receipt-info-item">
-                            <div class="receipt-info-label">เลขที่ / No.</div>
-                            <div class="receipt-info-value">O${orderInfo.oderId}</div>
-                        </div>
-                        <div class="receipt-info-item">
-                            <div class="receipt-info-label">วันที่ / Date</div>
-                            <div class="receipt-info-value">
-                                <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy" />
-                            </div>
+                <div class="receipt-info">
+                    <div class="receipt-info-item">
+                        <div class="receipt-info-label">โต๊ะ / Table</div>
+                        <div class="receipt-info-value">TA${orderInfo.table.tableid}</div>
+                    </div>
+                    <div class="receipt-info-item">
+                        <div class="receipt-info-label">เลขที่ / No.</div>
+                        <div class="receipt-info-value">O${orderInfo.oderId}</div>
+                    </div>
+                    <div class="receipt-info-item">
+                        <div class="receipt-info-label">วันที่ / Date</div>
+                        <div class="receipt-info-value">
+                            <fmt:formatDate value="${orderInfo.orderDate}" pattern="dd/MM/yyyy HH:mm:ss" timeZone="Asia/Bangkok" />
                         </div>
                     </div>
                 </div>
-        
-                <div class="receipt-body">
+            </div>
+    
+            <div class="receipt-body">
+                <%-- รวมทุกอย่างเข้าในฟอร์มเดียว --%>
+                <form id="billForm" method="POST" action="processFinalPayment">
+                    <input type="hidden" name="orderId" value="${orderInfo.oderId}">
                     
-                    <c:if test="${isPaid}">
-                        <div class="paid-status">
-                            <i class="fas fa-check-circle"></i>
-                            <span>ชำระเงินเรียบร้อยแล้ว</span>
-                        </div>
-                    </c:if>
-
                     <div class="items-section">
                         <table class="items-table">
                             <thead>
                                 <tr>
                                     <th>รายการ</th>
-                                    <th>จำนวน</th>
-                                    <th>ราคา</th>
+                                    <th style="text-align: center;">ราคา</th>
+                                    <th style="text-align: center;">จำนวน</th>
+                                    <th style="text-align: right;">รวม</th>
+                                    <th style="text-align: center;">ลบ</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach items="${orderDetails}" var="item">
-                                    <c:if test="${item.priceAtTimeOfOrder > 1.0}">
-                                        <tr>
-                                            <td class="item-name">${item.menufood.foodname}</td> 
-                                            <td class="item-qty">${item.quantity}</td>
-                                            <td class="item-price">
-                                                ฿<fmt:formatNumber value="${item.priceAtTimeOfOrder * item.quantity}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                               <c:forEach items="${orderDetails}" var="item" varStatus="status">
+                                    <%-- เงื่อนไขเดิม: แสดงเฉพาะรายการที่มีราคา > 0 --%>
+                                    <c:if test="${item.priceAtTimeOfOrder > 0}">
+                                        <tr id="row_${item.odermenuId}" class="${status.first ? 'first-row' : ''}">
+                                            <td>${item.menufood.foodname}</td>
+                                            <td style="text-align: center;">
+                                                ฿<span class="unit-price">${item.priceAtTimeOfOrder}</span>
+                                                <input type="hidden" id="price_val_${item.odermenuId}" value="${item.priceAtTimeOfOrder}">
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <input type="number" name="quantity_${item.odermenuId}" 
+                                                    id="qty_${item.odermenuId}" value="${item.quantity}" 
+                                                    <%-- แถวแรกห้ามลดจำนวนจนเป็น 0 (ขั้นต่ำ 1) --%>
+                                                    min="${status.first ? 1 : 0}" 
+                                                    class="qty-input" oninput="calculateTotal()">
+                                            </td>
+                                            <td style="text-align: right;">
+                                                ฿<span id="subtotal_${item.odermenuId}" class="subtotal-val">
+                                                    <fmt:formatNumber value="${item.priceAtTimeOfOrder * item.quantity}" pattern="#,##0.00"/>
+                                                </span>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <%-- ถ้าเป็นแถวแรก (status.first) ให้ปิดการใช้งานปุ่มลบ หรือซ่อนปุ่ม --%>
+                                                <c:choose>
+                                                    <c:when test="${status.first}">
+                                                        <button type="button" class="btn-delete" style="opacity: 0.3; cursor: not-allowed;" title="ไม่สามารถลบรายการหลักได้" disabled>
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <button type="button" class="btn-delete" onclick="removeItem('${item.odermenuId}')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </td>
                                         </tr>
                                     </c:if>
@@ -403,58 +427,80 @@
                             </tbody>
                         </table>
                     </div>
-        
+            
                     <div class="summary-section">
                         <div class="summary-row total-row">
                             <span class="total-label">ยอดรวมทั้งสิ้น</span>
                             <span class="total-amount">
-                                ฿<fmt:formatNumber value="${totalPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                ฿<span id="grandTotal"><fmt:formatNumber value="${totalPrice}" pattern="#,##0.00" /></span>
                             </span>
                         </div>
                     </div>
 
-                    <c:if test="${isPaid}">
-                        <div class="payment-info">
-                            <div class="payment-info-text">ชำระเงินเรียบร้อยแล้ว</div>
-                            <div class="thank-you">ขอบคุณที่ใช้บริการ</div>
-                        </div>
-                    </c:if>
-        
                     <div class="actions">
-                        <c:if test="${isPaid}">
-                            <c:choose>
-                                <c:when test="${not empty returnTo}">
-                                    <a href="${returnTo}" class="btn btn-primary">กลับไปหน้ารายการบิล</a>
-                                </c:when>
-                                <c:otherwise>
-                                    <a href="backToPastBills" class="btn btn-primary">กลับไปหน้ารายการบิล</a>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:if>
                         <c:if test="${!isPaid}">
-                            <form action="processFinalPayment" method="POST" style="flex: 1;">
-                                <input type="hidden" name="orderId" value="${orderInfo.oderId}">
-                                <button type="submit" class="btn btn-success" style="width: 100%;">ยืนยันชำระเงิน</button>
-                            </form>
+                            <button type="submit" class="btn btn-success">ยืนยันชำระเงิน</button>
                             <a href="backToListOrder" class="btn btn-outline">ยกเลิก</a>
                         </c:if>
                     </div>
+                </form>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>ไม่พบข้อมูลออเดอร์</h3>
+                <a href="homecashier" class="btn btn-primary">กลับหน้าหลัก</a>
+            </div>
+        </c:otherwise>
+    </c:choose>
+</div>
 
-                </div>
+<script>
+    function calculateTotal() {
+        let grandTotal = 0;
+        // ดึงทุกแถวที่มี id ขึ้นต้นด้วย row_
+        const rows = document.querySelectorAll('tr[id^="row_"]');
+        
+        rows.forEach(row => {
+            // คำนวณเฉพาะแถวที่ไม่ได้ถูกซ่อน (display !== 'none')
+            if (row.style.display !== 'none') {
+                const id = row.id.split('_')[1];
+                const price = parseFloat(document.getElementById('price_val_' + id).value) || 0;
+                const qty = parseInt(document.getElementById('qty_' + id).value) || 0;
+                
+                const subtotal = price * qty;
+                
+                // อัปเดตราคาย่อยรายบรรทัด
+                const subtotalLabel = document.getElementById('subtotal_' + id);
+                if (subtotalLabel) {
+                    subtotalLabel.innerText = subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+                
+                grandTotal += subtotal;
+            }
+        });
+        
+        // อัปเดตราคารวมสุทธิ
+        document.getElementById('grandTotal').innerText = grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
 
-            </c:when>
+    function removeItem(id) {
+        if (confirm('ยืนยันการลบรายการนี้?')) {
+            const row = document.getElementById('row_' + id);
+            const qtyInput = document.getElementById('qty_' + id);
             
-            <c:otherwise>
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <h3>ไม่พบข้อมูลออเดอร์</h3>
-                    <p>กรุณาตรวจสอบเลขที่ออเดอร์อีกครั้ง</p>
-                    <a href="welcomeCashier.jsp" class="btn btn-primary" style="max-width: 200px; margin: 0 auto;">กลับหน้าหลัก</a>
-                </div>
-            </c:otherwise>
-        </c:choose>
-
-    </div>
+            if (row && qtyInput) {
+                row.style.display = 'none'; // ซ่อนแถว
+                qtyInput.value = 0; // เซตจำนวนเป็น 0 เพื่อให้ Controller ลบใน DB
+                calculateTotal(); // คำนวณเงินใหม่ทันที
+            }
+        }
+    }
+    
+    // คำนวณครั้งแรกเมื่อโหลดหน้า
+    window.onload = calculateTotal;
+</script>
 
 </body>
 </html>

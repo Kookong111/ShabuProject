@@ -148,7 +148,9 @@
                     <c:forEach var="bill" items="${pastBills}">
                         <tr>
                             <td>${bill.paymentId}</td>
-                            <td><fmt:formatDate value="${bill.paymentDate}" pattern="dd/MM/yyyy HH:mm" timeZone="Asia/Bangkok"/></td>
+                            <td><div class="payment-time">
+                                    เวลาที่ชำระ: <fmt:formatDate value="${bill.paymentDate}" pattern="dd/MM/yyyy HH:mm:ss" timeZone="Asia/Bangkok" />
+                                </div></td>
                             <td><fmt:formatNumber value="${bill.totalPrice}" pattern="#,##0.00"/> บาท</td>
                             <td>${bill.employees.empname}</td>
                             <td>ออเดอร์ #${bill.orders.oderId} (โต๊ะ ${bill.orders.table.tableid})</td>

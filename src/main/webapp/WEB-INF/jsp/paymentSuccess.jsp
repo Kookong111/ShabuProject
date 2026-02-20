@@ -317,7 +317,7 @@
                 <div class="detail-row">
                     <span class="label">Date :</span>
                     <span class="value">
-                        <fmt:formatDate value="${paymentInfo.paymentDate}" pattern="dd/MM/yyyy" />
+                        <fmt:formatDate value="${paymentInfo.paymentDate}" pattern="dd/MM/yyyy HH:mm:ss" />
                     </span>
                 </div>
                 

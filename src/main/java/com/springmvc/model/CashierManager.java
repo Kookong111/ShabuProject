@@ -192,6 +192,31 @@ public class CashierManager {
         }
     }
 
+    public boolean updateOrderDetail(OrderDetail orderDetail) {
+        Session session = null;
+        try {
+            SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+            session = sessionFactory.openSession();
+            session.beginTransaction();
+
+            // ใช้ update เพื่อบันทึกการเปลี่ยนแปลงของ Object OrderDetail
+            session.update(orderDetail);
+
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;
+    }
+
     /**
      * อัปเดตข้อมูล Table (ในที่นี้คืออัปเดตสถานะ)
      */
