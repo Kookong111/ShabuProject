@@ -1,5 +1,6 @@
 package com.springmvc.model;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -89,7 +90,7 @@ public class MenufoodManager {
 			// ให้แสดงเป็นสถานะ "Reserved" (สีเหลือง)
 			LocalTime now = LocalTime.now(ZoneId.of("Asia/Bangkok"));
 			String currentTime = now.format(DateTimeFormatter.ofPattern("HH:mm"));
-			String bufferTime = now.plusMinutes(60).format(DateTimeFormatter.ofPattern("HH:mm"));
+			String bufferTime = now.plusMinutes(120).format(DateTimeFormatter.ofPattern("HH:mm"));
 
 			String hql = "FROM Reserve WHERE tables.tableid = :tableId " +
 					"AND reservedate = CURRENT_DATE " +
@@ -112,5 +113,39 @@ public class MenufoodManager {
 				session.close();
 		}
 		return "Free"; // ถ้าไม่มีเงื่อนไขข้างบน ให้เป็นสีเขียว
+	}
+
+	public String checkStatusByDateTimeSlot(String tableId, LocalDate targetDate, String targetTime) {
+		Session session = null;
+		try {
+			SessionFactory sessionFactory = HibernateConnection.doHibernateConnection();
+			session = sessionFactory.openSession();
+
+			LocalTime target = LocalTime.parse(targetTime);
+			java.sql.Date sqlDate = java.sql.Date.valueOf(targetDate);
+
+			// ดึงการจองของโต๊ะนี้ "ตามวันที่ระบุ"
+			String hql = "FROM Reserve WHERE tables.tableid = :tableId " +
+					"AND reservedate = :targetDate AND status = 'Reserved'";
+
+			List<Reserve> reservations = session.createQuery(hql, Reserve.class)
+					.setParameter("tableId", tableId)
+					.setParameter("targetDate", sqlDate)
+					.list();
+
+			for (Reserve res : reservations) {
+				LocalTime resTime = LocalTime.parse(res.getReservetime());
+				// กฎเดิม: ตรงเวลา หรือ อยู่ในช่วง Buffer 2 ชม. ก่อนหน้า
+				if (resTime.equals(target) || (target.isBefore(resTime) && target.isAfter(resTime.minusHours(2)))) {
+					return "Reserved";
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		return "Free";
 	}
 }
