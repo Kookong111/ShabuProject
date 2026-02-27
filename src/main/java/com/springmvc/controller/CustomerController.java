@@ -1,6 +1,11 @@
 package com.springmvc.controller;
 
+import java.security.KeyStore.LoadStoreParameter;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -200,18 +205,35 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/listTable", method = RequestMethod.GET)
-    public ModelAndView showListtable() {
-        MenufoodManager manager = new MenufoodManager();
-        List<Tables> tablelist = manager.getAllListTable();
-        // สร้าง Map เก็บสถานะคำนวณ: Key คือ tableid, Value คือสถานะ
-        // (Free/Reserved/Occupied)
+    public ModelAndView showListtable(
+            @RequestParam(value = "timeSlot", required = false) String timeSlot,
+            @RequestParam(value = "date", required = false) String date) {
+
+        TableManager tableManager = new TableManager();
+        MenufoodManager reserveManager = new MenufoodManager();
+        List<Tables> tablelist = tableManager.getAllTable();
+
+        // 1. จัดการเรื่องวันที่ (ถ้าไม่ส่งมา ให้เป็นวันนี้)
+        LocalDate targetDate = (date == null || date.isEmpty()) ? LocalDate.now() : LocalDate.parse(date);
+
+        // 2. จัดการเรื่องเวลา (ถ้าไม่ส่งมา ให้เป็นเวลาปัจจุบันปัดเศษ)
+        if (timeSlot == null || timeSlot.isEmpty()) {
+            timeSlot = LocalTime.now(ZoneId.of("Asia/Bangkok")).format(DateTimeFormatter.ofPattern("HH:00"));
+        }
+
         Map<String, String> statusMap = new HashMap<>();
         for (Tables t : tablelist) {
-            statusMap.put(t.getTableid(), manager.getTableStatusWithTimeCheck(t.getTableid()));
+            // ✅ ส่งทั้ง tableid, เวลาที่เลือก และ วันที่เลือก ไปเช็คสถานะ
+            statusMap.put(t.getTableid(),
+                    reserveManager.checkStatusByDateTimeSlot(t.getTableid(), targetDate, timeSlot));
         }
+
         ModelAndView mav = new ModelAndView("listTable");
         mav.addObject("tables", tablelist);
         mav.addObject("statusMap", statusMap);
+        mav.addObject("currentTimeSlot", timeSlot);
+        mav.addObject("selectedDate", targetDate.toString()); // ส่งวันที่เลือกกลับไป
+        mav.addObject("tomorrowDate", LocalDate.now().plusDays(1).toString()); // ส่งค่าพรุ่งนี้ไปให้ปุ่ม
         return mav;
     }
 
